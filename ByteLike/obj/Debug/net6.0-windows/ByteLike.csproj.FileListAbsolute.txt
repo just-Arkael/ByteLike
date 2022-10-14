@@ -109,3 +109,4 @@ C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windo
 C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphycs\ByteLikeGraphycs\water1101.png
 C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphycs\ByteLikeGraphycs\water1110.png
 C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphycs\ByteLikeGraphycs\water1111.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphycs\ByteLikeGraphycs\partialdarkness.png

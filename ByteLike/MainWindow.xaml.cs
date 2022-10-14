@@ -113,183 +113,192 @@ namespace ByteLike
 
             DrawingGroup drawingGroup = new DrawingGroup();
 
-            drawingGroup.Open();
-            // Draw the tiles
-            for (int i = 0; i < level.GetLength(1) && i < cameraSize[1]; i++)
+            using (DrawingContext dc = drawingGroup.Open())
             {
-                for (int j = 0; j < level.GetLength(0) && j < cameraSize[0]; j++)
+
+                // Draw the tiles
+                for (int i = 0; i < level.GetLength(1) && i < cameraSize[1]; i++)
                 {
-                    ImageDrawing imageDrawing = new ImageDrawing();
-
-
-                    imageDrawing.Rect = new Rect(j * 16, i * 16, 17, 17);
-                    string floorImage = "";
-                    if (darkness[camera[0] + j, camera[1] + i] > 0)
+                    for (int j = 0; j < level.GetLength(0) && j < cameraSize[0]; j++)
                     {
-                        imageDrawing.ImageSource = new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/darkness.png", UriKind.Relative));
-                        floorImage = "Graphycs/ByteLikeGraphycs/darkness.png";
-                        switch (level[camera[0] + j, camera[1] + i])
+                        string floorImage = "";
+                        if (darkness[camera[0] + j, camera[1] + i] > 0)
                         {
-                            // Void wall
-                            case 0:
-                                floorImage = "Graphycs/ByteLikeGraphycs/darkwall";
-                                if (level[camera[0] + j + 1, camera[1] + i] == 2 || level[camera[0] + j + 1, camera[1] + i] == 0 || level[camera[0] + j + 1, camera[1] + i] == 5) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                if (level[camera[0] + j, camera[1] + i - 1] == 2 || level[camera[0] + j, camera[1] + i - 1] == 0 || level[camera[0] + j, camera[1] + i - 1] == 5) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                if (level[camera[0] + j - 1, camera[1] + i] == 2 || level[camera[0] + j - 1, camera[1] + i] == 0 || level[camera[0] + j - 1, camera[1] + i] == 5) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                if (level[camera[0] + j, camera[1] + i + 1] == 2 || level[camera[0] + j, camera[1] + i + 1] == 0 || level[camera[0] + j, camera[1] + i + 1] == 5) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                floorImage += ".png";
-                                break;
-                            // Floor
-                            case 1:
-                                floorImage = "Graphycs/ByteLikeGraphycs/floor.png";
-                                break;
-                            // Wall
-                            case 2:
-                                floorImage = "Graphycs/ByteLikeGraphycs/wall";
-                                if (level[camera[0] + j + 1, camera[1] + i] == 2 || level[camera[0] + j + 1, camera[1] + i] == 0 || level[camera[0] + j + 1, camera[1] + i] == 5) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                if (level[camera[0] + j, camera[1] + i - 1] == 2 || level[camera[0] + j, camera[1] + i - 1] == 0 || level[camera[0] + j, camera[1] + i - 1] == 5) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                if (level[camera[0] + j - 1, camera[1] + i] == 2 || level[camera[0] + j - 1, camera[1] + i] == 0 || level[camera[0] + j - 1, camera[1] + i] == 5) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                if (level[camera[0] + j, camera[1] + i + 1] == 2 || level[camera[0] + j, camera[1] + i + 1] == 0 || level[camera[0] + j, camera[1] + i + 1] == 5) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                floorImage += ".png";
-                                break;
-                            // Center of the room, really only needed for debug
-                            case 3:
-                                floorImage = "Graphycs/ByteLikeGraphycs/floor.png";
-                                break;
-                            // Door
-                            case 4:
-                                floorImage = "Graphycs/ByteLikeGraphycs/door.png";
-                                break;
-                            // Outter wall
-                            case 5:
-                                floorImage = "Graphycs/ByteLikeGraphycs/darkwall";
+                            floorImage = "Graphycs/ByteLikeGraphycs/darkness.png";
+                            switch (level[camera[0] + j, camera[1] + i])
+                            {
+                                // Void wall
+                                case 0:
+                                    floorImage = "Graphycs/ByteLikeGraphycs/darkwall";
+                                    if (level[camera[0] + j + 1, camera[1] + i] == 2 || level[camera[0] + j + 1, camera[1] + i] == 0 || level[camera[0] + j + 1, camera[1] + i] == 5) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    if (level[camera[0] + j, camera[1] + i - 1] == 2 || level[camera[0] + j, camera[1] + i - 1] == 0 || level[camera[0] + j, camera[1] + i - 1] == 5) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    if (level[camera[0] + j - 1, camera[1] + i] == 2 || level[camera[0] + j - 1, camera[1] + i] == 0 || level[camera[0] + j - 1, camera[1] + i] == 5) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    if (level[camera[0] + j, camera[1] + i + 1] == 2 || level[camera[0] + j, camera[1] + i + 1] == 0 || level[camera[0] + j, camera[1] + i + 1] == 5) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    floorImage += ".png";
+                                    break;
+                                // Floor
+                                case 1:
+                                    floorImage = "Graphycs/ByteLikeGraphycs/floor.png";
+                                    break;
+                                // Wall
+                                case 2:
+                                    floorImage = "Graphycs/ByteLikeGraphycs/wall";
+                                    if (level[camera[0] + j + 1, camera[1] + i] == 2 || level[camera[0] + j + 1, camera[1] + i] == 0 || level[camera[0] + j + 1, camera[1] + i] == 5) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    if (level[camera[0] + j, camera[1] + i - 1] == 2 || level[camera[0] + j, camera[1] + i - 1] == 0 || level[camera[0] + j, camera[1] + i - 1] == 5) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    if (level[camera[0] + j - 1, camera[1] + i] == 2 || level[camera[0] + j - 1, camera[1] + i] == 0 || level[camera[0] + j - 1, camera[1] + i] == 5) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    if (level[camera[0] + j, camera[1] + i + 1] == 2 || level[camera[0] + j, camera[1] + i + 1] == 0 || level[camera[0] + j, camera[1] + i + 1] == 5) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    floorImage += ".png";
+                                    break;
+                                // Center of the room, really only needed for debug
+                                case 3:
+                                    floorImage = "Graphycs/ByteLikeGraphycs/floor.png";
+                                    break;
+                                // Door
+                                case 4:
+                                    floorImage = "Graphycs/ByteLikeGraphycs/door.png";
+                                    break;
+                                // Outter wall
+                                case 5:
+                                    floorImage = "Graphycs/ByteLikeGraphycs/darkwall";
 
-                                if (camera[0] + j == 0)
-                                {
-                                    if (camera[1] + i == 0 || camera[1] + i == level.GetLength(1) - 1 || level[1, camera[1] + i] == 2 || level[1, camera[1] + i] == 0)
+                                    if (camera[0] + j == 0)
                                     {
-                                        floorImage += "1111";
+                                        if (camera[1] + i == 0 || camera[1] + i == level.GetLength(1) - 1 || level[1, camera[1] + i] == 2 || level[1, camera[1] + i] == 0)
+                                        {
+                                            floorImage += "1111";
+                                        }
+                                        else { floorImage += "0000"; }
                                     }
-                                    else { floorImage += "0000"; }
-                                }
-                                else if (camera[0] + j == level.GetLength(0) - 1)
-                                {
-                                    if (camera[1] + i == 0 || camera[1] + i == level.GetLength(1) - 1 || level[level.GetLength(0) - 2, camera[1] + i] == 2 || level[level.GetLength(0) - 2, camera[1] + i] == 0)
+                                    else if (camera[0] + j == level.GetLength(0) - 1)
                                     {
-                                        floorImage += "1111";
+                                        if (camera[1] + i == 0 || camera[1] + i == level.GetLength(1) - 1 || level[level.GetLength(0) - 2, camera[1] + i] == 2 || level[level.GetLength(0) - 2, camera[1] + i] == 0)
+                                        {
+                                            floorImage += "1111";
+                                        }
+                                        else { floorImage += "0000"; }
                                     }
-                                    else { floorImage += "0000"; }
-                                }
-                                else if (camera[1] + i == 0)
-                                {
-                                    if (camera[0] + i == 0 || camera[0] + i == level.GetLength(0) - 1 || level[camera[0] + j, 1] == 2 || level[camera[0] + j, 1] == 0)
+                                    else if (camera[1] + i == 0)
                                     {
-                                        floorImage += "1111";
+                                        if (camera[0] + i == 0 || camera[0] + i == level.GetLength(0) - 1 || level[camera[0] + j, 1] == 2 || level[camera[0] + j, 1] == 0)
+                                        {
+                                            floorImage += "1111";
+                                        }
+                                        else { floorImage += "0000"; }
                                     }
-                                    else { floorImage += "0000"; }
-                                }
-                                else
-                                {
-                                    if (camera[0] + i == 0 || camera[0] + i == level.GetLength(0) - 1 || level[camera[0] + j, level.GetLength(1)-2] == 2 || level[camera[0] + j, level.GetLength(1) - 2] == 0)
+                                    else
                                     {
-                                        floorImage += "1111";
+                                        if (camera[0] + i == 0 || camera[0] + i == level.GetLength(0) - 1 || level[camera[0] + j, level.GetLength(1) - 2] == 2 || level[camera[0] + j, level.GetLength(1) - 2] == 0)
+                                        {
+                                            floorImage += "1111";
+                                        }
+                                        else { floorImage += "0000"; }
                                     }
-                                    else { floorImage += "0000"; }
-                                }
 
-                                floorImage += ".png";
-                                break;
-                            // Water
-                            case 6:
-                                floorImage = "Graphycs/ByteLikeGraphycs/water";
-                                if (level[camera[0] + j + 1, camera[1] + i] == 6) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                if (level[camera[0] + j, camera[1] + i - 1] == 6) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                if (level[camera[0] + j - 1, camera[1] + i] == 6) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                if (level[camera[0] + j, camera[1] + i + 1] == 6) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                floorImage += ".png";
-                                break;
-                            // Lava
-                            case 7:
-                                floorImage = "Graphycs/ByteLikeGraphycs/lava";
-                                if (level[camera[0] + j + 1, camera[1] + i] == 7) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                if (level[camera[0] + j, camera[1] + i - 1] == 7) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                if (level[camera[0] + j - 1, camera[1] + i] == 7) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                if (level[camera[0] + j, camera[1] + i + 1] == 7) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                floorImage += ".png";
-                                break;
-                            // Grass
-                            case 8:
-                            case 9:
-                            case 10:
-                                floorImage = "Graphycs/ByteLikeGraphycs/grass";
-                                if (level[camera[0] + j + 1, camera[1] + i] == 8 || level[camera[0] + j + 1, camera[1] + i] == 9 || level[camera[0] + j + 1, camera[1] + i] == 10) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                if (level[camera[0] + j, camera[1] + i - 1] == 8 || level[camera[0] + j, camera[1] + i - 1] == 9 || level[camera[0] + j, camera[1] + i - 1] == 10) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                if (level[camera[0] + j - 1, camera[1] + i] == 8 || level[camera[0] + j - 1, camera[1] + i] == 9 || level[camera[0] + j - 1, camera[1] + i] == 10) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                if (level[camera[0] + j, camera[1] + i + 1] == 8 || level[camera[0] + j, camera[1] + i + 1] == 9 || level[camera[0] + j, camera[1] + i + 1] == 10) { floorImage += "1"; }
-                                else { floorImage += "0"; }
-                                floorImage += ".png";
-                                if (floorImage == "Graphycs/ByteLikeGraphycs/grass0000.png" && level[camera[0] + j, camera[1] + i] != 8) { floorImage = "Graphycs/ByteLikeGraphycs/hiddentrap.png"; }
-                                break;
-                            // Trap
-                            case 11:
-                                floorImage = "Graphycs/ByteLikeGraphycs/spiketrap.png";
-                                break;
-                            // Posion Trap
-                            case 12:
-                                floorImage = "Graphycs/ByteLikeGraphycs/poisontrap.png";
-                                break;
+                                    floorImage += ".png";
+                                    break;
+                                // Water
+                                case 6:
+                                    floorImage = "Graphycs/ByteLikeGraphycs/water";
+                                    if (level[camera[0] + j + 1, camera[1] + i] == 6) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    if (level[camera[0] + j, camera[1] + i - 1] == 6) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    if (level[camera[0] + j - 1, camera[1] + i] == 6) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    if (level[camera[0] + j, camera[1] + i + 1] == 6) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    floorImage += ".png";
+                                    break;
+                                // Lava
+                                case 7:
+                                    floorImage = "Graphycs/ByteLikeGraphycs/lava";
+                                    if (level[camera[0] + j + 1, camera[1] + i] == 7) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    if (level[camera[0] + j, camera[1] + i - 1] == 7) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    if (level[camera[0] + j - 1, camera[1] + i] == 7) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    if (level[camera[0] + j, camera[1] + i + 1] == 7) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    floorImage += ".png";
+                                    break;
+                                // Grass
+                                case 8:
+                                case 9:
+                                case 10:
+                                    floorImage = "Graphycs/ByteLikeGraphycs/grass";
+                                    if (level[camera[0] + j + 1, camera[1] + i] == 8 || level[camera[0] + j + 1, camera[1] + i] == 9 || level[camera[0] + j + 1, camera[1] + i] == 10) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    if (level[camera[0] + j, camera[1] + i - 1] == 8 || level[camera[0] + j, camera[1] + i - 1] == 9 || level[camera[0] + j, camera[1] + i - 1] == 10) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    if (level[camera[0] + j - 1, camera[1] + i] == 8 || level[camera[0] + j - 1, camera[1] + i] == 9 || level[camera[0] + j - 1, camera[1] + i] == 10) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    if (level[camera[0] + j, camera[1] + i + 1] == 8 || level[camera[0] + j, camera[1] + i + 1] == 9 || level[camera[0] + j, camera[1] + i + 1] == 10) { floorImage += "1"; }
+                                    else { floorImage += "0"; }
+                                    floorImage += ".png";
+                                    if (floorImage == "Graphycs/ByteLikeGraphycs/grass0000.png" && level[camera[0] + j, camera[1] + i] != 8) { floorImage = "Graphycs/ByteLikeGraphycs/hiddentrap.png"; }
+                                    break;
+                                // Trap
+                                case 11:
+                                    floorImage = "Graphycs/ByteLikeGraphycs/spiketrap.png";
+                                    break;
+                                // Posion Trap
+                                case 12:
+                                    floorImage = "Graphycs/ByteLikeGraphycs/poisontrap.png";
+                                    break;
+                            }
+
                         }
-                        imageDrawing.ImageSource = new BitmapImage(new Uri(floorImage, UriKind.Relative));
+                        else
+                        {
+                            floorImage = "Graphycs/ByteLikeGraphycs/darkness.png";
+                        }
+
+                        dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+
+                        if (darkness[camera[0] + j, camera[1] + i] == 2)
+                        {
+                            dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/partialdarkness.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                        }
+
+
+                        if (player.position[0] == camera[0] + j && player.position[1] == camera[1] + i)
+                        {
+                            //Bitmap source1 = new Bitmap(System.Drawing.Image.FromFile("Graphycs/ByteLikeGraphycs/player1.png")); // your source images - assuming they're the same size
+                            //Bitmap source2 = new Bitmap(System.Drawing.Image.FromFile(floorImage));
+                            //var target = new Bitmap(source1.Width, source1.Height, PixelFormat.Format32bppArgb);
+                            //var graphics = Graphics.FromImage(target);
+                            //graphics.CompositingMode = CompositingMode.SourceOver; // this is the default, but just to be clear
+
+                            //graphics.DrawImage(source1, 0, 0);
+                            //graphics.DrawImage(source2, 0, 0);
+
+                            dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/player1.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+
+                        }
+
+
+
                     }
-                    else
-                    {
-                        imageDrawing.ImageSource = new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/darkness.png", UriKind.Relative));
-                        floorImage = "Graphycs/ByteLikeGraphycs/darkness.png";
-                    }
 
-                    drawingGroup.Children.Add(imageDrawing);
-
-                    if (player.position[0] == camera[0] + j && player.position[1] == camera[1] + i)
-                    {
-                        //Bitmap source1 = new Bitmap(System.Drawing.Image.FromFile("Graphycs/ByteLikeGraphycs/player1.png")); // your source images - assuming they're the same size
-                        //Bitmap source2 = new Bitmap(System.Drawing.Image.FromFile(floorImage));
-                        //var target = new Bitmap(source1.Width, source1.Height, PixelFormat.Format32bppArgb);
-                        //var graphics = Graphics.FromImage(target);
-                        //graphics.CompositingMode = CompositingMode.SourceOver; // this is the default, but just to be clear
-
-                        //graphics.DrawImage(source1, 0, 0);
-                        //graphics.DrawImage(source2, 0, 0);
-
-
-
-                        imageDrawing.ImageSource = new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/player1.png", UriKind.Relative));
-                        drawingGroup.Children.Add(imageDrawing);
-                    }
 
                 }
+                //
 
-                
+                FormattedText dialogue = new FormattedText(response, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 16, System.Windows.Media.Brushes.Black);
+                dialogue.MaxTextWidth = 640;
+
+
+                dc.DrawText(dialogue, new System.Windows.Point(0, 400));
             }
-            //
 
             DrawingImage drawingImageSource = new DrawingImage(drawingGroup);
 
@@ -336,6 +345,7 @@ namespace ByteLike
             this.Background = System.Windows.Media.Brushes.White;
             this.Margin = new Thickness(0);
             this.Content = imageBorder;
+
         }
 
         private void Grid_KeyDown(object sender, KeyEventArgs e)
@@ -364,7 +374,7 @@ namespace ByteLike
             imageBorder.HorizontalAlignment = HorizontalAlignment.Left;
             imageBorder.VerticalAlignment = VerticalAlignment.Top;
             imageBorder.Margin = new Thickness(0);
-            imageBorder.Child = DrawMap(prevresponse);
+            imageBorder.Child = DrawMap(response);
 
             this.Background = System.Windows.Media.Brushes.White;
             this.Margin = new Thickness(0);
@@ -372,24 +382,6 @@ namespace ByteLike
 
             Console.Write(response);
 
-
-            prevresponse = response;
-            Console.WriteLine("HP - {0} / {1}", player.Stats["HP"], player.Stats["MaxHP"]);
-            prevresponse += String.Format("HP - {0} / {1}", player.Stats["HP"], player.Stats["MaxHP"]);
-
-            Console.WriteLine("Mana - {0} / {1}", player.Stats["Mana"], player.Stats["MaxMana"]);
-            prevresponse += String.Format("Mana - {0} / {1}", player.Stats["Mana"], player.Stats["MaxMana"]);
-
-
-            Console.WriteLine("Defense - {0} / {1}", player.Stats["Defense"], player.Stats["MagicDefense"]);
-            prevresponse += String.Format("Defense - {0} / {1}", player.Stats["Defense"], player.Stats["MagicDefense"]);
-
-
-            Console.WriteLine("Level {0} - {1} / {2}", player.Stats["Level"], player.Stats["XP"], 90 + Math.Pow(player.Stats["Level"], 2) * 10);
-            prevresponse += String.Format("Level {0} - {1} / {2}", player.Stats["Level"], player.Stats["XP"], 90 + Math.Pow(player.Stats["Level"], 2) * 10);
-
-            Console.WriteLine("{0} Str, {1} Mag, {2} Agi", player.Stats["Strength"], player.Stats["Magic"], player.Stats["Agility"]);
-            prevresponse += String.Format("{0} Str, {1} Mag, {2} Agi", player.Stats["Strength"], player.Stats["Magic"], player.Stats["Agility"]);
 
 
             
@@ -577,9 +569,13 @@ namespace ByteLike
             }
             //
 
+
+            
+
             // If we managed to generate any rooms
             if (remrooms.Count > 0)
             {
+
                 for (int f = 0; f < remrooms.Count; f++)
                 {
                     // Set position to room's center
@@ -711,6 +707,7 @@ namespace ByteLike
                 level[level.GetLength(0) - 2, i] = 0;
             }
             //
+
 
             // Set default spawnpoint, return newly generated map
             player = startingpoint;
@@ -1158,7 +1155,7 @@ namespace ByteLike
             Stats["MaxMana"] = 10;
 
             Stats.Add("XP", 0);
-            Stats.Add("Torch", 20);
+            Stats.Add("Torch", 2);
 
             Buffs.Add("Torch", 0);
 

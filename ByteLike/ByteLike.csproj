@@ -168,6 +168,9 @@
     <None Update="Graphycs\ByteLikeGraphycs\lava1111.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Graphycs\ByteLikeGraphycs\partialdarkness.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Graphycs\ByteLikeGraphycs\player1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
