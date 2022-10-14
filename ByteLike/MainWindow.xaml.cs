@@ -115,6 +115,8 @@ namespace ByteLike
 
             using (DrawingContext dc = drawingGroup.Open())
             {
+                FormattedText dialogue = new FormattedText(response, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 16, System.Windows.Media.Brushes.White);
+                dialogue.MaxTextWidth = (cameraSize[0] * 16) - 96;
 
                 // Draw the tiles
                 for (int i = 0; i < level.GetLength(1) && i < cameraSize[1]; i++)
@@ -272,20 +274,58 @@ namespace ByteLike
 
                         if (player.position[0] == camera[0] + j && player.position[1] == camera[1] + i)
                         {
-                            //Bitmap source1 = new Bitmap(System.Drawing.Image.FromFile("Graphycs/ByteLikeGraphycs/player1.png")); // your source images - assuming they're the same size
-                            //Bitmap source2 = new Bitmap(System.Drawing.Image.FromFile(floorImage));
-                            //var target = new Bitmap(source1.Width, source1.Height, PixelFormat.Format32bppArgb);
-                            //var graphics = Graphics.FromImage(target);
-                            //graphics.CompositingMode = CompositingMode.SourceOver; // this is the default, but just to be clear
-
-                            //graphics.DrawImage(source1, 0, 0);
-                            //graphics.DrawImage(source2, 0, 0);
-
                             dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/player1.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
 
                         }
 
+                        
 
+                        if (player.OpenInventory)
+                        {
+                            if (j >= 5 && j-5 < player.Inventory.GetLength(0) && i < player.Inventory.GetLength(1))
+                            {
+                                floorImage = "Graphycs/ByteLikeGraphycs/invslot";
+                                if (i == 0)
+                                {
+                                    floorImage += (j - 4);
+                                }
+                                else { floorImage += 0; }
+                                floorImage += ".png";
+                                dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                            }
+
+                            if (j-5 == player.SelectedSlot[0] && i == player.SelectedSlot[1])
+                            {
+                                dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/invslot13.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                            }
+
+                            if (j-5 == player.CurrentSlot[0] && i == player.CurrentSlot[1])
+                            {
+                                dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/invslot12.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                            }
+
+                        }
+
+
+
+                        if (response != "" && j>4)
+                        {
+                            if (i * 16 >= (cameraSize[1] * 16) - dialogue.Height - 16)
+                            {
+                                if ((i - 1) * 16 < (cameraSize[1] * 16) - dialogue.Height - 16)
+                                {
+                                    if (j == 5) { dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/dialoguebox1.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17)); }
+                                    else if (j + 1 == cameraSize[0]) { dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/dialoguebox4.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17)); }
+                                    else { dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/dialoguebox2.png", UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16)); }
+                                }
+                                else
+                                {
+                                    if (j == 5) { dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/dialoguebox3.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17)); }
+                                    else if (j + 1 == cameraSize[0]) { dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/dialoguebox5.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17)); }
+                                    else { dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/dialoguebox6.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17)); }
+                                }
+                            }
+                        }
 
                     }
 
@@ -293,11 +333,51 @@ namespace ByteLike
                 }
                 //
 
-                FormattedText dialogue = new FormattedText(response, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 16, System.Windows.Media.Brushes.Black);
-                dialogue.MaxTextWidth = 640;
+                for (int i = 0; i < 9; i++)
+                {
+                    string floorImage = "Graphycs/ByteLikeGraphycs/hud";
+                    floorImage += i;
+                    floorImage += ".png";
+                    dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(0, i * 32, 17, 17));
+                    switch (i)
+                    {
+                        case 0:
+                            floorImage = String.Format("{0}/{1}", player.Stats["HP"], player.Stats["MaxHP"]);
+                            break;
+                        case 1:
+                            floorImage = String.Format("{0}/{1}", player.Stats["Mana"], player.Stats["MaxMana"]);
+                            break;
+                        case 2:
+                            floorImage = player.Stats["Defense"].ToString();
+                            break;
+                        case 3:
+                            floorImage = player.Stats["MagicDefense"].ToString();
+                            break;
+                        case 4:
+                            floorImage = player.Stats["Strength"].ToString();
+                            break;
+                        case 5:
+                            floorImage = player.Stats["Magic"].ToString();
+                            break;
+                        case 6:
+                            floorImage = player.Stats["Agility"].ToString();
+                            break;
+                        case 7:
+                            floorImage = player.Stats["Level"].ToString();
+                            break;
+                        case 8:
+                            floorImage = String.Format("{0}/{1}", player.Stats["XP"], 90+ Math.Pow(player.Stats["Level"],2)*10);
+                            break;
+                    }
+                    FormattedText dialogue2 = new FormattedText(floorImage, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 16, System.Windows.Media.Brushes.White);
+                    dialogue2.MaxTextWidth = 56;
+                    dc.DrawText(dialogue2, new System.Windows.Point(4, 14 + i * 32));
+                }
 
-
-                dc.DrawText(dialogue, new System.Windows.Point(0, 400));
+                if (response != "")
+                {
+                    dc.DrawText(dialogue, new System.Windows.Point(88, (cameraSize[1]*16)-dialogue.Height-8));
+                }
             }
 
             DrawingImage drawingImageSource = new DrawingImage(drawingGroup);
@@ -356,7 +436,22 @@ namespace ByteLike
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-
+            if (Keyboard.IsKeyToggled(Key.Up) && Keyboard.IsKeyDown(Key.Up) && cameraSize[1] > 20)
+            {
+                cameraSize[1]--;
+            }
+            if (Keyboard.IsKeyToggled(Key.Down) && Keyboard.IsKeyDown(Key.Down) && cameraSize[1] < 100)
+            {
+                cameraSize[1]++;
+            }
+            if (Keyboard.IsKeyToggled(Key.Left) && Keyboard.IsKeyDown(Key.Left) && cameraSize[0] > 20)
+            {
+                cameraSize[0]--;
+            }
+            if (Keyboard.IsKeyToggled(Key.Right) && Keyboard.IsKeyDown(Key.Right) && cameraSize[0] < 100)
+            {
+                cameraSize[0]++;
+            }
 
             response = player.Logics(ref level);
 
@@ -468,9 +563,30 @@ namespace ByteLike
                         else
                         {
                             level[position[0] + j, position[1] + i] = 1;
-                            if (rand.Next(5) == 0) { level[position[0] + j, position[1] + i] = 8; }
-                            else if (rand.Next(20) == 0) { level[position[0] + j, position[1] + i] = 9; }
-                            else if (rand.Next(15) == 0) { level[position[0] + j, position[1] + i] = 10; }
+                            if (rand.Next(5) == 0)
+                            {
+                                level[position[0] + j, position[1] + i] = 8;
+                                level[position[0] + j - 1, position[1] + i] = 8;
+                                level[position[0] + j + 1, position[1] + i] = 8;
+                                level[position[0] + j, position[1] + i + 1] = 8;
+                                level[position[0] + j, position[1] + i - 1] = 8;
+                            }
+                            else if (rand.Next(20) == 0)
+                            {
+                                level[position[0] + j, position[1] + i] = 9;
+                                level[position[0] + j - 1, position[1] + i] = 8;
+                                level[position[0] + j + 1, position[1] + i] = 8;
+                                level[position[0] + j, position[1] + i + 1] = 8;
+                                level[position[0] + j, position[1] + i - 1] = 8;
+                            }
+                            else if (rand.Next(15) == 0)
+                            {
+                                level[position[0] + j, position[1] + i] = 10;
+                                level[position[0] + j - 1, position[1] + i] = 8;
+                                level[position[0] + j + 1, position[1] + i] = 8;
+                                level[position[0] + j, position[1] + i + 1] = 8;
+                                level[position[0] + j, position[1] + i - 1] = 8;
+                            }
                             // Check for water/lava
                             if (DistanceBetween(new int[] { j, i }, waterCords) < water)
                             {
@@ -628,7 +744,8 @@ namespace ByteLike
                                 // Create doors
                                 for (int j = -(width / 2) + 1; j < width / 2 - 1; j++)
                                 {
-                                    level[beampos[0] - 1, beampos[1] + j] = 4;
+                                    if (beampos[0] - 1 >= 0 && beampos[0] - 1 < level.GetLength(0) && beampos[1] + j >= 0 && beampos[1] + j < level.GetLength(1))
+                                        level[beampos[0] - 1, beampos[1] + j] = 4;
                                 }
                                 break;
 
@@ -640,7 +757,8 @@ namespace ByteLike
                                 // Create doors
                                 for (int j = -(width / 2) + 1; j < width / 2 - 1; j++)
                                 {
-                                    level[beampos[0], beampos[1] + j] = 4;
+                                    if (beampos[0] >= 0 && beampos[0] < level.GetLength(0) && beampos[1] + j >= 0 && beampos[1] + j < level.GetLength(1))
+                                        level[beampos[0], beampos[1] + j] = 4;
                                 }
                                 // Adjust hallway position due to calculation error
                                 beampos[0]--;
@@ -654,7 +772,8 @@ namespace ByteLike
                                 // Create doors
                                 for (int j = -(width / 2) + 1; j < width / 2 - 1; j++)
                                 {
-                                    level[beampos[0] + j, beampos[1]] = 4;
+                                    if (beampos[0] + j >= 0 && beampos[0] + j < level.GetLength(0) && beampos[1] >= 0 && beampos[1] < level.GetLength(1))
+                                        level[beampos[0] + j, beampos[1]] = 4;
                                 }
                                 // Adjust hallway position due to calculation error
                                 beampos[1]--;
@@ -668,7 +787,8 @@ namespace ByteLike
                                 // Create doors
                                 for (int j = -(width / 2) + 1; j < width / 2 - 1; j++)
                                 {
-                                    level[beampos[0] + j, beampos[1] - 1] = 4;
+                                    if (beampos[0] + j >= 0 && beampos[0] + j < level.GetLength(0) && beampos[1] -1 >= 0 && beampos[1] -1 < level.GetLength(1))
+                                        level[beampos[0] + j, beampos[1] - 1] = 4;
                                 }
                                 break;
                         }
@@ -844,25 +964,29 @@ namespace ByteLike
                                 case 0:
                                     for (int j = -(width / 2) + 1; j < width / 2 - 1; j++)
                                     {
-                                        Generator.level[position[0], position[1] + j] = 4;
+                                        if (position[1] + j >= 0 && position[1] + j < Generator.level.GetLength(1))
+                                            Generator.level[position[0], position[1] + j] = 4;
                                     }
                                     break;
                                 case 180:
                                     for (int j = -(width / 2) + 1; j < width / 2 - 1; j++)
                                     {
-                                        Generator.level[position[0], position[1] + j] = 4;
+                                        if (position[1] + j >= 0 && position[1] + j < Generator.level.GetLength(1))
+                                            Generator.level[position[0], position[1] + j] = 4;
                                     }
                                     break;
                                 case 90:
                                     for (int j = -(width / 2) + 1; j < width / 2 - 1; j++)
                                     {
-                                        Generator.level[position[0] + j, position[1]] = 4;
+                                        if (position[0] + j >= 0 && position[0] + j < Generator.level.GetLength(0))
+                                            Generator.level[position[0] + j, position[1]] = 4;
                                     }
                                     break;
                                 case 270:
                                     for (int j = -(width / 2) + 1; j < width / 2 - 1; j++)
                                     {
-                                        Generator.level[position[0] + j, position[1]] = 4;
+                                        if (position[0] + j >= 0 && position[0] + j < Generator.level.GetLength(0))
+                                            Generator.level[position[0] + j, position[1]] = 4;
                                     }
                                     break;
                             }
@@ -951,7 +1075,7 @@ namespace ByteLike
 
     public class Item
     {
-        // 0 - Useless, 1 - Head, 2 - Torso, 3 - Legs, 4 - Weapon, 5 - OffHand, 6 - Torch, 7 - Ring, 8 - Necklace, 9 - Consumable, 10 - Ammo
+        // 0 - Useless, 1 - Head, 2 - Torso, 3 - Legs, 4 - Weapon, 5 - OffHand, 6 - Torch, 7 - Necklace, 8 - Ring, 9 - (For safety, none), 10 - Usable, 11 - Ammo
         public int GearType = 0;
         public string Name = "???";
         public string Description = "This seems useless";
@@ -1144,6 +1268,10 @@ namespace ByteLike
 
         public new Item[,] Inventory = new Item[11, 7];
 
+        public bool OpenInventory = false;
+        public int[] SelectedSlot = new int[2] { -100, -1 };
+        public int[] CurrentSlot = new int[2] { 0, 0 };
+
 
         public Player(string name)
             : base()
@@ -1155,7 +1283,6 @@ namespace ByteLike
             Stats["MaxMana"] = 10;
 
             Stats.Add("XP", 0);
-            Stats.Add("Torch", 2);
 
             Buffs.Add("Torch", 0);
 
@@ -1169,10 +1296,16 @@ namespace ByteLike
             if (Stats["HP"] <= 0) { wasAlive = false; }
             string response = "";
             int[] movement = new int[] { 0, 0 };
+            bool invCheck = false;
 
             // Movement code
 
             // Keys
+            if (Keyboard.IsKeyDown(Key.Q) && !OpenInventory)
+            {
+                OpenInventory = true;
+                invCheck = true;
+            }
             // Move only if not frozen/paralysed
             if (Statuses[2] == 0 && Statuses[3] % 2 == 0)
             {
@@ -1180,14 +1313,13 @@ namespace ByteLike
                 else if (Keyboard.IsKeyDown(Key.S)) { movement[1] = 1; }
                 else if (Keyboard.IsKeyDown(Key.A)) { movement[0] = -1; }
                 else if (Keyboard.IsKeyDown(Key.D)) { movement[0] = 1; }
-
             }
         //
 
         // Actual Movement
         WalkReset:
             // Check inbounds
-            if (position[0] + movement[0] >= 0 && position[0] + movement[0] < level.GetLength(0) && position[1] + movement[1] >= 0 && position[1] + movement[1] < level.GetLength(1))
+            if (position[0] + movement[0] >= 0 && position[0] + movement[0] < level.GetLength(0) && position[1] + movement[1] >= 0 && position[1] + movement[1] < level.GetLength(1) && !OpenInventory)
             {
                 // FloorCheck does a check whether we actually step on the floor
                 // We don't if we're ghost or have certain conditions or something
@@ -1368,14 +1500,119 @@ namespace ByteLike
 
                 }
             }
+            else if (OpenInventory)
+            {
+                CurrentSlot[0] += movement[0];
+                CurrentSlot[1] += movement[1];
+                if (CurrentSlot[0] >= Inventory.GetLength(0)) { CurrentSlot[0] = 0; }
+                if (CurrentSlot[0] < 0) { CurrentSlot[0] = Inventory.GetLength(0)-1; }
+                if (CurrentSlot[1] >= Inventory.GetLength(1)) { CurrentSlot[1] = 0; }
+                if (CurrentSlot[1] < 0) { CurrentSlot[1] = Inventory.GetLength(1) - 1; }
+
+                if (Keyboard.IsKeyDown(Key.E))
+                {
+                    if (SelectedSlot[0] >= 0)
+                    {
+                        if (CurrentSlot[1] != 0 && SelectedSlot[1] != 0)
+                        {
+                            Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
+                            Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+                            Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
+                            SelectedSlot[0] = -100;
+                        }
+                        else if (SelectedSlot[1] == 0)
+                        {
+                            if (SelectedSlot[0] < 9)
+                            {
+                                if (Inventory[CurrentSlot[0], CurrentSlot[1]] == null)
+                                {
+                                    if (CurrentSlot[1] != 0 || (CurrentSlot[0] == 7 && SelectedSlot[0] == 8) || (CurrentSlot[0] == 8 && SelectedSlot[0] == 7))
+                                    {
+                                        Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
+                                        Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+                                        Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
+                                        SelectedSlot[0] = -100;
+                                    }
+                                    else if (CurrentSlot[0] < 9)
+                                    {
+                                        response += $"{Name}: I can't put that there.\n";
+                                    }
+                                    else if (CurrentSlot[0] == 9)
+                                    {
+                                        response += $"{Name}: I can't directly use that.\n";
+                                    }
+                                }
+                                else if (Inventory[CurrentSlot[0], CurrentSlot[1]].GearType == SelectedSlot[0] + 1 || (SelectedSlot[0] == 8 && Inventory[CurrentSlot[0], CurrentSlot[1]].GearType == SelectedSlot[0]))
+                                {
+                                    Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
+                                    Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+                                    Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
+                                    SelectedSlot[0] = -100;
+                                }
+                                else
+                                {
+                                    response += $"{Name}: I can't put that there.\n";
+                                }
+                            }
+                        }
+                        else if (CurrentSlot[1] == 0)
+                        {
+                            if (CurrentSlot[0] < 9)
+                            {
+                                if (Inventory[SelectedSlot[0], SelectedSlot[1]] == null)
+                                {
+                                    if (SelectedSlot[1] != 0 || (CurrentSlot[0] == 7 && SelectedSlot[0] == 8) || (CurrentSlot[0] == 8 && SelectedSlot[0] == 7))
+                                    {
+                                        Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
+                                        Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+                                        Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
+                                        SelectedSlot[0] = -100;
+                                    }
+                                    else
+                                    {
+                                        response += $"{Name}: I can't put that there.\n";
+                                    }
+                                }
+                                else if (Inventory[SelectedSlot[0], SelectedSlot[1]].GearType == CurrentSlot[0] + 1 || (CurrentSlot[0] == 8 && Inventory[SelectedSlot[0], SelectedSlot[1]].GearType == CurrentSlot[0]))
+                                {
+                                    Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
+                                    Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+                                    Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
+                                    SelectedSlot[0] = -100;
+                                }
+                                else
+                                {
+                                    response += $"{Name}: I can't put that there.\n";
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (CurrentSlot[1] != 0 || CurrentSlot[0] < 9)
+                        {
+                            SelectedSlot[0] = CurrentSlot[0];
+                            SelectedSlot[1] = CurrentSlot[1];
+                        }
+                    }
+                }
+
+            }
             //
 
-
-            response = Conditions(response);
+            if (!OpenInventory)
+            {
+                response = Conditions(response);
+            }
 
 
             // Death
             if (wasAlive && Stats["HP"] <= 0) { response += $"{Name} dies!\n"; }
+
+            if (Keyboard.IsKeyDown(Key.Q) && OpenInventory && !invCheck)
+            {
+                OpenInventory = false;
+            }
 
             return response;
 
@@ -1387,7 +1624,7 @@ namespace ByteLike
 
         public int Torch()
         {
-            int result = Stats["Torch"];
+            int result = 1;
 
             if (Buffs["Torch"] > 0) { result += BuffLevels["Torch"]; }
             for (int i = 0; i < 9; i++)
