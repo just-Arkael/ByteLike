@@ -50,30 +50,84 @@ namespace ByteLike
         // Torch and darkness
         static void ClearLight()
         {
+            int[] position = new int[2];
+            bool doNext = true;
+
+
             for (int i = -player.Torch() - 5; i <= player.Torch() + 5; i++)
             {
                 for (int j = -player.Torch() - 5; j <= player.Torch() + 5; j++)
                 {
                     if (player.position[0] + j > 0 && player.position[0] + j < level.GetLength(0) && player.position[1] + i > 0 && player.position[1] + i < level.GetLength(1))
                     {
-                        if ((level[player.position[0] + j, player.position[1] + i] != 0 && level[player.position[0] + j, player.position[1] + i] != 5 && DistanceBetween(player.position, new int[] { player.position[0] + j, player.position[1] + i }) < (player.Torch() + 0.5) * 1.5) || DistanceBetween(player.position, new int[] { player.position[0] + j, player.position[1] + i }) < (player.Torch() + 0.5))
+                        if (darkness[player.position[0] + j, player.position[1] + i] != 0)
                         {
-                            darkness[player.position[0] + j, player.position[1] + i] = 1;
+                            darkness[player.position[0] + j, player.position[1] + i] = 2;
                         }
                         else
                         {
-                            if (darkness[player.position[0] + j, player.position[1] + i] != 0)
+                            darkness[player.position[0] + j, player.position[1] + i] = 0;
+                        }
+                    }
+                }
+            }
+            darkness[player.position[0], player.position[1]] = 3;
+
+            while (doNext)
+            {
+                doNext = false;
+                for (int i = -player.Torch() - 5; i <= player.Torch() + 5; i++)
+                {
+                    for (int j = -player.Torch() - 5; j <= player.Torch() + 5; j++)
+                    {
+                        if (player.position[0] + j > 0 && player.position[0] + j < level.GetLength(0) && player.position[1] + i > 0 && player.position[1] + i < level.GetLength(1))
+                        {
+                            if (darkness[player.position[0] + j, player.position[1] + i] == 3)
                             {
-                                darkness[player.position[0] + j, player.position[1] + i] = 2;
-                            }
-                            else
-                            {
-                                darkness[player.position[0] + j, player.position[1] + i] = 0;
+                                position[0] = player.position[0];
+                                position[1] = player.position[1];
+                                position[0] += j;
+                                position[1] += i;
+                                if (level[position[0], position[1]] != 2 && level[position[0], position[1]] != 0 && level[position[0], position[1]] != 5 && level[position[0], position[1]] != 4)
+                                {
+                                    if (position[0] + 1 > 0 && position[0] + 1 < level.GetLength(0) && position[1] > 0 && position[1] < level.GetLength(1) && DistanceBetween(player.position, new int[] { position[0] + 1, position[1] }) < (player.Torch() + 0.5) * 1.5)
+                                    {
+                                        if (darkness[position[0] + 1, position[1]] != 1)
+                                            darkness[position[0] + 1, position[1]] = 3;
+                                        doNext = true;
+                                    }
+
+                                    if (position[0] - 1 > 0 && position[0] - 1 < level.GetLength(0) && position[1] > 0 && position[1] < level.GetLength(1) && DistanceBetween(player.position, new int[] { position[0] - 1, position[1] }) < (player.Torch() + 0.5) * 1.5)
+                                    {
+                                        if (darkness[position[0] - 1, position[1]] != 1)
+                                            darkness[position[0] - 1, position[1]] = 3;
+                                        doNext = true;
+                                    }
+
+                                    if (position[0] > 0 && position[0] < level.GetLength(0) && position[1] + 1 > 0 && position[1] + 1 < level.GetLength(1) && DistanceBetween(player.position, new int[] { position[0], position[1] + 1 }) < (player.Torch() + 0.5) * 1.5)
+                                    {
+                                        if (darkness[position[0], position[1] + 1] != 1)
+                                            darkness[position[0], position[1] + 1] = 3;
+                                        doNext = true;
+                                    }
+
+                                    if (position[0] > 0 && position[0] < level.GetLength(0) && position[1] - 1 > 0 && position[1] - 1 < level.GetLength(1) && DistanceBetween(player.position, new int[] { position[0], position[1] - 1 }) < (player.Torch() + 0.5) * 1.5)
+                                    {
+                                        if (darkness[position[0], position[1] - 1] != 1)
+                                            darkness[position[0], position[1] - 1] = 3;
+                                        doNext = true;
+                                    }
+                                }
+
+                                
+                                darkness[position[0], position[1]] = 1;
                             }
                         }
                     }
                 }
             }
+            
+
         }
         //
 
@@ -274,7 +328,38 @@ namespace ByteLike
 
                         if (player.position[0] == camera[0] + j && player.position[1] == camera[1] + i)
                         {
-                            dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/player1.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                            if (player.Inventory[4, 0] != null)
+                            {
+                                if (player.Inventory[4, 0].Name.Contains("Quiver"))
+                                {
+                                    dc.DrawImage(new BitmapImage(new Uri(player.Inventory[4,0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                }
+                            }
+                            if (!player.IsGhost)
+                            {
+                                dc.DrawImage(new BitmapImage(new Uri(player.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                            }
+                            else
+                            {
+                                dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/player4.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                            }
+                            if (player.Inventory[2, 0] != null)
+                                dc.DrawImage(new BitmapImage(new Uri(player.Inventory[2, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                            if (player.Inventory[1, 0] != null)
+                                dc.DrawImage(new BitmapImage(new Uri(player.Inventory[1, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                            if (player.Inventory[0, 0] != null)
+                                dc.DrawImage(new BitmapImage(new Uri(player.Inventory[0, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                            if (player.Inventory[3, 0] != null)
+                                dc.DrawImage(new BitmapImage(new Uri(player.Inventory[3, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+
+                            if (player.Inventory[4, 0] != null)
+                            {
+                                
+                                if (!player.Inventory[4, 0].Name.Contains("Quiver"))
+                                {
+                                    dc.DrawImage(new BitmapImage(new Uri(player.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                }
+                            }
 
                         }
 
@@ -292,6 +377,8 @@ namespace ByteLike
                                 else { floorImage += 0; }
                                 floorImage += ".png";
                                 dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                if (player.Inventory[j-5,i] != null)
+                                    dc.DrawImage(new BitmapImage(new Uri(player.Inventory[j-5,i].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
                             }
 
                             if (j-5 == player.SelectedSlot[0] && i == player.SelectedSlot[1])
@@ -342,25 +429,25 @@ namespace ByteLike
                     switch (i)
                     {
                         case 0:
-                            floorImage = String.Format("{0}/{1}", player.Stats["HP"], player.Stats["MaxHP"]);
+                            floorImage = String.Format("{0}/{1}", player.Stats["HP"].ToString(), player.GetStat("MaxHP"));
                             break;
                         case 1:
-                            floorImage = String.Format("{0}/{1}", player.Stats["Mana"], player.Stats["MaxMana"]);
+                            floorImage = String.Format("{0}/{1}", player.Stats["Mana"].ToString(), player.GetStat("MaxMana"));
                             break;
                         case 2:
-                            floorImage = player.Stats["Defense"].ToString();
+                            floorImage = player.GetStat("Defense").ToString();
                             break;
                         case 3:
-                            floorImage = player.Stats["MagicDefense"].ToString();
+                            floorImage = player.GetStat("MagicDefense").ToString();
                             break;
                         case 4:
-                            floorImage = player.Stats["Strength"].ToString();
+                            floorImage = player.GetStat("Strength").ToString();
                             break;
                         case 5:
-                            floorImage = player.Stats["Magic"].ToString();
+                            floorImage = player.GetStat("Magic").ToString();
                             break;
                         case 6:
-                            floorImage = player.Stats["Agility"].ToString();
+                            floorImage = player.GetStat("Agility").ToString();
                             break;
                         case 7:
                             floorImage = player.Stats["Level"].ToString();
@@ -1077,13 +1164,17 @@ namespace ByteLike
     {
         // 0 - Useless, 1 - Head, 2 - Torso, 3 - Legs, 4 - Weapon, 5 - OffHand, 6 - Torch, 7 - Necklace, 8 - Ring, 9 - (For safety, none), 10 - Usable, 11 - Ammo
         public int GearType = 0;
+        public int ClassType = 0;
         public string Name = "???";
-        public string Description = "This seems useless";
         public Dictionary<string, int> Stats = new Dictionary<string, int>();
-        public string Spell;
+        public string Spell = "Nothing";
         public bool IsHeavy = false;
+        static Random rand = new Random();
+        public string File = "placeholder.png";
+        // None - 0, Fire - 1, Posion - 2, Freeze - 3, Paralysis - 4
+        public int Element = 0;
 
-        public Item()
+        public Item(int floor)
         {
             Stats.Add("Torch", 0);
             Stats.Add("MaxHP", 0);
@@ -1095,6 +1186,971 @@ namespace ByteLike
             Stats.Add("MagicDefense", 0);
             Stats.Add("HPRegen", 0);
             Stats.Add("ManaRegen", 0);
+
+
+            GearType = rand.Next(4) + 1;
+
+            RandomizeGearType:
+            switch (GearType)
+            {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    bool sideB = false;
+                    int typeSwitch = 0;
+                    int strength = (floor / 30) + rand.Next(-0, 1);
+                    if (strength < 0) { strength = 0; }
+                    else if (strength > 4) { strength = 4; }
+                    if (rand.Next(1) == 0 && strength != 0 && strength != 4)
+                    {
+                        sideB = true;
+                        if (strength > 3) { strength = 3; }
+                        typeSwitch += 5000;
+                    }
+                    typeSwitch += strength * 10000;
+
+
+                    Stats["MaxHP"] += rand.Next(0, strength+1) * 5;
+                    Stats["MaxMana"] += rand.Next(0, strength+1) * 5;
+                    Stats["Strength"] += rand.Next(0, strength+1);
+                    Stats["Magic"] += rand.Next(0, strength+1);
+                    Stats["Agility"] += rand.Next(0, strength+1);
+                    Stats["Defense"] += rand.Next(0, strength+1);
+                    Stats["MagicDefense"] += rand.Next(0, strength+1);
+
+                    if (strength == 0)
+                    {
+                        GearType = rand.Next(3) + 1;
+                        sideB = false;
+                    }
+
+                    File = "Graphycs/ByteLikeGraphycs/armor" + strength.ToString() + "-" + GearType.ToString();
+                    typeSwitch += GearType * 10;
+                    if (GearType == 4 && rand.Next(1) == 0)
+                    {
+                        File += "b";
+                        typeSwitch += 5;
+                    }
+                    if (strength > 0)
+                    {
+                        switch (rand.Next(2))
+                        {
+                            case 0:
+                                File += "w";
+                                typeSwitch += 100;
+                                ClassType = 1;
+                                break;
+                            case 1:
+                                File += "r";
+                                typeSwitch += 200;
+                                ClassType = 2;
+                                break;
+                            case 2:
+                                File += "m";
+                                typeSwitch += 300;
+                                ClassType = 3;
+                                break;
+                        }
+                    }
+
+                    if (sideB) { File += "b"; }
+                    File += ".png";
+
+
+                    //Name = "";
+                    //Stats["Torch"] += 0;
+                    //Stats["MaxHP"] += 0;
+                    //Stats["MaxMana"] += 0;
+                    //Stats["Strength"] += 0;
+                    //Stats["Magic"] += 0;
+                    //Stats["Agility"] += 0;
+                    //Stats["Defense"] += 0;
+                    //Stats["MagicDefense"] += 0;
+                    //Stats["HPRegen"] += 0;
+                    //Stats["ManaRegen"] += 0;
+
+
+                    switch (typeSwitch)
+                    {
+                        case 10:
+                            Name = "Leather Cap";
+                            Stats["Defense"] += 1;
+                            break;
+                        case 20:
+                            Name = "Leather Vest";
+                            Stats["Defense"] += 1;
+                            break;
+                        case 30:
+                            Name = "Leather Boots";
+                            Stats["MagicDefense"] += 1;
+                            break;
+                        case 40:
+                            Name = "Makeshift Spear";
+                            Stats["Strength"] += 2;
+                            Stats["Magic"] += 1;
+                            break;
+                        case 45:
+                            Name = "Makeshift Hatchet";
+                            Stats["Strength"] += 3;
+                            break;
+                        case 10110:
+                            Name = "Iron Cap";
+                            Stats["Strength"] += 1;
+                            Stats["Defense"] += 2;
+                            break;
+                        case 10120:
+                            Name = "Chainmail";
+                            Stats["Strength"] += 1;
+                            Stats["Defense"] += 3;
+                            break;
+                        case 10130:
+                            Name = "Leather Leggings";
+                            Stats["Strength"] += 1;
+                            Stats["Defense"] += 1;
+                            break;
+                        case 10140:
+                            Name = "Longsword";
+                            Stats["Strength"] += 5;
+                            break;
+                        case 10145:
+                            Name = "Warhammer";
+                            Stats["Strength"] += 6;
+                            Stats["Magic"] += -2;
+                            break;
+                        case 10150:
+                            Name = "Buckler";
+                            Stats["Defense"] += 2;
+                            break;
+                        case 15110:
+                            Name = "Enchanted Cap";
+                            Stats["Strength"] += 1;
+                            Stats["Defense"] += 1;
+                            Stats["MagicDefense"] += 1;
+                            break;
+                        case 15120:
+                            Name = "Enchanted Chainmail";
+                            Stats["Strength"] += 1;
+                            Stats["MagicDefense"] += 2;
+                            break;
+                        case 15130:
+                            Name = "Enchanted Leggings";
+                            Stats["Strength"] += 1;
+                            Stats["MagicDefense"] += 1;
+                            break;
+                        case 15140:
+                            Name = "Posioned Sword";
+                            Stats["Strength"] += 4;
+                            Stats["MagicDefense"] += -1;
+                            Element = 2;
+                            break;
+                        case 15145:
+                            Name = "Thunder Hammer";
+                            Stats["Strength"] += 5;
+                            Stats["Magic"] += -3;
+                            Element = 4;
+                            break;
+                        case 15150:
+                            Name = "Spiky Buckler";
+                            Stats["Strength"] += 1;
+                            Stats["Defense"] += 1;
+                            break;
+                        case 10210:
+                            Name = "Cloth Hat";
+                            Stats["Agility"] += 1;
+                            Stats["Defense"] += 1;
+                            break;
+                        case 10220:
+                            Name = "Cloth Shirt";
+                            Stats["Agility"] += 1;
+                            Stats["Defense"] += 2;
+                            break;
+                        case 10230:
+                            Name = "Cloth Leggings";
+                            Stats["Agility"] += 1;
+                            Stats["MagicDefense"] += 1;
+                            break;
+                        case 10240:
+                            Name = "Longbow";
+                            Stats["Strength"] += 3;
+                            Stats["Agility"] += 5;
+                            break;
+                        case 10245:
+                            Name = "Shortbow";
+                            Stats["Strength"] += 1;
+                            Stats["Magic"] += 2;
+                            Stats["Agility"] += 4;
+                            break;
+                        case 10250:
+                            Name = "Basic Quiver";
+                            Stats["Agility"] += 2;
+                            break;
+                        case 15210:
+                            Name = "Bandit Bandana";
+                            Stats["Agility"] += 1;
+                            Stats["MagicDefense"] += 1;
+                            break;
+                        case 15220:
+                            Name = "Bandit Shawl";
+                            Stats["Agility"] += 2;
+                            Stats["Defense"] += 1;
+                            Stats["MagicDefense"] += 1;
+                            break;
+                        case 15230:
+                            Name = "Bandit Pants";
+                            Stats["Agility"] += 1;
+                            Stats["Defense"] += 1;
+                            break;
+                        case 15240:
+                            Name = "Crystal Bow";
+                            Stats["Strength"] += 4;
+                            Stats["Magic"] += 3;
+                            Stats["Agility"] += 4;
+                            break;
+                        case 15245:
+                            Name = "Poison Shortbow";
+                            Stats["Strength"] += 2;
+                            Stats["Agility"] += 3;
+                            Element = 2;
+                            break;
+                        case 15250:
+                            Name = "Scorpion Quiver";
+                            Stats["Agility"] += 1;
+                            Stats["MagicDefense"] += 1;
+                            break;
+                        case 10310:
+                            Name = "Apprentice Hood";
+                            Stats["Magic"] += 1;
+                            Stats["MagicDefense"] += 1;
+                            break;
+                        case 10320:
+                            Name = "Apprentice Cloak";
+                            Stats["Magic"] += 2;
+                            Stats["Defense"] += 1;
+                            break;
+                        case 10330:
+                            Name = "Apprentice Kilt";
+                            Stats["Magic"] += 1;
+                            Stats["MagicDefense"] += 1;
+                            break;
+                        case 10340:
+                            Name = "Saphire Staff";
+                            Stats["Strength"] += 3;
+                            Stats["Magic"] += 6;
+                            break;
+                        case 10345:
+                            Name = "Ember Wand";
+                            Stats["Strength"] += 2;
+                            Stats["Magic"] += 4;
+                            Stats["MagicDefense"] += 2;
+                            break;
+                        case 10350:
+                            Name = "Commoner's Tome";
+                            Stats["Magic"] +=        2;
+                            break;
+                        case 15310:
+                            Name = "Bug Master Hood";
+                            Stats["MaxMana"] += 10;
+                            Stats["Defense"] += 1;
+                            break;
+                        case 15320:
+                            Name = "Bug Master CLoak";
+                            Stats["Magic"] +=        1;
+                            Stats["Defense"] +=      2;
+                            break;
+                        case 15330:
+                            Name = "Bug Master Kilt";
+                            Stats["MaxMana"] +=      5;
+                            Stats["Defense"] +=      1;
+                            break;
+                        case 15340:
+                            Name = "Diamond Staff";
+                            Stats["MaxMana"] +=      20;
+                            Stats["Strength"] +=     3;
+                            Stats["Magic"] +=        5;
+                            break;
+                        case 15345:
+                            Name = "Root Wand";
+                            Stats["Strength"] +=     2;
+                            Stats["Magic"] +=        4;
+                            Stats["ManaRegen"] +=    -1;
+                            break;
+                        case 15350:
+                            Name = "Hidden Tome";
+                            Stats["MaxMana"] +=      10;
+                            break;
+                        case 20110:
+                            Name = "Iron Helmet";
+                            Stats["Strength"] +=     2;
+                            Stats["Defense"] +=      4;
+                            Stats["MagicDefense"] += 2;
+                            break;
+                        case 20120:
+                            Name = "Iron Vest";
+                            Stats["Strength"] +=     2;
+                            Stats["Defense"] +=      6;
+                            break;
+                        case 20130:
+                            Name = "Iron Leggings";
+                            Stats["Strength"] +=     2;
+                            Stats["Defense"] +=      4;
+                            Stats["MagicDefense"] += 1;
+                            break;
+                        case 20140:
+                            Name = "Greatsword";
+                            Stats["Strength"] +=     8;
+                            break;
+                        case 20145:
+                            Name = "Mythril Hammer";
+                            Stats["Strength"] +=     10;
+                            Stats["Magic"] +=        -3;
+                            break;
+                        case 20150:
+                            Name = "Warrior Shield";
+                            Stats["Strength"] +=     1;
+                            Stats["Defense"] +=      4;
+                            Stats["MagicDefense"] += 1;
+                            break;
+                        case 25110:
+                            Name = "Mythril Helmet";
+                            Stats["Strength"] +=     2;
+                            Stats["Defense"] +=      2;
+                            Stats["MagicDefense"] += 4;
+                            break;
+                        case 25120:
+                            Name = "Mythril Vest";
+                            Stats["Strength"] +=     2;
+                            Stats["Defense"] +=      3;
+                            Stats["MagicDefense"] += 3;
+                            break;
+                        case 25130:
+                            Name = "Mythril Leggings";
+                            Stats["Strength"] +=     2;
+                            Stats["Magic"] +=        1;
+                            Stats["Defense"] +=      1;
+                            Stats["MagicDefense"] += 4;
+                            break;
+                        case 25140:
+                            Name = "Fire Sword";
+                            Stats["Strength"] +=     6;
+                            Stats["Magic"] +=        3;
+                            Element = 1;
+                            break;
+                        case 25145:
+                            Name = "Holy Hammer";
+                            Stats["MaxMana"] +=      5;
+                            Stats["Strength"] +=     8;
+                            Stats["Magic"] +=        2;
+                            break;
+                        case 25150:
+                            Name = "Rubber Shield";
+                            Stats["Strength"] +=     1;
+                            Stats["Defense"] +=      3;
+                            Stats["MagicDefense"] += 4;
+                            break;
+                        case 20210:
+                            Name = "Royal Cap";
+                            Stats["Agility"] +=      2;
+                            Stats["Defense"] +=      2;
+                            Stats["MagicDefense"] += 3;
+                            break;
+                        case 20220:
+                            Name = "Royal Vest";
+                            Stats["Agility"] +=      3;
+                            Stats["Defense"] +=      3;
+                            Stats["MagicDefense"] += 2;
+                            break;
+                        case 20230:
+                            Name = "Royal Leggings";
+                            Stats["Agility"] +=      2;
+                            Stats["Defense"] +=      1;
+                            Stats["MagicDefense"] += 2;
+                            break;
+                        case 20240:
+                            Name = "Royal Longbow";
+                            Stats["Strength"] +=     5;
+                            Stats["Agility"] +=      8;
+                            break;
+                        case 20245:
+                            Name = "Huntsman's Shortbow";
+                            Stats["Strength"] +=     3;
+                            Stats["Magic"] +=        4;
+                            Stats["Agility"] +=      6;
+                            break;
+                        case 20250:
+                            Name = "Royal Quiver";
+                            Stats["Magic"] +=        2;
+                            Stats["Agility"] +=      4;
+                            break;
+                        case 25210:
+                            Name = "Wanderer's Hat";
+                            Stats["MaxMana"] +=      5;
+                            Stats["Agility"] +=      3;
+                            Stats["Defense"] +=      1;
+                            Stats["MagicDefense"] += 2;
+                            break;
+                        case 25220:
+                            Name = "Wanderer's Clothes";
+                            Stats["Magic"] +=        2;
+                            Stats["Agility"] +=      2;
+                            Stats["Defense"] +=      2;
+                            Stats["MagicDefense"] += 3;
+                            break;
+                        case 25230:
+                            Name = "Wanderer's Shorts";
+                            Stats["Magic"] +=        1;
+                            Stats["Agility"] +=      1;
+                            Stats["Defense"] +=      1;
+                            Stats["MagicDefense"] += 3;
+                            break;
+                        case 25240:
+                            Name = "Spiky Longbow";
+                            Stats["MaxMana"] +=      5;
+                            Stats["Strength"] +=     6;
+                            Stats["Magic"] +=        2;
+                            Stats["Agility"] +=      5;
+                            break;
+                        case 25245:
+                            Name = "Frozen Shortbow";
+                            Stats["MaxHP"] +=        10;
+                            Stats["Strength"] +=     5;
+                            Stats["Magic"] +=        2;
+                            Stats["Agility"] +=      4;
+                            Element = 3;
+                            break;
+                        case 25250:
+                            Name = "Lava Quiver";
+                            Stats["Magic"] +=        3;
+                            Stats["Agility"] +=      3;
+                            Element = 1;
+                            break;
+                        case 20310:
+                            Name = "Cut-up Hood";
+                            Stats["Magic"] +=        2;
+                            Stats["MagicDefense"] += 5;
+                            break;
+                        case 20320:
+                            Name = "Cut-up Cloak";
+                            Stats["MaxMana"] +=      10;
+                            Stats["Magic"] +=        3;
+                            Stats["Defense"] +=      2;
+                            Stats["MagicDefense"] += 6;
+                            break;
+                        case 20330:
+                            Name = "Cut-up Kilt";
+                            Stats["MaxMana"] +=      5;
+                            Stats["Magic"] +=        2;
+                            Stats["MagicDefense"] += 4;
+                            break;
+                        case 20340:
+                            Name = "Emerald Staff";
+                            Stats["MaxMana"] +=      5;
+                            Stats["Strength"] +=     5;
+                            Stats["Magic"] +=        10;
+                            break;
+                        case 20345:
+                            Name = "Water Wand";
+                            Stats["MaxMana"] +=      15;
+                            Stats["Strength"] +=     6;
+                            Stats["Magic"] +=        7;
+                            Stats["MagicDefense"] += 4;
+                            break;
+                        case 20350:
+                            Name = "Scholar's Tome";
+                            Stats["MaxMana"] +=      10;
+                            Stats["Magic"] +=        3;
+                            break;
+                        case 25310:
+                            Name = "Crystal Hood";
+                            Stats["Magic"] +=        1;
+                            Stats["Defense"] +=      2;
+                            Stats["MagicDefense"] += 3;
+                            break;
+                        case 25320:
+                            Name = "Crystal Cloak";
+                            Stats["MaxMana"] +=      15;
+                            Stats["Magic"] +=        5;
+                            Stats["Defense"] +=      -2;
+                            Stats["MagicDefense"] += 8;
+                            break;
+                        case 25330:
+                            Name = "Crystal Kilt";
+                            Stats["MaxMana"] +=      15;
+                            Stats["Strength"] +=     -2;
+                            Stats["Magic"] +=        3;
+                            Stats["Defense"] +=      2;
+                            Stats["MagicDefense"] += 2;
+                            break;
+                        case 25340:
+                            Name = "Crooked Staff";
+                            Stats["Torch"] +=        1;
+                            Stats["MaxMana"] +=      15;
+                            Stats["Strength"] +=     6;
+                            Stats["Magic"] +=        8;
+                            break;
+                        case 25345:
+                            Name = "Flame Wand";
+                            Stats["Torch"] +=        1;
+                            Stats["MaxMana"] +=      10;
+                            Stats["Strength"] +=     3;
+                            Stats["Magic"] +=        7;
+                            Stats["Defense"] +=      2;
+                            Stats["MagicDefense"] += 2;
+                            break;
+                        case 25350:
+                            Name = "Enchanted Tome";
+                            Stats["MaxMana"] +=      15;
+                            Stats["Strength"] +=     -2;
+                            Stats["Magic"] +=        3;
+                            Stats["Defense"] +=      2;
+                            Stats["MagicDefense"] += 2;
+                            break;
+                        case 30110:
+                            Name = "Hardened Helmet";
+                            Stats["MaxHP"] +=        5;
+                            Stats["Strength"] +=     3;
+                            Stats["Magic"] +=        -1;
+                            Stats["Defense"] +=      8;
+                            Stats["MagicDefense"] += 3;
+                            break;
+                        case 30120:
+                            Name = "Hardened Armor";
+                            Stats["MaxHP"] +=        10;
+                            Stats["MaxMana"] +=      -5;
+                            Stats["Strength"] +=     3;
+                            Stats["Defense"] +=      10;
+                            Stats["MagicDefense"] += 4;
+                            break;
+                        case 30130:
+                            Name = "Hardened Leggings";
+                            Stats["Strength"] +=     3;
+                            Stats["Defense"] +=      6;
+                            Stats["MagicDefense"] += 2;
+                            break;
+                        case 30140:
+                            Name = "Hardened Sword";
+                            Stats["Strength"] +=     13;
+                            Stats["Defense"] +=      2;
+                            break;
+                        case 30145:
+                            Name = "Obsidian Hammer";
+                            Stats["MaxMana"] +=      -5;
+                            Stats["Strength"] +=     16;
+                            Stats["Magic"] +=        -5;
+                            Stats["Defense"] +=      4;
+                            break;
+                        case 30150:
+                            Name = "Tower Shield";
+                            Stats["MaxHP"] +=        5;
+                            Stats["Strength"] +=     2;
+                            Stats["Defense"] +=      7;
+                            Stats["MagicDefense"] += 2;
+                            break;
+                        case 35110:
+                            Name = "Dragon Helmet";
+                            Stats["Strength"] +=     3;
+                            Stats["Magic"] +=        1;
+                            Stats["Defense"] +=      5;
+                            Stats["MagicDefense"] += 6;
+                            Stats["HPRegen"] +=      -1;
+                            break;
+                        case 35120:
+                            Name = "Dragon Armor";
+                            Stats["MaxHP"] +=        5;
+                            Stats["MaxMana"] +=      5;
+                            Stats["Strength"] +=     3;
+                            Stats["Defense"] +=      7;
+                            Stats["MagicDefense"] += 6;
+                            Stats["HPRegen"] +=      -2;
+                            break;
+                        case 35130:
+                            Name = "Dragon Leggings";
+                            Stats["Torch"] +=        1;
+                            Stats["MaxHP"] +=        5;
+                            Stats["Strength"] +=     3;
+                            Stats["Defense"] +=      4;
+                            Stats["MagicDefense"] += 4;
+                            break;
+                        case 35140:
+                            Name = "Obsidian Sword";
+                            Stats["Strength"] +=     10;
+                            Stats["Defense"] +=      3;
+                            Stats["MagicDefense"] += 2;
+                            Stats["ManaRegen"] +=    -2;
+                            break;
+                        case 35145:
+                            Name = "Milion Pounds Hammer";
+                            Stats["Torch"] +=        -1;
+                            Stats["MaxMana"] +=      -10;
+                            Stats["Strength"] +=     20;
+                            Stats["Magic"] +=        -5;
+                            Stats["Defense"] +=      6;
+                            break;
+                        case 35150:
+                            Name = "Reflective Shield";
+                            Stats["MaxHP"] +=        5;
+                            Stats["Defense"] +=      7;
+                            Stats["MagicDefense"] += 4;
+                            Stats["HPRegen"] +=      -1;
+                            Stats["ManaRegen"] +=    -2;
+                            break;
+                        case 30210:
+                            Name = "Huntsman's Hat";
+                            Stats["Magic"] +=        2;
+                            Stats["Agility"] +=      3;
+                            Stats["Defense"] +=      4;
+                            Stats["MagicDefense"] += 5;
+                            break;
+                        case 30220:
+                            Name = "Huntsman's Vest";
+                            Stats["MaxMana"] +=      10;
+                            Stats["Agility"] +=      3;
+                            Stats["Defense"] +=      6;
+                            Stats["MagicDefense"] += 4;
+                            break;
+                        case 30230:
+                            Name = "Huntsman's Leggings";
+                            Stats["Magic"] +=        2;
+                            Stats["Agility"] +=      3;
+                            Stats["Defense"] +=      4;
+                            Stats["MagicDefense"] += 3;
+                            break;
+                        case 30240:
+                            Name = "Huntsman's Longbow";
+                            Stats["MaxMana"] +=      5;
+                            Stats["Strength"] +=     8;
+                            Stats["Agility"] +=      12;
+                            break;
+                        case 30245:
+                            Name = "Perfected Shortbow";
+                            Stats["Torch"] +=        1;
+                            Stats["MaxMana"] +=      5;
+                            Stats["Strength"] +=     6;
+                            Stats["Magic"] +=        3;
+                            Stats["Agility"] +=      10;
+                            break;
+                        case 30250:
+                            Name = "Crystal Quiver";
+                            Stats["Strength"] +=     2;
+                            Stats["Magic"] +=        3;
+                            Stats["Agility"] +=      6;
+                            break;
+                        case 35210:
+                            Name = "Camo Hat";
+                            Stats["Torch"] +=        1;
+                            Stats["Magic"] +=        2;
+                            Stats["Agility"] +=      4;
+                            Stats["Defense"] +=      2;
+                            Stats["MagicDefense"] += 2;
+                            break;
+                        case 35220:
+                            Name = "Camo Vest";
+                            Stats["Magic"] +=        1;
+                            Stats["Agility"] +=      3;
+                            Stats["Defense"] +=      4;
+                            Stats["MagicDefense"] += 6;
+                            Stats["ManaRegen"] +=    -1;
+                            break;
+                        case 35230:
+                            Name = "Camo Leggings";
+                            Stats["Magic"] +=        2;
+                            Stats["Agility"] +=      3;
+                            Stats["Defense"] +=      3;
+                            Stats["HPRegen"] +=      -1;
+                            break;
+                        case 35240:
+                            Name = "Golden Longbow";
+                            Stats["Torch"] +=        1;
+                            Stats["Strength"] +=     5;
+                            Stats["Agility"] +=      10;
+                            Element = 4;
+                            break;
+                        case 35245:
+                            Name = "Crystal Shortbow";
+                            Stats["Torch"] +=        3;
+                            Stats["Strength"] +=     3;
+                            Stats["Magic"] +=        5;
+                            Stats["Agility"] +=      7;
+                            Stats["HPRegen"] +=      -1;
+                            Stats["ManaRegen"] +=    -2;
+                            break;
+                        case 35250:
+                            Name = "Enchanted Quiver";
+                            Stats["Torch"] +=        2;
+                            Stats["Strength"] +=     3;
+                            Stats["Agility"] +=      4;
+                            Stats["HPRegen"] +=      -1;
+                            Stats["ManaRegen"] +=    -1;
+                            break;
+                        case 30310:
+                            Name = "Wizard's Hood";
+                            Stats["MaxMana"] +=      10;
+                            Stats["Magic"] +=        3;
+                            Stats["Defense"] +=      2;
+                            Stats["MagicDefense"] += 7;
+                            break;
+                        case 30320:
+                            Name = "Wizard's Cloak";
+                            Stats["MaxMana"] +=      15;
+                            Stats["Magic"] +=        3;
+                            Stats["Defense"] +=      3;
+                            Stats["MagicDefense"] += 9;
+                            break;
+                        case 30330:
+                            Name = "Wizard's Kilt";
+                            Stats["MaxMana"] +=      10;
+                            Stats["Magic"] +=        3;
+                            Stats["Defense"] +=      1;
+                            Stats["MagicDefense"] += 6;
+                            break;
+                        case 30340:
+                            Name = "Ruby Staff";
+                            Stats["Torch"] +=        1;
+                            Stats["MaxMana"] +=      10;
+                            Stats["Strength"] +=     8;
+                            Stats["Magic"] +=        15;
+                            Stats["Defense"] +=      2;
+                            Stats["ManaRegen"] +=    -1;
+                            break;
+                        case 30345:
+                            Name = "Arkhana Wand";
+                            Stats["Torch"] +=        1;
+                            Stats["MaxMana"] +=      20;
+                            Stats["Strength"] +=     10;
+                            Stats["Magic"] +=        10;
+                            Stats["Defense"] +=      3;
+                            Stats["MagicDefense"] += 4;
+                            Stats["HPRegen"] +=      -1;
+                            break;
+                        case 30350:
+                            Name = "Wizard's Tome";
+                            Stats["MaxMana"] +=      15;
+                            Stats["Magic"] +=        5;
+                            Stats["MagicDefense"] += 1;
+                            Stats["ManaRegen"] +=    -1;
+                            break;
+                        case 35310:
+                            Name = "Dark Mage's Hood";
+                            Stats["Torch"] +=        2;
+                            Stats["MaxMana"] +=      5;
+                            Stats["Magic"] +=        3;
+                            Stats["Defense"] +=      4;
+                            Stats["MagicDefense"] += 4;
+                            break;
+                        case 35320:
+                            Name = "Dark Mage's Cloak";
+                            Stats["MaxMana"] +=      10;
+                            Stats["Magic"] +=        3;
+                            Stats["Defense"] +=      4;
+                            Stats["MagicDefense"] += 7;
+                            Stats["ManaRegen"] +=    -2;
+                            break;
+                        case 35330:
+                            Name = "Dark Mage's Kilt";
+                            Stats["Torch"] +=        2;
+                            Stats["Magic"] +=        3;
+                            Stats["Defense"] +=      3;
+                            Stats["MagicDefense"] += 3;
+                            Stats["HPRegen"] +=      -2;
+                            Stats["ManaRegen"] +=    -1;
+                            break;
+                        case 35340:
+                            Name = "Shattered Staff";
+                            Stats["MaxMana"] +=      30;
+                            Stats["Magic"] +=        20;
+                            Stats["Defense"] +=      -6;
+                            Stats["MagicDefense"] += -8;
+                            Stats["ManaRegen"] +=    -2;
+                            Stats["Strength"] +=     10;
+                            break;
+                        case 35345:
+                            Name = "Two-sided Wand";
+                            Stats["Torch"] +=        2;
+                            Stats["MaxMana"] +=      10;
+                            Stats["Strength"] +=     15;
+                            Stats["Magic"] +=        15;
+                            Stats["Defense"] +=      -4;
+                            Stats["MagicDefense"] += -4;
+                            Stats["HPRegen"] +=      1;
+                            Stats["ManaRegen"] +=    -2;
+                            break;
+                        case 35350:
+                            Name = "Forbidden Tome";
+                            Stats["Torch"] +=        1;
+                            Stats["MaxMana"] +=      20;
+                            Stats["Magic"] +=        3;
+                            Stats["ManaRegen"] +=    -2;
+                            break;
+                        case 40110:
+                            Name = "Paladin's Helmet";
+                            Stats["MaxHP"] +=        10;
+                            Stats["Strength"] +=     4;
+                            Stats["Magic"] +=        -2;
+                            Stats["Agility"] +=      -2;
+                            Stats["Defense"] +=      10;
+                            Stats["MagicDefense"] += 5;
+                            Stats["HPRegen"] +=      -1;
+                            break;
+                        case 40120:
+                            Name = "Paladin's Armor";
+                            Stats["MaxHP"] +=        15;
+                            Stats["MaxMana"] +=      -5;
+                            Stats["Strength"] +=     4;
+                            Stats["Agility"] +=      -1;
+                            Stats["Defense"] +=      15;
+                            Stats["MagicDefense"] += 6;
+                            Stats["HPRegen"] +=      -2;
+                            break;
+                        case 40130:
+                            Name = "Paladin's Leggings";
+                            Stats["MaxHP"] +=        10;
+                            Stats["MaxMana"] +=      -5;
+                            Stats["Strength"] +=     4;
+                            Stats["Agility"] +=      -1;
+                            Stats["Defense"] +=      8;
+                            Stats["MagicDefense"] += 4;
+                            Stats["HPRegen"] +=      -1;
+                            break;
+                        case 40140:
+                            Name = "Sword Of Legends";
+                            Stats["Strength"] +=     15;
+                            Stats["Defense"] +=      2;
+                            Stats["MagicDefense"] += 2;
+                            Stats["HPRegen"] +=      -1;
+                            break;
+                        case 40145:
+                            Name = "Mace Of Legends";
+                            Stats["MaxHP"] +=        5;
+                            Stats["Strength"] +=     20;
+                            Stats["Magic"] +=        -3;
+                            Stats["Agility"] +=      -3;
+                            Stats["Defense"] +=      4;
+                            Stats["HPRegen"] +=      1;
+                            Stats["ManaRegen"] +=    2;
+                            break;
+                        case 40150:
+                            Name = "Unbreakable Shield";
+                            Stats["Strength"] +=     3;
+                            Stats["Defense"] +=      10;
+                            Stats["MagicDefense"] += 2;
+                            Stats["HPRegen"] +=      -2;
+                            break;
+                        case 40210:
+                            Name = "Hawk Hat";
+                            Stats["Torch"] +=        2;
+                            Stats["Magic"] +=        3;
+                            Stats["Agility"] +=      4;
+                            Stats["Defense"] +=      7;
+                            Stats["MagicDefense"] += 6;
+                            break;
+                        case 40220:
+                            Name = "Hawk Scarf";
+                            Stats["Torch"] +=        1;
+                            Stats["MaxMana"] +=      10;
+                            Stats["Magic"] +=        2;
+                            Stats["Agility"] +=      4;
+                            Stats["Defense"] +=      9;
+                            Stats["MagicDefense"] += 6;
+                            break;
+                        case 40230:
+                            Name = "Hawk Belt";
+                            Stats["Magic"] +=        2;
+                            Stats["Agility"] +=      4;
+                            Stats["Defense"] +=      7;
+                            Stats["MagicDefense"] += 4;
+                            Stats["ManaRegen"] +=    -1;
+                            break;
+                        case 40240:
+                            Name = "Living Longbow";
+                            Stats["MaxMana"] +=      5;
+                            Stats["Strength"] +=     10;
+                            Stats["Magic"] +=        2;
+                            Stats["Agility"] +=      15;
+                            Stats["Defense"] +=      2;
+                            break;
+                        case 40245:
+                            Name = "Full Metal Shortbow";
+                            Stats["Torch"] +=        3;
+                            Stats["MaxMana"] +=      15;
+                            Stats["Strength"] +=     7;
+                            Stats["Magic"] +=        4;
+                            Stats["Agility"] +=      12;
+                            Stats["Defense"] +=      1;
+                            Stats["HPRegen"] +=      -1;
+                            break;
+                        case 40250:
+                            Name = "Black Feather Quiver";
+                            Stats["MaxMana"] +=      5;
+                            Stats["Strength"] +=     2;
+                            Stats["Agility"] +=      8;
+                            Stats["Defense"] +=      2;
+                            Stats["MagicDefense"] += 2;
+                            Stats["ManaRegen"] +=    -1;
+                            break;
+                        case 40310:
+                            Name = "Forgotten Hood";
+                            Stats["Torch"] +=        2;
+                            Stats["MaxMana"] +=      20;
+                            Stats["Magic"] +=        4;
+                            Stats["Defense"] +=      4;
+                            Stats["MagicDefense"] += 12;
+                            Stats["ManaRegen"] +=    -1;
+                            break;
+                        case 40320:
+                            Name = "Forgotten Cape";
+                            Stats["Torch"] +=        2;
+                            Stats["MaxMana"] +=      20;
+                            Stats["Magic"] +=        4;
+                            Stats["Defense"] +=      5;
+                            Stats["MagicDefense"] += 15;
+                            Stats["ManaRegen"] +=    -1;
+                            break;
+                        case 40330:
+                            Name = "Mana Belt";
+                            Stats["Torch"] +=        1;
+                            Stats["MaxMana"] +=      30;
+                            Stats["Magic"] +=        4;
+                            Stats["Defense"] +=      3;
+                            Stats["MagicDefense"] += 7;
+                            Stats["ManaRegen"] +=    -2;
+                            break;
+                        case 40340:
+                            Name = "Rainbow Staff";
+                            Stats["Torch"] +=        1;
+                            Stats["MaxMana"] +=      15;
+                            Stats["Strength"] +=     10;
+                            Stats["Magic"] +=        20;
+                            Stats["Defense"] +=      3;
+                            Stats["ManaRegen"] +=    -2;
+                            break;
+                        case 40345:
+                            Name = "Refraction Wand";
+                            Stats["Torch"] +=        3;
+                            Stats["MaxMana"] +=      30;
+                            Stats["Strength"] +=     15;
+                            Stats["Magic"] +=        15;
+                            Stats["Defense"] +=      5;
+                            Stats["MagicDefense"] += 3;
+                            Stats["ManaRegen"] +=    -3;
+                            break;
+                        case 40350:
+                            Name = "Balance Tome";
+                            Stats["MaxMana"] +=      20;
+                            Stats["Magic"] +=        6;
+                            Stats["Defense"] +=      3;
+                            Stats["MagicDefense"] += 3;
+                            Stats["HPRegen"] +=      -2;
+                            Stats["ManaRegen"] +=    -2;
+                            break;
+                    }
+
+
+                    break;
+
+
+            }
+
         }
     }
 
@@ -1120,6 +2176,8 @@ namespace ByteLike
         public bool IsGhost = false;
         public List<string> Spells = new List<string>();
         public Item[,] Inventory = new Item[11, 1];
+        public string File = "Graphycs/ByteLikeGraphycs/placeholder.png";
+        static protected Random rand = new Random();
 
         public Creature()
         {
@@ -1129,17 +2187,17 @@ namespace ByteLike
             Stats.Add("Strength", 3);
             Stats.Add("Magic", 3);
             Stats.Add("Agility", 3);
-            Stats.Add("Defense", 2);
-            Stats.Add("MagicDefense", 2);
-            Stats.Add("HPRegen", 0);
-            Stats.Add("ManaRegen", 0);
+            Stats.Add("Defense", 1);
+            Stats.Add("MagicDefense", 1);
+            Stats.Add("HPRegen", 5);
+            Stats.Add("ManaRegen", 7);
             Stats.Add("MaxHP", 5);
             Stats.Add("MaxMana", 10);
-            Stats.Add("MaxHPRegen", 5);
-            Stats.Add("MaxManaRegen", 7);
+            Stats.Add("MaxHPRegen", 0);
+            Stats.Add("MaxManaRegen", 0);
 
-            Buffs.Add("HP", 0);
-            Buffs.Add("Mana", 0);
+            Buffs.Add("MaxHP", 0);
+            Buffs.Add("MaxMana", 0);
             Buffs.Add("Defense", 0);
             Buffs.Add("MagicDefense", 0);
             Buffs.Add("Strength", 0);
@@ -1149,8 +2207,8 @@ namespace ByteLike
             Buffs.Add("ManaRegen", 0);
 
 
-            BuffLevels.Add("HP", 0);
-            BuffLevels.Add("Mana", 0);
+            BuffLevels.Add("MaxHP", 0);
+            BuffLevels.Add("MaxMana", 0);
             BuffLevels.Add("Defense", 0);
             BuffLevels.Add("MagicDefense", 0);
             BuffLevels.Add("Strength", 0);
@@ -1189,8 +2247,8 @@ namespace ByteLike
             // Regeneration
 
 
-            Stats["HPRegen"]++;
-            Stats["ManaRegen"]++;
+            Stats["MaxHPRegen"]++;
+            Stats["MaxManaRegen"]++;
 
 
             foreach (KeyValuePair<string, int> item in Buffs)
@@ -1199,17 +2257,29 @@ namespace ByteLike
             }
 
 
-            if ((Stats["HPRegen"] >= Stats["MaxHPRegen"] - BuffLevels["HPRegen"] && Stats["HP"] < Stats["MaxHP"] && Buffs["HPRegen"] > 0) || (Stats["HPRegen"] >= Stats["MaxHPRegen"] && Stats["HP"] < Stats["MaxHP"] && Buffs["HPRegen"] <= 0))
+            if (Stats["MaxHPRegen"] >= GetStat("HPRegen"))
             {
-                Stats["HP"]++;
-                Stats["HPRegen"] = 0;
+                Stats["HP"]+= 2;
+
+                if (GetStat("HPRegen") < 0)
+                {
+                    Stats["HP"] -= GetStat("HPRegen");
+                }
+
+                Stats["MaxHPRegen"] = 0;
             }
 
 
-            if ((Stats["ManaRegen"] >= Stats["MaxManaRegen"] - BuffLevels["ManaRegen"] && Stats["Mana"] < Stats["MaxMana"] && Buffs["ManaRegen"] > 0) || (Stats["ManaRegen"] >= Stats["MaxManaRegen"] && Stats["Mana"] < Stats["MaxMana"] && Buffs["ManaRegen"] <= 0))
+            if (Stats["MaxManaRegen"] >= GetStat("ManaRegen"))
             {
-                Stats["Mana"]++;
-                Stats["ManaRegen"] = 0;
+                Stats["Mana"] += 2;
+
+                if (GetStat("ManaRegen") < 0)
+                {
+                    Stats["Mana"] -= GetStat("ManaRegen");
+                }
+
+                Stats["MaxManaRegen"] = 0;
             }
 
 
@@ -1219,7 +2289,7 @@ namespace ByteLike
 
             for (int i = 0; i < 4; i++)
             {
-                if (Potentials[i] > Stats["MagicDefense"] && Buffs["MagicDefense"] == 0 || Potentials[i] > Stats["MagicDefense"] + BuffLevels["MagicDefense"])
+                if (Potentials[i] > GetStat("MagicDefense")/2)
                 {
                     Statuses[i] = 5;
                     switch (i)
@@ -1256,6 +2326,23 @@ namespace ByteLike
 
         }
 
+        public int GetStat(string index)
+        {
+            int current = Stats[index];
+            for (int i = 0; i < 9; i++)
+            {
+                if (Inventory[i, 0] != null)
+                    current += Inventory[i, 0].Stats[index];
+            }
+
+            if (Buffs[index] > 0)
+            {
+                current += BuffLevels[index];
+            }
+
+            return current;
+        }
+
     }
 
 
@@ -1276,6 +2363,18 @@ namespace ByteLike
         public Player(string name)
             : base()
         {
+            switch (rand.Next(2))
+            {
+                case 0:
+                    File = "Graphycs/ByteLikeGraphycs/player1.png";
+                    break;
+                case 1:
+                    File = "Graphycs/ByteLikeGraphycs/player2.png";
+                    break;
+                case 2:
+                    File = "Graphycs/ByteLikeGraphycs/player3.png";
+                    break;
+            }
             Name = name;
             Stats["HP"] = 20;
             Stats["Mana"] = 10;
@@ -1287,6 +2386,13 @@ namespace ByteLike
             Buffs.Add("Torch", 0);
 
             BuffLevels.Add("Torch", 0);
+
+
+            Inventory[0, 1] = new Item(90);
+            Inventory[0, 2] = new Item(90);
+            Inventory[0, 3] = new Item(90);
+            Inventory[0, 4] = new Item(90);
+            Inventory[0, 5] = new Item(90);
         }
 
         // Main Logics
@@ -1307,7 +2413,7 @@ namespace ByteLike
                 invCheck = true;
             }
             // Move only if not frozen/paralysed
-            if (Statuses[2] == 0 && Statuses[3] % 2 == 0)
+            if (Statuses[2] == 0 && Statuses[3] % 2 == 0 || OpenInventory)
             {
                 if (Keyboard.IsKeyDown(Key.W)) { movement[1] = -1; }
                 else if (Keyboard.IsKeyDown(Key.S)) { movement[1] = 1; }
@@ -1505,9 +2611,14 @@ namespace ByteLike
                 CurrentSlot[0] += movement[0];
                 CurrentSlot[1] += movement[1];
                 if (CurrentSlot[0] >= Inventory.GetLength(0)) { CurrentSlot[0] = 0; }
-                if (CurrentSlot[0] < 0) { CurrentSlot[0] = Inventory.GetLength(0)-1; }
+                if (CurrentSlot[0] < 0) { CurrentSlot[0] = Inventory.GetLength(0) - 1; }
                 if (CurrentSlot[1] >= Inventory.GetLength(1)) { CurrentSlot[1] = 0; }
                 if (CurrentSlot[1] < 0) { CurrentSlot[1] = Inventory.GetLength(1) - 1; }
+
+                if (Inventory[CurrentSlot[0], CurrentSlot[1]] != null)
+                {
+                    response = Inventory[CurrentSlot[0], CurrentSlot[1]].Name;
+                }
 
                 if (Keyboard.IsKeyDown(Key.E))
                 {
@@ -1603,7 +2714,10 @@ namespace ByteLike
             if (!OpenInventory)
             {
                 response = Conditions(response);
+                if (Stats["HP"] > GetStat("MaxHP")) { Stats["HP"] = GetStat("MaxHP"); }
+                if (Stats["Mana"] > GetStat("MaxMana")) { Stats["Mana"] = GetStat("MaxMana"); }
             }
+
 
 
             // Death
@@ -1619,6 +2733,43 @@ namespace ByteLike
         }
         //
 
+        public new int GetStat(string index)
+        {
+            int current = Stats[index];
+            for (int i = 0; i < 9; i++)
+            {
+                if (!OpenInventory || CurrentSlot[1] == 0)
+                {
+                    if (Inventory[i, 0] != null)
+                        current += Inventory[i, 0].Stats[index];
+                }
+                else
+                {
+                    if (Inventory[CurrentSlot[0], CurrentSlot[1]] != null)
+                    {
+                        if (Inventory[CurrentSlot[0], CurrentSlot[1]].GearType == i + 1 || (i == 8 && Inventory[CurrentSlot[0], CurrentSlot[1]].GearType == i))
+                        {
+                            current += Inventory[CurrentSlot[0], CurrentSlot[1]].Stats[index];
+                        }
+                        else if (Inventory[i, 0] != null)
+                        {
+                            current += Inventory[i, 0].Stats[index];
+                        }
+                    }
+                    else if (Inventory[i, 0] != null)
+                    {
+                        current += Inventory[i, 0].Stats[index];
+                    }
+                }
+            }
+
+            if (Buffs[index] > 0)
+            {
+                current += BuffLevels[index];
+            }
+
+            return current;
+        }
 
 
 
