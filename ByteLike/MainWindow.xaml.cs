@@ -22,7 +22,6 @@ namespace ByteLike
     /// </summary>
     public partial class MainWindow : Window
     {
-
         static int[,] level = new int[100, 100];
         static int[,] darkness = new int[100, 100];
 
@@ -30,6 +29,7 @@ namespace ByteLike
         static int[] camera = new int[2];
         static int[] cameraSize = new int[] { 40, 30 };
         static int floor = 1;
+        static List<Chest> chests = new List<Chest>();
 
         static int[] sizes = new int[2];
         static string response = "";
@@ -54,9 +54,9 @@ namespace ByteLike
             bool doNext = true;
 
 
-            for (int i = -player.Torch() - 5; i <= player.Torch() + 5; i++)
+            for (int i = -player.GetStat("Torch") - 5; i <= player.GetStat("Torch") + 5; i++)
             {
-                for (int j = -player.Torch() - 5; j <= player.Torch() + 5; j++)
+                for (int j = -player.GetStat("Torch") - 5; j <= player.GetStat("Torch") + 5; j++)
                 {
                     if (player.position[0] + j > 0 && player.position[0] + j < level.GetLength(0) && player.position[1] + i > 0 && player.position[1] + i < level.GetLength(1))
                     {
@@ -76,13 +76,13 @@ namespace ByteLike
             while (doNext)
             {
                 doNext = false;
-                for (int i = -player.Torch() - 5; i <= player.Torch() + 5; i++)
+                for (int i = -player.GetStat("Torch") - 5; i <= player.GetStat("Torch") + 5; i++)
                 {
-                    for (int j = -player.Torch() - 5; j <= player.Torch() + 5; j++)
+                    for (int j = -player.GetStat("Torch") - 5; j <= player.GetStat("Torch") + 5; j++)
                     {
                         if (player.position[0] + j > 0 && player.position[0] + j < level.GetLength(0) && player.position[1] + i > 0 && player.position[1] + i < level.GetLength(1))
                         {
-                            if (darkness[player.position[0] + j, player.position[1] + i] == 3)
+                            if (darkness[player.position[0] + j, player.position[1] + i] >= 3)
                             {
                                 position[0] = player.position[0];
                                 position[1] = player.position[1];
@@ -90,31 +90,31 @@ namespace ByteLike
                                 position[1] += i;
                                 if (level[position[0], position[1]] != 2 && level[position[0], position[1]] != 0 && level[position[0], position[1]] != 5 && level[position[0], position[1]] != 4)
                                 {
-                                    if (position[0] + 1 > 0 && position[0] + 1 < level.GetLength(0) && position[1] > 0 && position[1] < level.GetLength(1) && DistanceBetween(player.position, new int[] { position[0] + 1, position[1] }) < (player.Torch() + 0.5) * 1.5)
+                                    if (position[0] + 1 > 0 && position[0] + 1 < level.GetLength(0) && position[1] > 0 && position[1] < level.GetLength(1) && darkness[position[0],position[1]]-3 < player.GetStat("Torch"))
                                     {
                                         if (darkness[position[0] + 1, position[1]] != 1)
-                                            darkness[position[0] + 1, position[1]] = 3;
+                                            darkness[position[0] + 1, position[1]] = darkness[position[0],position[1]]+1;
                                         doNext = true;
                                     }
 
-                                    if (position[0] - 1 > 0 && position[0] - 1 < level.GetLength(0) && position[1] > 0 && position[1] < level.GetLength(1) && DistanceBetween(player.position, new int[] { position[0] - 1, position[1] }) < (player.Torch() + 0.5) * 1.5)
+                                    if (position[0] - 1 > 0 && position[0] - 1 < level.GetLength(0) && position[1] > 0 && position[1] < level.GetLength(1) && darkness[position[0], position[1]] - 3 < player.GetStat("Torch"))
                                     {
                                         if (darkness[position[0] - 1, position[1]] != 1)
-                                            darkness[position[0] - 1, position[1]] = 3;
+                                            darkness[position[0] - 1, position[1]] = darkness[position[0], position[1]] + 1;
                                         doNext = true;
                                     }
 
-                                    if (position[0] > 0 && position[0] < level.GetLength(0) && position[1] + 1 > 0 && position[1] + 1 < level.GetLength(1) && DistanceBetween(player.position, new int[] { position[0], position[1] + 1 }) < (player.Torch() + 0.5) * 1.5)
+                                    if (position[0] > 0 && position[0] < level.GetLength(0) && position[1] + 1 > 0 && position[1] + 1 < level.GetLength(1) && darkness[position[0], position[1]] - 3 < player.GetStat("Torch"))
                                     {
                                         if (darkness[position[0], position[1] + 1] != 1)
-                                            darkness[position[0], position[1] + 1] = 3;
+                                            darkness[position[0], position[1] + 1] = darkness[position[0], position[1]] + 1;
                                         doNext = true;
                                     }
 
-                                    if (position[0] > 0 && position[0] < level.GetLength(0) && position[1] - 1 > 0 && position[1] - 1 < level.GetLength(1) && DistanceBetween(player.position, new int[] { position[0], position[1] - 1 }) < (player.Torch() + 0.5) * 1.5)
+                                    if (position[0] > 0 && position[0] < level.GetLength(0) && position[1] - 1 > 0 && position[1] - 1 < level.GetLength(1) && darkness[position[0], position[1]] - 3 < player.GetStat("Torch"))
                                     {
                                         if (darkness[position[0], position[1] - 1] != 1)
-                                            darkness[position[0], position[1] - 1] = 3;
+                                            darkness[position[0], position[1] - 1] = darkness[position[0], position[1]] + 1;
                                         doNext = true;
                                     }
                                 }
@@ -151,7 +151,10 @@ namespace ByteLike
         static System.Windows.Controls.Image DrawMap(string response)
         {
             // Clear darkness
-            ClearLight();
+            if (!player.OpenSpell)
+            {
+                ClearLight();
+            }
 
             // Set camera to it's top left corner
             camera[0] -= cameraSize[0] / 2;
@@ -166,6 +169,8 @@ namespace ByteLike
             //
 
             DrawingGroup drawingGroup = new DrawingGroup();
+
+            int currentChest = player.GetChest(ref chests);
 
             using (DrawingContext dc = drawingGroup.Open())
             {
@@ -312,6 +317,7 @@ namespace ByteLike
                                     break;
                             }
 
+
                         }
                         else
                         {
@@ -323,6 +329,16 @@ namespace ByteLike
                         if (darkness[camera[0] + j, camera[1] + i] == 2)
                         {
                             dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/partialdarkness.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                        }
+                        else if (darkness[camera[0] + j, camera[1] + i] > 0)
+                        {
+                            foreach (Chest item in chests)
+                            {
+                                if (item.position[0] == camera[0] + j && item.position[1] == camera[1] + i)
+                                {
+                                    dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                }
+                            }
                         }
 
 
@@ -367,32 +383,208 @@ namespace ByteLike
 
                         if (player.OpenInventory)
                         {
-                            if (j >= 5 && j-5 < player.Inventory.GetLength(0) && i < player.Inventory.GetLength(1))
+                            if (!player.OpenSpell)
                             {
-                                floorImage = "Graphycs/ByteLikeGraphycs/invslot";
-                                if (i == 0)
+                                if (j >= 5 && j - 5 < player.Inventory.GetLength(0) && i < player.Inventory.GetLength(1))
                                 {
-                                    floorImage += (j - 4);
+                                    floorImage = "Graphycs/ByteLikeGraphycs/invslot";
+                                    if (i == 0)
+                                    {
+                                        floorImage += (j - 4);
+                                    }
+                                    else { floorImage += 0; }
+                                    floorImage += ".png";
+                                    dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                    if (player.Inventory[j - 5, i] != null)
+                                    {
+                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[j - 5, i].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        if (player.Inventory[j - 5, i].Quantity > 1)
+                                        {
+                                            FormattedText dialogue3 = new FormattedText(player.Inventory[j - 5, i].Quantity.ToString(), System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 8, System.Windows.Media.Brushes.White);
+                                            dialogue3.MaxTextWidth = 56;
+                                            dc.DrawText(dialogue3, new System.Windows.Point(j * 16, 8 + i * 16));
+                                        }
+                                    }
                                 }
-                                else { floorImage += 0; }
-                                floorImage += ".png";
-                                dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                if (player.Inventory[j-5,i] != null)
-                                    dc.DrawImage(new BitmapImage(new Uri(player.Inventory[j-5,i].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                            }
+                                else if (currentChest != -1)
+                                {
+                                    
+                                    if (j >= 5 && j - 5 < player.Inventory.GetLength(0) && i - player.Inventory.GetLength(1) - 1 < chests[currentChest].Inventory.GetLength(1) && i > player.Inventory.GetLength(1))
+                                    {
+                                        floorImage = "Graphycs/ByteLikeGraphycs/invslot0.png";
+                                        dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        if (chests[currentChest].Inventory[j - 5, i - 1 - player.Inventory.GetLength(1)] != null)
+                                        {
+                                            dc.DrawImage(new BitmapImage(new Uri(chests[currentChest].Inventory[j - 5, i - 1 - player.Inventory.GetLength(1)].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                            if (chests[currentChest].Inventory[j - 5, i - 1 - player.Inventory.GetLength(1)].Quantity > 1)
+                                            {
+                                                FormattedText dialogue3 = new FormattedText(chests[currentChest].Inventory[j - 5, i - 1 - player.Inventory.GetLength(1)].Quantity.ToString(), System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 8, System.Windows.Media.Brushes.White);
+                                                dialogue3.MaxTextWidth = 56;
+                                                dc.DrawText(dialogue3, new System.Windows.Point(j * 16, 8 + i * 16));
+                                            }
+                                        }
+                                    }
+                                }
 
-                            if (j-5 == player.SelectedSlot[0] && i == player.SelectedSlot[1])
-                            {
-                                dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/invslot13.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                            }
+                                if (j - 5 == player.SelectedSlot[0] && i == player.SelectedSlot[1] && player.SelectedSlot[1] < player.Inventory.GetLength(1))
+                                {
+                                    dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/invslot13.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                }
+                                else if (j - 5 == player.SelectedSlot[0] && i == player.SelectedSlot[1]+1 && player.SelectedSlot[1] >= player.Inventory.GetLength(1))
+                                {
+                                    dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/invslot13.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                }
 
-                            if (j-5 == player.CurrentSlot[0] && i == player.CurrentSlot[1])
-                            {
-                                dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/invslot12.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                if (j - 5 == player.CurrentSlot[0] && i == player.CurrentSlot[1] && player.CurrentSlot[1] < player.Inventory.GetLength(1))
+                                {
+                                    dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/invslot12.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                }
+                                else if (j - 5 == player.CurrentSlot[0] && i == player.CurrentSlot[1]+1 && player.CurrentSlot[1] >= player.Inventory.GetLength(1))
+                                {
+                                    dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/invslot12.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                }
                             }
 
                         }
 
+                        if (player.OpenSpell)
+                        {
+                            int[] spellpos = new int[2] { player.position[0], player.position[1] };
+                            //int speedx = 0;
+                            //int speedy = 0;
+                            //int counter = 0;
+
+                            int counter = 0;
+                            int direction = 0;
+
+                            if (player.CurrentSlot[0] + player.position[0] > camera[0] && player.CurrentSlot[0] + player.position[0] + 1 < camera[0] + cameraSize[0] && player.CurrentSlot[1] + player.position[1] > camera[1] && player.CurrentSlot[1] + player.position[1] + 1 < camera[1] + cameraSize[1])
+                            {
+                                dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/invslot12.png", UriKind.Relative)), new Rect((player.position[0] + player.CurrentSlot[0] - camera[0]) * 16, (player.position[1] + player.CurrentSlot[1] - camera[1]) * 16, 17, 17));
+                            }
+
+
+                            if (DistanceBetween(new int[2] { player.position[0], player.position[1] }, new int[2] { player.position[0] + player.CurrentSlot[0], player.position[1] }) >= DistanceBetween(new int[2] { player.position[0], player.position[1] }, new int[2] { player.position[0], player.position[1] + player.CurrentSlot[1] }))
+                            {
+                                if (player.CurrentSlot[0] < 0)
+                                {
+                                    direction = 180;
+                                }
+                            }
+                            else
+                            {
+                                direction = 270;
+                                if (player.CurrentSlot[1] < 0)
+                                {
+                                    direction = 90;
+                                }
+                            }
+
+
+                            while (spellpos[0] > camera[0] && spellpos[0]+1 < camera[0] + cameraSize[0] && spellpos[1] > camera[1] && spellpos[1]+1 < camera[1] + cameraSize[1] && (player.CurrentSlot[0] != 0 || player.CurrentSlot[1] != 0) && (darkness[spellpos[0],spellpos[1]] == 1 || darkness[spellpos[0], spellpos[1]] == 2) && level[spellpos[0],spellpos[1]] != 0 && level[spellpos[0], spellpos[1]] != 2 && level[spellpos[0], spellpos[1]] != 5 && level[spellpos[0], spellpos[1]] != 4)
+                            {
+                                switch (direction)
+                                {
+                                    case 0:
+                                        spellpos[0]++;
+                                        if (player.CurrentSlot[1] != 0)
+                                        {
+                                            if (player.CurrentSlot[1] < 0)
+                                            {
+                                                counter++;
+                                                if (counter >= player.CurrentSlot[0] / (-player.CurrentSlot[1]))
+                                                {
+                                                    spellpos[1]--;
+                                                    counter = 0;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                counter++;
+                                                if (counter >= player.CurrentSlot[0] / player.CurrentSlot[1])
+                                                {
+                                                    spellpos[1]++;
+                                                    counter = 0;
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    case 180:
+                                        spellpos[0]--;
+                                        if (player.CurrentSlot[1] != 0)
+                                        {
+                                            if (player.CurrentSlot[1] < 0)
+                                            {
+                                                counter--;
+                                                if (counter <= player.CurrentSlot[0] / (-player.CurrentSlot[1]))
+                                                {
+                                                    spellpos[1]--;
+                                                    counter = 0;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                counter--;
+                                                if (counter <= player.CurrentSlot[0] / player.CurrentSlot[1])
+                                                {
+                                                    spellpos[1]++;
+                                                    counter = 0;
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    case 90:
+                                        spellpos[1]--;
+                                        if (player.CurrentSlot[0] != 0)
+                                        {
+                                            if (player.CurrentSlot[0] < 0)
+                                            {
+                                                counter--;
+                                                if (counter <= player.CurrentSlot[1] / (-player.CurrentSlot[0]))
+                                                {
+                                                    spellpos[0]--;
+                                                    counter = 0;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                counter--;
+                                                if (counter <= player.CurrentSlot[1] / player.CurrentSlot[0])
+                                                {
+                                                    spellpos[0]++;
+                                                    counter = 0;
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    case 270:
+                                        spellpos[1]++;
+                                        if (player.CurrentSlot[0] != 0)
+                                        {
+                                            if (player.CurrentSlot[0] < 0)
+                                            {
+                                                counter++;
+                                                if (counter >= player.CurrentSlot[1] / (-player.CurrentSlot[0]))
+                                                {
+                                                    spellpos[0]--;
+                                                    counter = 0;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                counter++;
+                                                if (counter >= player.CurrentSlot[1] / player.CurrentSlot[0])
+                                                {
+                                                    spellpos[0]++;
+                                                    counter = 0;
+                                                }
+                                            }
+                                        }
+                                        break;
+                                }
+                                dc.DrawImage(new BitmapImage(new Uri("Graphycs/ByteLikeGraphycs/invslot13.png", UriKind.Relative)), new Rect((spellpos[0] - camera[0]) * 16, (spellpos[1] - camera[1]) * 16, 17, 17));
+                            }
+
+                        }
 
 
                         if (response != "" && j>4)
@@ -495,7 +687,7 @@ namespace ByteLike
             InitLevel();
 
             // Generate level, set player's initial position
-            level = Generator.Generate(level, out player.position, floor);
+            level = Generator.Generate(level, out player.position, floor, ref chests);
             floor++;
 
             camera[0] = player.position[0];
@@ -540,7 +732,7 @@ namespace ByteLike
                 cameraSize[0]++;
             }
 
-            response = player.Logics(ref level);
+            response = player.Logics(ref level, ref chests);
 
             // Set camera to player's position
             camera[0] = player.position[0];
@@ -603,11 +795,12 @@ namespace ByteLike
         }
 
         // Room creator
-        static void CreateRoom(bool remember)
+        static void CreateRoom(bool remember, out Chest chest, int currentFloor)
         {
             int water = 0;
             int[] waterCords = new int[] { 0, 0 };
             bool lava = false;
+            chest = null;
             // If we're generating a rock, reduce it's size
             if (!remember)
             {
@@ -645,6 +838,7 @@ namespace ByteLike
                         else if (j == 0 && i == 0)
                         {
                             level[position[0] + j, position[1] + i] = 3;
+                            chest = new Chest(new int[] { position[0] + j, position[1] + i }, currentFloor);
                         }
                         // Else, set to floor
                         else
@@ -739,7 +933,7 @@ namespace ByteLike
         //
 
         // Level Generator
-        static public int[,] Generate(int[,] game, out int[] player, int currentfloor)
+        static public int[,] Generate(int[,] game, out int[] player, int currentfloor, ref List<Chest> chests)
         {
             floor = currentfloor;
             level = game;
@@ -757,7 +951,9 @@ namespace ByteLike
                         startingpoint = position;
                     }
                     // Create room, tell it not to be a rock
-                    CreateRoom(true);
+                    Chest temp;
+                    CreateRoom(true, out temp, currentfloor);
+                    if (temp != null) { chests.Add(temp); }
                 }
             }
             //
@@ -767,7 +963,8 @@ namespace ByteLike
             {
                 if (Randomize())
                 {
-                    CreateRoom(false);
+                    Chest temp2;
+                    CreateRoom(false, out temp2, currentfloor);
                 }
             }
             //
@@ -1173,6 +1370,7 @@ namespace ByteLike
         public string File = "placeholder.png";
         // None - 0, Fire - 1, Posion - 2, Freeze - 3, Paralysis - 4
         public int Element = 0;
+        public int Quantity = 1;
 
         public Item(int floor)
         {
@@ -1189,6 +1387,7 @@ namespace ByteLike
 
 
             GearType = rand.Next(4) + 1;
+            if (rand.Next(2) == 0) { GearType = 10; }
 
             RandomizeGearType:
             switch (GearType)
@@ -2147,14 +2346,254 @@ namespace ByteLike
 
 
                     break;
-
-
+                case 10:
+                    if (rand.Next(2) == 0)
+                    {
+                        Element = rand.Next(4);
+                    }
+                    File = "Graphycs/ByteLikeGraphycs/arrow";
+                    File += Element;
+                    Name = "";
+                    switch (Element)
+                    {
+                        case 1:
+                            Name += "Fire ";
+                            break;
+                        case 2:
+                            Name += "Poison ";
+                            break;
+                        case 3:
+                            Name += "Ice ";
+                            break;
+                        case 4:
+                            Name += "Lightning";
+                            break;
+                    }
+                    Name += "Arrow";
+                    File += ".png";
+                    Stats["Agility"] = 3;
+                    Spell = "Shoot Arrow";
+                    Quantity = (rand.Next(3)+1) * 5;
+                    break;
             }
 
         }
     }
 
+    public class Chest
+    {
+        public Item[,] Inventory = new Item[11, 7];
 
+        public string File = "Graphycs/ByteLikeGraphycs/chest0.png";
+
+        public int[] position = new int[2];
+
+        static Random rand = new Random();
+        public bool IsEmpty()
+        {
+            bool check = true;
+            for (int i = 0; i < Inventory.GetLength(1); i++)
+            {
+                for (int j = 0; j < Inventory.GetLength(0); j++)
+                {
+                    if (Inventory[j, i] != null)
+                    {
+                        check = false;
+                    }
+                }
+            }
+            return check;
+        }
+
+        public Chest(int[] coordinates, int floor)
+        {
+            position[0] = coordinates[0];
+            position[1] = coordinates[1];
+
+            if (floor > 0)
+            {
+                for (int i = 0; i < Inventory.GetLength(1); i++)
+                {
+                    for (int j = 0; j < Inventory.GetLength(0); j++)
+                    {
+                        if (rand.Next(20) == 0)
+                        {
+                            Inventory[j, i] = new Item(floor);
+                        }
+                    }
+                }
+            }
+
+        }
+
+        public void CopyInto(Item[,] inventory)
+        {
+            for (int i = 0; i < inventory.GetLength(1); i++)
+            {
+                for (int j = 0; j < inventory.GetLength(0); j++)
+                {
+                    Inventory[j, i] = inventory[j, i];
+                }
+            }
+        }
+
+        public Item PutIn(Item item, int[] slot)
+        {
+            if (item != null)
+            {
+                if (item.GearType > 9 || item.GearType == 0)
+                {
+                    if (Inventory[slot[0], slot[1]] != null)
+                    {
+                        if (Inventory[slot[0], slot[1]].Name == item.Name)
+                        {
+                            Inventory[slot[0], slot[1]].Quantity += item.Quantity;
+                            return null;
+                        }
+                        else
+                        {
+                            Item temp2 = Inventory[slot[0], slot[1]];
+                            Inventory[slot[0], slot[1]] = item;
+                            return temp2;
+                        }
+                    }
+                    else
+                    {
+                        Inventory[slot[0], slot[1]] = item;
+                        return null;
+                    }
+                }
+            }
+            Item temp = Inventory[slot[0], slot[1]];
+            Inventory[slot[0], slot[1]] = item;
+
+            return temp;
+        }
+
+        public Item TakeOut(Item item, int[] slot)
+        {
+            if (item != null)
+            {
+                if (item.GearType > 9 || item.GearType == 0)
+                {
+                    if (Inventory[slot[0], slot[1]] != null)
+                    {
+                        if (Inventory[slot[0], slot[1]].Name == item.Name)
+                        {
+                            item.Quantity += Inventory[slot[0], slot[1]].Quantity;
+                            Inventory[slot[0], slot[1]] = null;
+                            return item;
+                        }
+                        else
+                        {
+                            Item temp = Inventory[slot[0],slot[1]];
+                            Inventory[slot[0], slot[1]] = item;
+                            return temp;
+                        }
+                    }
+                    else
+                    {
+                        Inventory[slot[0], slot[1]] = item;
+                        return null;
+                    }
+                }
+            }
+            else if (Inventory[slot[0], slot[1]] != null)
+            {
+                Item temp2 = Inventory[slot[0], slot[1]];
+                Inventory[slot[0], slot[1]] = null;
+                return temp2;
+            }
+            return item;
+        }
+
+        public void Swap(int[] CurrentSlot, int[] SelectedSlot)
+        {
+            if (CurrentSlot[0] != SelectedSlot[0] || CurrentSlot[1] != SelectedSlot[1])
+            {
+                if (Inventory[SelectedSlot[0], SelectedSlot[1]] != null)
+                {
+                    if (Inventory[SelectedSlot[0], SelectedSlot[1]].GearType > 9 || Inventory[SelectedSlot[0], SelectedSlot[1]].GearType == 0)
+                    {
+                        if (Inventory[CurrentSlot[0], CurrentSlot[1]] != null)
+                        {
+                            if (Inventory[CurrentSlot[0], CurrentSlot[1]].Name == Inventory[SelectedSlot[0], SelectedSlot[1]].Name)
+                            {
+                                Inventory[CurrentSlot[0], CurrentSlot[1]].Quantity += Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity;
+                                Inventory[SelectedSlot[0], SelectedSlot[1]] = null;
+                            }
+                            else
+                            {
+                                Item temp2 = Inventory[CurrentSlot[0], CurrentSlot[1]];
+                                Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+                                Inventory[SelectedSlot[0], SelectedSlot[1]] = temp2;
+                            }
+                        }
+                        else
+                        {
+                            Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+                            Inventory[SelectedSlot[0], SelectedSlot[1]] = null;
+                        }
+                    }
+                    else
+                    {
+                        Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
+                        Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+
+                        Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
+                    }
+                }
+                else
+                {
+                    Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
+                    Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+
+                    Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
+                }
+            }
+        }
+
+        public bool AddTo(Item item)
+        {
+            if (item == null)
+            {
+                return true;
+            }
+
+            if (item.GearType > 9 || item.GearType == 0)
+            {
+                for (int i = 0; i < Inventory.GetLength(1); i++)
+                {
+                    for (int j = 0; j < Inventory.GetLength(0); j++)
+                    {
+                        if (Inventory[j, i] != null)
+                        {
+                            if (Inventory[j, i].GearType == item.GearType && Inventory[j, i].Name == item.Name)
+                            {
+                                Inventory[j, i].Quantity += item.Quantity;
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < Inventory.GetLength(1); i++)
+            {
+                for (int j = 0; j < Inventory.GetLength(0); j++)
+                {
+                    if (Inventory[j, i] == null)
+                    {
+                        Inventory[j, i] = item;
+                        return true;
+                    }
+                }
+            }
+
+
+            return false;
+        }
+    }
 
 
 
@@ -2238,6 +2677,47 @@ namespace ByteLike
             }
 
             return result;
+        }
+
+        public bool AddTo(Item item)
+        {
+            if (item == null)
+            {
+                return true;
+            }
+
+            if (item.GearType > 9 || item.GearType == 0)
+            {
+                for (int i = 1; i < Inventory.GetLength(1); i++)
+                {
+                    for (int j = 0; j < Inventory.GetLength(0); j++)
+                    {
+                        if (Inventory[j, i] != null)
+                        {
+                            if (Inventory[j, i].GearType == item.GearType && Inventory[j, i].Name == item.Name)
+                            {
+                                Inventory[j, i].Quantity += item.Quantity;
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (int i = 1; i < Inventory.GetLength(1); i++)
+            {
+                for (int j = 0; j < Inventory.GetLength(0); j++)
+                {
+                    if (Inventory[j, i] == null)
+                    {
+                        Inventory[j, i] = item;
+                        return true;
+                    }
+                }
+            }
+
+
+            return false;
         }
 
 
@@ -2326,6 +2806,18 @@ namespace ByteLike
 
         }
 
+        public int GetChest(ref List<Chest> chests)
+        {
+            for (int i = 0; i < chests.Count; i++)
+            {
+                if (chests[i].position[0] == position[0] && chests[i].position[1] == position[1])
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
         public int GetStat(string index)
         {
             int current = Stats[index];
@@ -2358,7 +2850,7 @@ namespace ByteLike
         public bool OpenInventory = false;
         public int[] SelectedSlot = new int[2] { -100, -1 };
         public int[] CurrentSlot = new int[2] { 0, 0 };
-
+        public bool OpenSpell = false;
 
         public Player(string name)
             : base()
@@ -2382,6 +2874,7 @@ namespace ByteLike
             Stats["MaxMana"] = 10;
 
             Stats.Add("XP", 0);
+            Stats.Add("Torch", 1);
 
             Buffs.Add("Torch", 0);
 
@@ -2396,7 +2889,7 @@ namespace ByteLike
         }
 
         // Main Logics
-        public string Logics(ref int[,] level)
+        public string Logics(ref int[,] level, ref List<Chest> chests)
         {
             bool wasAlive = true;
             if (Stats["HP"] <= 0) { wasAlive = false; }
@@ -2610,100 +3103,274 @@ namespace ByteLike
             {
                 CurrentSlot[0] += movement[0];
                 CurrentSlot[1] += movement[1];
-                if (CurrentSlot[0] >= Inventory.GetLength(0)) { CurrentSlot[0] = 0; }
-                if (CurrentSlot[0] < 0) { CurrentSlot[0] = Inventory.GetLength(0) - 1; }
-                if (CurrentSlot[1] >= Inventory.GetLength(1)) { CurrentSlot[1] = 0; }
-                if (CurrentSlot[1] < 0) { CurrentSlot[1] = Inventory.GetLength(1) - 1; }
-
-                if (Inventory[CurrentSlot[0], CurrentSlot[1]] != null)
+                if (!OpenSpell)
                 {
-                    response = Inventory[CurrentSlot[0], CurrentSlot[1]].Name;
-                }
+                    int currentChest = GetChest(ref chests);
+                    if (CurrentSlot[0] >= Inventory.GetLength(0)) { CurrentSlot[0] = 0; }
+                    if (CurrentSlot[0] < 0) { CurrentSlot[0] = Inventory.GetLength(0) - 1; }
 
-                if (Keyboard.IsKeyDown(Key.E))
-                {
-                    if (SelectedSlot[0] >= 0)
+                    if (currentChest == -1)
                     {
-                        if (CurrentSlot[1] != 0 && SelectedSlot[1] != 0)
+                        if (CurrentSlot[1] >= Inventory.GetLength(1)) { CurrentSlot[1] = 0; }
+                        if (CurrentSlot[1] < 0) { CurrentSlot[1] = Inventory.GetLength(1) - 1; }
+                    }
+                    else
+                    {
+                        if (CurrentSlot[1] >= Inventory.GetLength(1) + chests[currentChest].Inventory.GetLength(1)) { CurrentSlot[1] = 0; }
+                        if (CurrentSlot[1] < 0) { CurrentSlot[1] = Inventory.GetLength(1) + chests[currentChest].Inventory.GetLength(1) - 1; }
+                    }
+
+                    if (CurrentSlot[1] < Inventory.GetLength(1))
+                    {
+                        if (Inventory[CurrentSlot[0], CurrentSlot[1]] != null)
                         {
-                            Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
-                            Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
-                            Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
-                            SelectedSlot[0] = -100;
-                        }
-                        else if (SelectedSlot[1] == 0)
-                        {
-                            if (SelectedSlot[0] < 9)
-                            {
-                                if (Inventory[CurrentSlot[0], CurrentSlot[1]] == null)
-                                {
-                                    if (CurrentSlot[1] != 0 || (CurrentSlot[0] == 7 && SelectedSlot[0] == 8) || (CurrentSlot[0] == 8 && SelectedSlot[0] == 7))
-                                    {
-                                        Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
-                                        Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
-                                        Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
-                                        SelectedSlot[0] = -100;
-                                    }
-                                    else if (CurrentSlot[0] < 9)
-                                    {
-                                        response += $"{Name}: I can't put that there.\n";
-                                    }
-                                    else if (CurrentSlot[0] == 9)
-                                    {
-                                        response += $"{Name}: I can't directly use that.\n";
-                                    }
-                                }
-                                else if (Inventory[CurrentSlot[0], CurrentSlot[1]].GearType == SelectedSlot[0] + 1 || (SelectedSlot[0] == 8 && Inventory[CurrentSlot[0], CurrentSlot[1]].GearType == SelectedSlot[0]))
-                                {
-                                    Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
-                                    Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
-                                    Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
-                                    SelectedSlot[0] = -100;
-                                }
-                                else
-                                {
-                                    response += $"{Name}: I can't put that there.\n";
-                                }
-                            }
-                        }
-                        else if (CurrentSlot[1] == 0)
-                        {
-                            if (CurrentSlot[0] < 9)
-                            {
-                                if (Inventory[SelectedSlot[0], SelectedSlot[1]] == null)
-                                {
-                                    if (SelectedSlot[1] != 0 || (CurrentSlot[0] == 7 && SelectedSlot[0] == 8) || (CurrentSlot[0] == 8 && SelectedSlot[0] == 7))
-                                    {
-                                        Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
-                                        Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
-                                        Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
-                                        SelectedSlot[0] = -100;
-                                    }
-                                    else
-                                    {
-                                        response += $"{Name}: I can't put that there.\n";
-                                    }
-                                }
-                                else if (Inventory[SelectedSlot[0], SelectedSlot[1]].GearType == CurrentSlot[0] + 1 || (CurrentSlot[0] == 8 && Inventory[SelectedSlot[0], SelectedSlot[1]].GearType == CurrentSlot[0]))
-                                {
-                                    Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
-                                    Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
-                                    Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
-                                    SelectedSlot[0] = -100;
-                                }
-                                else
-                                {
-                                    response += $"{Name}: I can't put that there.\n";
-                                }
-                            }
+                            response = Inventory[CurrentSlot[0], CurrentSlot[1]].Name + "\n";
                         }
                     }
                     else
                     {
-                        if (CurrentSlot[1] != 0 || CurrentSlot[0] < 9)
+                        if (chests[currentChest].Inventory[CurrentSlot[0], CurrentSlot[1]-Inventory.GetLength(1)] != null)
                         {
-                            SelectedSlot[0] = CurrentSlot[0];
-                            SelectedSlot[1] = CurrentSlot[1];
+                            response = chests[currentChest].Inventory[CurrentSlot[0], CurrentSlot[1] - Inventory.GetLength(1)].Name + "\n";
+                        }
+                    }
+
+
+                    if (Keyboard.IsKeyDown(Key.E))
+                    {
+                        if (SelectedSlot[0] >= 0)
+                        {
+                            if (CurrentSlot[1] != 0 && SelectedSlot[1] != 0)
+                            {
+                                
+                                if (CurrentSlot[1] < Inventory.GetLength(1) && SelectedSlot[1] < Inventory.GetLength(1))
+                                {
+                                    // Swap
+                                    if (CurrentSlot[0] != SelectedSlot[0] || CurrentSlot[1] != SelectedSlot[1])
+                                    {
+                                        if (Inventory[SelectedSlot[0], SelectedSlot[1]] != null)
+                                        {
+                                            if (Inventory[SelectedSlot[0], SelectedSlot[1]].GearType > 9 || Inventory[SelectedSlot[0], SelectedSlot[1]].GearType == 0)
+                                            {
+                                                if (Inventory[CurrentSlot[0], CurrentSlot[1]] != null)
+                                                {
+                                                    if (Inventory[CurrentSlot[0], CurrentSlot[1]].Name == Inventory[SelectedSlot[0], SelectedSlot[1]].Name)
+                                                    {
+                                                        Inventory[CurrentSlot[0], CurrentSlot[1]].Quantity += Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity;
+                                                        Inventory[SelectedSlot[0], SelectedSlot[1]] = null;
+                                                    }
+                                                    else
+                                                    {
+                                                        Item temp2 = Inventory[CurrentSlot[0], CurrentSlot[1]];
+                                                        Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+                                                        Inventory[SelectedSlot[0], SelectedSlot[1]] = temp2;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+                                                    Inventory[SelectedSlot[0], SelectedSlot[1]] = null;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
+                                                Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+
+                                                Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
+                                            Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+
+                                            Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
+                                        }
+                                    }
+                                    // End Swap
+
+                                }
+                                else if (CurrentSlot[1] < Inventory.GetLength(1))
+                                {
+                                    Inventory[CurrentSlot[0], CurrentSlot[1]] = chests[currentChest].TakeOut(Inventory[CurrentSlot[0], CurrentSlot[1]], new int[] { SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1) });
+                                }
+                                else if (SelectedSlot[1] < Inventory.GetLength(1))
+                                {
+                                    Inventory[SelectedSlot[0], SelectedSlot[1]] = chests[currentChest].PutIn(Inventory[SelectedSlot[0], SelectedSlot[1]], new int[] { CurrentSlot[0], CurrentSlot[1] - Inventory.GetLength(1) });
+                                }
+                                else
+                                {
+                                    chests[currentChest].Swap(new int[] { CurrentSlot[0], CurrentSlot[1]-Inventory.GetLength(1) }, new int[] { SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1) });
+                                }
+                                SelectedSlot[0] = -100;
+
+
+                            }
+                            else if (SelectedSlot[1] == 0)
+                            {
+                                if (CurrentSlot[1] < Inventory.GetLength(1))
+                                {
+                                    if (SelectedSlot[0] < 9)
+                                    {
+                                        if (Inventory[CurrentSlot[0], CurrentSlot[1]] == null)
+                                        {
+                                            if (CurrentSlot[1] != 0 || (CurrentSlot[0] == 7 && SelectedSlot[0] == 8) || (CurrentSlot[0] == 8 && SelectedSlot[0] == 7))
+                                            {
+                                                Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
+                                                Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+                                                Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
+                                                SelectedSlot[0] = -100;
+                                            }
+                                            else if (CurrentSlot[0] < 9)
+                                            {
+                                                response += $"{Name}: I can't put that there.\n";
+                                            }
+                                            else if (CurrentSlot[0] == 9)
+                                            {
+                                                if (Inventory[SelectedSlot[0], SelectedSlot[1]] != null)
+                                                {
+                                                    if (Inventory[SelectedSlot[0], SelectedSlot[1]].GearType != 10)
+                                                    {
+                                                        response += $"{Name}: I can't directly use that.\n";
+                                                    }
+                                                    else
+                                                    {
+                                                        CurrentSlot[0] = 0;
+                                                        CurrentSlot[1] = 0;
+                                                        OpenSpell = true;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        else if (Inventory[CurrentSlot[0], CurrentSlot[1]].GearType == SelectedSlot[0] + 1 || (SelectedSlot[0] == 8 && Inventory[CurrentSlot[0], CurrentSlot[1]].GearType == SelectedSlot[0]))
+                                        {
+                                            Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
+                                            Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+                                            Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
+                                            SelectedSlot[0] = -100;
+                                        }
+                                        else
+                                        {
+                                            response += $"{Name}: I can't put that there.\n";
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    response += $"{Name}: I need to take it off first.\n";
+                                }
+                            }
+                            else if (CurrentSlot[1] == 0)
+                            {
+                                if (SelectedSlot[1] < Inventory.GetLength(1))
+                                {
+                                    if (CurrentSlot[0] < 9)
+                                    {
+                                        if (Inventory[SelectedSlot[0], SelectedSlot[1]] == null)
+                                        {
+                                            if (SelectedSlot[1] != 0 || (CurrentSlot[0] == 7 && SelectedSlot[0] == 8) || (CurrentSlot[0] == 8 && SelectedSlot[0] == 7))
+                                            {
+                                                Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
+                                                Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+                                                Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
+                                                SelectedSlot[0] = -100;
+                                            }
+                                            else
+                                            {
+                                                response += $"{Name}: I can't put that there.\n";
+                                            }
+                                        }
+                                        else if (Inventory[SelectedSlot[0], SelectedSlot[1]].GearType == CurrentSlot[0] + 1 || (CurrentSlot[0] == 8 && Inventory[SelectedSlot[0], SelectedSlot[1]].GearType == CurrentSlot[0]))
+                                        {
+                                            Item temp = Inventory[CurrentSlot[0], CurrentSlot[1]];
+                                            Inventory[CurrentSlot[0], CurrentSlot[1]] = Inventory[SelectedSlot[0], SelectedSlot[1]];
+                                            Inventory[SelectedSlot[0], SelectedSlot[1]] = temp;
+                                            SelectedSlot[0] = -100;
+                                        }
+                                        else
+                                        {
+                                            response += $"{Name}: I can't put that there.\n";
+                                        }
+                                    }
+                                    else if (CurrentSlot[0] == 9)
+                                    {
+                                        if (Inventory[SelectedSlot[0], SelectedSlot[1]] != null)
+                                        {
+                                            if (Inventory[SelectedSlot[0], SelectedSlot[1]].GearType != 10)
+                                            {
+                                                response += $"{Name}: I can't directly use that.\n";
+                                            }
+                                            else
+                                            {
+                                                CurrentSlot[0] = 0;
+                                                CurrentSlot[1] = 0;
+                                                OpenSpell = true;
+                                            }
+                                        }
+                                    }
+                                    else if (CurrentSlot[0] == 10)
+                                    {
+                                        if (GetChest(ref chests) >= 0)
+                                        {
+                                            if (chests[GetChest(ref chests)].AddTo(Inventory[SelectedSlot[0], SelectedSlot[1]]))
+                                            {
+                                                Inventory[SelectedSlot[0], SelectedSlot[1]] = null;
+                                            }
+                                            else
+                                            {
+                                                response += $"{Name}: There's not enough space here.\n";
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Chest temp = new Chest(new int[] { position[0], position[1] }, -1);
+                                            temp.AddTo(Inventory[SelectedSlot[0], SelectedSlot[1]]);
+                                            chests.Add(temp);
+                                            Inventory[SelectedSlot[0], SelectedSlot[1]] = null;
+                                        }
+                                        SelectedSlot[0] = -100;
+                                    }
+                                }
+                                else
+                                {
+                                    response += $"{Name}: I need to take it out first.\n";
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            if (CurrentSlot[1] != 0 || CurrentSlot[0] < 9)
+                            {
+                                SelectedSlot[0] = CurrentSlot[0];
+                                SelectedSlot[1] = CurrentSlot[1];
+                            }
+                            else if (CurrentSlot[0] == 10 && GetChest(ref chests) >= 0)
+                            {
+                                for (int i = 0; i < chests[GetChest(ref chests)].Inventory.GetLength(1); i++)
+                                {
+                                    for (int j = 0; j < chests[GetChest(ref chests)].Inventory.GetLength(0); j++)
+                                    {
+                                        if (AddTo(chests[GetChest(ref chests)].Inventory[j,i]))
+                                        {
+                                            chests[GetChest(ref chests)].Inventory[j, i] = null;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (Keyboard.IsKeyDown(Key.E))
+                    {
+                        if (CurrentSlot[0] == 0 && CurrentSlot[1] == 0)
+                        {
+                            OpenSpell = false;
+                            CurrentSlot[0] = SelectedSlot[0];
+                            CurrentSlot[1] = SelectedSlot[1];
                         }
                     }
                 }
@@ -2726,6 +3393,10 @@ namespace ByteLike
             if (Keyboard.IsKeyDown(Key.Q) && OpenInventory && !invCheck)
             {
                 OpenInventory = false;
+                OpenSpell = false;
+                CurrentSlot[0] = SelectedSlot[0];
+                CurrentSlot[1] = SelectedSlot[1];
+                SelectedSlot[0] = -100;
             }
 
             return response;
@@ -2738,7 +3409,7 @@ namespace ByteLike
             int current = Stats[index];
             for (int i = 0; i < 9; i++)
             {
-                if (!OpenInventory || CurrentSlot[1] == 0)
+                if (!OpenInventory || CurrentSlot[1] == 0 || OpenSpell || CurrentSlot[1] >= Inventory.GetLength(1))
                 {
                     if (Inventory[i, 0] != null)
                         current += Inventory[i, 0].Stats[index];
@@ -2773,21 +3444,6 @@ namespace ByteLike
 
 
 
-        public int Torch()
-        {
-            int result = 1;
-
-            if (Buffs["Torch"] > 0) { result += BuffLevels["Torch"]; }
-            for (int i = 0; i < 9; i++)
-            {
-                if (Inventory[i, 0] != null)
-                {
-                    result += Inventory[i, 0].Stats["Torch"];
-                }
-            }
-
-            return result;
-        }
     }
 
 
