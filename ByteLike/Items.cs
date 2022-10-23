@@ -22,6 +22,7 @@ namespace ByteLike
         // None - 0, Fire - 1, Posion - 2, Freeze - 3, Paralysis - 4
         public int Element = 0;
         public int Quantity = 1;
+        public string Description = "";
 
         public Item(int floor)
         {
@@ -76,7 +77,7 @@ namespace ByteLike
                         sideB = false;
                     }
 
-                    File = "Graphycs/ByteLikeGraphycs/armor" + strength.ToString() + "-" + GearType.ToString();
+                    File = "Graphics/ByteLikeGraphics/Armor/armor" + strength.ToString() + "-" + GearType.ToString();
                     typeSwitch += GearType * 10;
                     if (GearType == 4 && rand.Next(1) == 0)
                     {
@@ -1002,7 +1003,7 @@ namespace ByteLike
                     {
                         Element = rand.Next(4);
                     }
-                    File = "Graphycs/ByteLikeGraphycs/arrow";
+                    File = "Graphics/ByteLikeGraphics/Items/arrow";
                     File += Element;
                     Name = "";
                     switch (Element)
@@ -1028,6 +1029,55 @@ namespace ByteLike
                     break;
             }
 
+            string[] statnames = new string[] { "Light", "HP", "Mana", "Str", "Mag", "Agi", "Def", "Mg Def", "HP Regen", "Mana Regen" };
+            int pos = 0;
+            bool first = true;
+
+            foreach (KeyValuePair<string,int> item in Stats)
+            {
+                int value = item.Value;
+                if (item.Key.Contains("Regen"))
+                    value = -value;
+                if (first)
+                {
+                    if (value > 0)
+                    {
+                        Description += string.Format("+{0} {1}", value, statnames[pos]);
+                        first = false;
+                    }
+                    else if (value < 0)
+                    {
+                        Description += string.Format("{0} {1}", value, statnames[pos]);
+                        first = false;
+                    }
+                }
+                else
+                {
+                    if (value > 0)
+                        Description += string.Format(", +{0} {1}", value, statnames[pos]);
+                    else if (value < 0)
+                        Description += string.Format(", {0} {1}", value, statnames[pos]);
+                }
+                pos++;
+            }
+
+            Description += "\n";
+            switch (Element)
+            {
+                case 1:
+                    Description += "Fire Attack\n";
+                    break;
+                case 2:
+                    Description += "Poison Attack\n";
+                    break;
+                case 3:
+                    Description += "Freezing Attack\n";
+                    break;
+                case 4:
+                    Description += "Paralyzing Attack\n";
+                    break;
+            }
+
         }
     }
 
@@ -1037,7 +1087,7 @@ namespace ByteLike
     {
         public Item[,] Inventory = new Item[11, 7];
 
-        public string File = "Graphycs/ByteLikeGraphycs/chest0.png";
+        public string File = "Graphics/ByteLikeGraphics/chest0.png";
 
         public int[] position = new int[2];
 

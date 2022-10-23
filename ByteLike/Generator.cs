@@ -17,6 +17,7 @@ namespace ByteLike
         static int[] room;
         static List<int[]> remrooms = new List<int[]>();
         static int floor = 0;
+        static bool GeneratedSecret = false;
 
         static double DistanceBetween(int[] x, int[] y)
         {
@@ -34,6 +35,7 @@ namespace ByteLike
         static public void Reset()
         {
             remrooms = new List<int[]>();
+            GeneratedSecret = false;
         }
 
         // Room creator
@@ -105,6 +107,15 @@ namespace ByteLike
                             else if (rand.Next(15) == 0)
                             {
                                 level[position[0] + j, position[1] + i] = 10;
+                                level[position[0] + j - 1, position[1] + i] = 8;
+                                level[position[0] + j + 1, position[1] + i] = 8;
+                                level[position[0] + j, position[1] + i + 1] = 8;
+                                level[position[0] + j, position[1] + i - 1] = 8;
+                            }
+                            else if (rand.Next(15) == 0 && GeneratedSecret == false)
+                            {
+                                GeneratedSecret = true;
+                                level[position[0] + j, position[1] + i] = 16;
                                 level[position[0] + j - 1, position[1] + i] = 8;
                                 level[position[0] + j + 1, position[1] + i] = 8;
                                 level[position[0] + j, position[1] + i + 1] = 8;
@@ -231,6 +242,10 @@ namespace ByteLike
                     bool generateAll = false;
 
                     if (f == 0 || rand.Next(2) == 0 || f + 1 == remrooms.Count) { generateAll = true; }
+
+                    // If the last room - generate exit
+                    if (f == 0)
+                        level[position[0], position[1]] = 15;
 
                     // Create a hallway for each direction
                     for (int i = 0; i < 360; i += 90)
