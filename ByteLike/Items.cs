@@ -38,8 +38,8 @@ namespace ByteLike
             Stats.Add("ManaRegen", 0);
 
 
-            GearType = rand.Next(4) + 1;
-            if (rand.Next(2) == 0) { GearType = 10; }
+            GearType = rand.Next(6) + 1;
+            if (rand.Next(3) == 0) { GearType = 10; }
 
         RandomizeGearType:
             switch (GearType)
@@ -51,10 +51,10 @@ namespace ByteLike
                 case 5:
                     bool sideB = false;
                     int typeSwitch = 0;
-                    int strength = (floor / 30) + rand.Next(-0, 1);
+                    int strength = (floor / 30) + rand.Next(2);
                     if (strength < 0) { strength = 0; }
                     else if (strength > 4) { strength = 4; }
-                    if (rand.Next(1) == 0 && strength != 0 && strength != 4)
+                    if (rand.Next(2) == 0 && strength != 0 && strength != 4)
                     {
                         sideB = true;
                         if (strength > 3) { strength = 3; }
@@ -73,20 +73,20 @@ namespace ByteLike
 
                     if (strength == 0)
                     {
-                        GearType = rand.Next(3) + 1;
+                        GearType = rand.Next(4) + 1;
                         sideB = false;
                     }
 
                     File = "Graphics/ByteLikeGraphics/Armor/armor" + strength.ToString() + "-" + GearType.ToString();
                     typeSwitch += GearType * 10;
-                    if (GearType == 4 && rand.Next(1) == 0)
+                    if (GearType == 4 && rand.Next(2) == 0)
                     {
                         File += "b";
                         typeSwitch += 5;
                     }
                     if (strength > 0)
                     {
-                        switch (rand.Next(2))
+                        switch (rand.Next(0,3))
                         {
                             case 0:
                                 File += "w";
@@ -128,252 +128,304 @@ namespace ByteLike
                         case 10:
                             Name = "Leather Cap";
                             Stats["Defense"] += 1;
+                            Description = "A hat made from leather scraps. A bit too big for you\n";
                             break;
                         case 20:
                             Name = "Leather Vest";
                             Stats["Defense"] += 1;
+                            Description = "A vest made from leather scraps. Usually worn underneath proper armor\n";
                             break;
                         case 30:
                             Name = "Leather Boots";
                             Stats["MagicDefense"] += 1;
+                            Description = "Boots made from leather scraps. The stitching could be better\n";
                             break;
                         case 40:
                             Name = "Makeshift Spear";
                             Stats["Strength"] += 2;
                             Stats["Magic"] += 1;
+                            Description = "A day-to-day spear. Usually used for hunting, but requires sharpening\n";
                             break;
                         case 45:
                             Name = "Makeshift Hatchet";
                             Stats["Strength"] += 3;
+                            Description = "Somewhat dull hatchet. Could probably still chop a log or two\n";
                             break;
                         case 10110:
                             Name = "Iron Cap";
                             Stats["Strength"] += 1;
                             Stats["Defense"] += 2;
+                            Description = "A common helmet for travelers. No more gravel falling on your head!\n";
                             break;
                         case 10120:
                             Name = "Chainmail";
                             Stats["Strength"] += 1;
                             Stats["Defense"] += 3;
+                            Description = "Lightweight, but still protects from a blade\n";
                             break;
                         case 10130:
                             Name = "Leather Leggings";
                             Stats["Strength"] += 1;
                             Stats["Defense"] += 1;
+                            Description = "Underwear for paladins! Perfect for a battlefield\n";
                             break;
                         case 10140:
                             Name = "Longsword";
                             Stats["Strength"] += 5;
+                            Description = "The same blade knights receive at the age of 10. Despite not being sharpened properly, still pretty good or a fight\n";
                             break;
                         case 10145:
                             Name = "Warhammer";
                             Stats["Strength"] += 6;
                             Stats["Magic"] += -2;
+                            Description = "A large hammer. Way too heavy for blacksmithing, but smashes bones with extra effectiveness\n";
                             break;
                         case 10150:
                             Name = "Buckler";
                             Stats["Defense"] += 2;
+                            Description = "A common shield for travelers. Isn't that durable, but will protect from a stray arrow\n";
                             break;
                         case 15110:
                             Name = "Enchanted Cap";
                             Stats["Strength"] += 1;
                             Stats["Defense"] += 1;
                             Stats["MagicDefense"] += 1;
+                            Description = "A helmet infused with magic. It has a strange aura around it\n";
                             break;
                         case 15120:
                             Name = "Enchanted Chainmail";
                             Stats["Strength"] += 1;
                             Stats["MagicDefense"] += 2;
+                            Description = "A great mix between magical and protective. Was the blacksmith practicing mana arts on the job?\n";
                             break;
                         case 15130:
                             Name = "Enchanted Leggings";
                             Stats["Strength"] += 1;
                             Stats["MagicDefense"] += 1;
+                            Description = "Leggings weaved with an enchanted thread. Despite all the smol torns, the tag is still fully in tact\n";
                             break;
                         case 15140:
                             Name = "Posioned Sword";
                             Stats["Strength"] += 4;
                             Stats["MagicDefense"] += -1;
+                            Description = "A blade of evil, dunked into some kind of poison. Be very careful not to touch the dried poison yourself\n";
                             Element = 2;
                             break;
                         case 15145:
                             Name = "Thunder Hammer";
                             Stats["Strength"] += 5;
                             Stats["Magic"] += -3;
+                            Description = "An enchanted hammer once struck by a lightning. You can feel the handle pulsate\n";
                             Element = 4;
                             break;
                         case 15150:
                             Name = "Spiky Buckler";
                             Stats["Strength"] += 1;
                             Stats["Defense"] += 1;
+                            Description = "The spikes aren't the best for its structure, but they help deliver an extra punch\n";
                             break;
                         case 10210:
                             Name = "Cloth Hat";
                             Stats["Agility"] += 1;
                             Stats["Defense"] += 1;
+                            Description = "The thread is a mix between cotton and wool. It's warm and helps with keeping your hair from your eyes\n";
                             break;
                         case 10220:
                             Name = "Cloth Shirt";
                             Stats["Agility"] += 1;
                             Stats["Defense"] += 2;
+                            Description = "An attempt to make a warm doublet. Despite being torn at the sides, still helps keep your hands from shaking\n";
                             break;
                         case 10230:
                             Name = "Cloth Leggings";
                             Stats["Agility"] += 1;
                             Stats["MagicDefense"] += 1;
+                            Description = "The soles have fine leather stitched to them. Perfect for that extra grip on the ground while not getting in the way\n";
                             break;
                         case 10240:
                             Name = "Longbow";
                             Stats["Strength"] += 3;
                             Stats["Agility"] += 5;
+                            Description = "These bows are home-made. It's said you can hear it tell its tales when you shoot an arrow from it\n";
                             break;
                         case 10245:
                             Name = "Shortbow";
                             Stats["Strength"] += 1;
                             Stats["Magic"] += 2;
                             Stats["Agility"] += 4;
+                            Description = "Preffered for their compactness. It's never a bad idea to chug one in your bag if you're going on an adventure\n";
                             break;
                         case 10250:
                             Name = "Basic Quiver";
                             Stats["Agility"] += 2;
+                            Description = "A medium sized quiver. No more reaching in your bag for arrows!\n";
                             break;
                         case 15210:
                             Name = "Bandit Bandana";
                             Stats["Agility"] += 1;
                             Stats["MagicDefense"] += 1;
+                            Description = "It's said the king wanted to stop the production of such wares, but too many of his own men were in on it\n";
                             break;
                         case 15220:
                             Name = "Bandit Shawl";
                             Stats["Agility"] += 2;
                             Stats["Defense"] += 1;
                             Stats["MagicDefense"] += 1;
+                            Description = "If you feel creepy wearing this, just imagine it's dark magic and not the souls of those killed by the previous owner\n";
                             break;
                         case 15230:
                             Name = "Bandit Pants";
                             Stats["Agility"] += 1;
                             Stats["Defense"] += 1;
+                            Description = "It's only a myth that bandits don't shower... Right?\n";
                             break;
                         case 15240:
                             Name = "Crystal Bow";
                             Stats["Strength"] += 4;
                             Stats["Magic"] += 3;
                             Stats["Agility"] += 4;
+                            Description = "This bow was made in a family of sorcerers. You can still read the runes on the crystals\n";
                             break;
                         case 15245:
                             Name = "Poison Shortbow";
                             Stats["Strength"] += 2;
                             Stats["Agility"] += 3;
+                            Description = "The arrow shelf is extra wide to make sure the poison doesn't drip to your hand\n";
                             Element = 2;
                             break;
                         case 15250:
                             Name = "Scorpion Quiver";
                             Stats["Agility"] += 1;
                             Stats["MagicDefense"] += 1;
+                            Description = "The belief that scorpion quivers have poison in them started after one man wrongfully assumed so and died from drinking an antidote after\n";
                             break;
                         case 10310:
                             Name = "Apprentice Hood";
                             Stats["Magic"] += 1;
                             Stats["MagicDefense"] += 1;
+                            Description = "A hood given to all who join the arkhana school. It has runes that dull out the magic so you wouldn't hurt yourself\n";
                             break;
                         case 10320:
                             Name = "Apprentice Cloak";
                             Stats["Magic"] += 2;
                             Stats["Defense"] += 1;
+                            Description = "Many mages start with these cloaks. The enchanted thread helps channel your mana into your staff or wand\n";
                             break;
                         case 10330:
                             Name = "Apprentice Kilt";
                             Stats["Magic"] += 1;
                             Stats["MagicDefense"] += 1;
+                            Description = "There's a rumor that women are generally better at magic because they're not as ashamed of wearing mana kilts\n";
                             break;
                         case 10340:
                             Name = "Saphire Staff";
                             Stats["Strength"] += 3;
                             Stats["Magic"] += 6;
+                            Description = "A thick stick with a polished saphire on the tip. The saphire glows with every spell you cast\n";
                             break;
                         case 10345:
                             Name = "Ember Wand";
                             Stats["Strength"] += 2;
                             Stats["Magic"] += 4;
                             Stats["MagicDefense"] += 2;
+                            Description = "One of the most basic wands. Rumor has it that the ember is actually just a decoration, but nobody's brave enough to check\n";
                             break;
                         case 10350:
                             Name = "Commoner's Tome";
                             Stats["Magic"] += 2;
+                            Description = "A tome perfect for writing down spells. Being able to read the spell instead of remembering it helps concentrate\n";
                             break;
                         case 15310:
                             Name = "Bug Master Hood";
                             Stats["MaxMana"] += 10;
                             Stats["Defense"] += 1;
+                            Description = "Bug Masters are a strange group of sorceres in the west. They don't use tome's, forks or anything made from oak\n";
                             break;
                         case 15320:
                             Name = "Bug Master CLoak";
                             Stats["Magic"] += 1;
                             Stats["Defense"] += 2;
+                            Description = "Bug Masters use thin metal string instead of cotton for their cloaks. Travelers are often unprepared for their extra defenses\n";
                             break;
                         case 15330:
                             Name = "Bug Master Kilt";
                             Stats["MaxMana"] += 5;
                             Stats["Defense"] += 1;
+                            Description = "A waterproof kilt from the west. The wings emmit a buzz whenever you channel mana to your staff/wand\n";
                             break;
                         case 15340:
                             Name = "Diamond Staff";
                             Stats["MaxMana"] += 20;
                             Stats["Strength"] += 3;
                             Stats["Magic"] += 5;
+                            Description = "A second most popular use for diamonds! To make a diamond wand, you must polish the diamond with an enchanted cloth\n";
                             break;
                         case 15345:
                             Name = "Root Wand";
                             Stats["Strength"] += 2;
                             Stats["Magic"] += 4;
                             Stats["ManaRegen"] += -1;
+                            Description = "A wand made from a cut off birch root. A living proof that a good mage can turn anything into a wand\n";
                             break;
                         case 15350:
                             Name = "Hidden Tome";
                             Stats["MaxMana"] += 10;
+                            Description = "This tome contains strange symbols you can't read. There's still enough room for new spells to be written in\n";
                             break;
                         case 20110:
                             Name = "Iron Helmet";
                             Stats["Strength"] += 2;
                             Stats["Defense"] += 4;
                             Stats["MagicDefense"] += 2;
+                            Description = "A helmet made for newbie guards of the palace. It's an honor to be taken into the royal army\n";
                             break;
                         case 20120:
                             Name = "Iron Vest";
                             Stats["Strength"] += 2;
                             Stats["Defense"] += 6;
+                            IsHeavy = true;
+                            Description = "A well piece of armor only royal guards may wear. Some guards request chainmail sleeves to be added to their vests\n";
                             break;
                         case 20130:
                             Name = "Iron Leggings";
                             Stats["Strength"] += 2;
                             Stats["Defense"] += 4;
                             Stats["MagicDefense"] += 1;
+                            Description = "Royal piece of armor for legs. Despite popular belief, both men and women wear the same type of iron leggings\n";
                             break;
                         case 20140:
                             Name = "Greatsword";
                             Stats["Strength"] += 8;
+                            Description = "A rather large sword. Knights must train their entire life to keep the strength to wield one\n";
                             break;
                         case 20145:
                             Name = "Mythril Hammer";
                             Stats["Strength"] += 10;
                             Stats["Magic"] += -3;
+                            IsHeavy = true;
+                            Description = "A warhammer coated with mystical metal. Mythril is very easy to polish\n";
                             break;
                         case 20150:
                             Name = "Warrior Shield";
                             Stats["Strength"] += 1;
                             Stats["Defense"] += 4;
                             Stats["MagicDefense"] += 1;
+                            Description = "A fine shield usually used for war. Different kingdoms paint their warrior shield's in different colors\n";
                             break;
                         case 25110:
                             Name = "Mythril Helmet";
                             Stats["Strength"] += 2;
                             Stats["Defense"] += 2;
                             Stats["MagicDefense"] += 4;
+                            Description = "A helmet made from the mystical metal. Only royalty can afford to equip their army with mythril\n";
                             break;
                         case 25120:
                             Name = "Mythril Vest";
                             Stats["Strength"] += 2;
                             Stats["Defense"] += 3;
                             Stats["MagicDefense"] += 3;
+                            IsHeavy = true;
+                            Description = "A vest made from the mystical metal. Absence of any scratches on one's armor either means they're a rookie, or wearing mythril\n";
                             break;
                         case 25130:
                             Name = "Mythril Leggings";
@@ -381,24 +433,30 @@ namespace ByteLike
                             Stats["Magic"] += 1;
                             Stats["Defense"] += 1;
                             Stats["MagicDefense"] += 4;
+                            Description = "Leggings made from the mystical metal. Mythril leggings are usually oversized so knights could use one set for a long time\n";
                             break;
                         case 25140:
                             Name = "Fire Sword";
-                            Stats["Strength"] += 6;
+                            Stats["Strength"] += 5;
                             Stats["Magic"] += 3;
+                            Stats["Torch"] += 1;
                             Element = 1;
+                            Description = "A blade that spews out fire! Perfect for scorching your enemies and your food\n";
                             break;
                         case 25145:
                             Name = "Holy Hammer";
                             Stats["MaxMana"] += 5;
                             Stats["Strength"] += 8;
                             Stats["Magic"] += 2;
+                            IsHeavy = true;
+                            Description = "A hammer blessed by a priest. The undead aren't afraid of them anymore, however they're still made due to giving knights confidence\n";
                             break;
                         case 25150:
                             Name = "Rubber Shield";
                             Stats["Strength"] += 1;
                             Stats["Defense"] += 3;
                             Stats["MagicDefense"] += 4;
+                            Description = "A shield with a rubber coating. Despite being less effective than reflective shield, they're still considered more prestige\n";
                             break;
                         case 20210:
                             Name = "Royal Cap";
@@ -998,10 +1056,32 @@ namespace ByteLike
 
 
                     break;
-                case 10:
-                    if (rand.Next(2) == 0)
+                case 6:
+
+                    File = "Graphics/ByteLikeGraphics/Items/torch";
+                    typeSwitch = rand.Next(2);
+                    File += typeSwitch;
+                    File += ".png";
+                    switch (typeSwitch)
                     {
-                        Element = rand.Next(4);
+                        case 0:
+                            Name = "Makeshift Torch";
+                            Stats["Torch"] += 1;
+                            Description = "An old cloth doused in oil wrapped around a stick. Will do for now\n";
+                            break;
+                        case 1:
+                            Name = "Torch";
+                            Stats["Torch"] += 2;
+                            Description = "A regular torch\n";
+                            break;
+                    }
+
+
+                    break;
+                case 10:
+                    if (rand.Next(3) == 0)
+                    {
+                        Element = rand.Next(5);
                     }
                     File = "Graphics/ByteLikeGraphics/Items/arrow";
                     File += Element;
@@ -1018,14 +1098,14 @@ namespace ByteLike
                             Name += "Ice ";
                             break;
                         case 4:
-                            Name += "Lightning";
+                            Name += "Lightning ";
                             break;
                     }
                     Name += "Arrow";
                     File += ".png";
-                    Stats["Agility"] = 3;
-                    Spell = "Shoot Arrow";
-                    Quantity = (rand.Next(3) + 1) * 5;
+                    Spell = $"Shoot {Name}";
+                    Quantity = rand.Next(5) + 1;
+                    Description += "Can be shot using a bow\n";
                     break;
             }
 
@@ -1060,8 +1140,10 @@ namespace ByteLike
                 }
                 pos++;
             }
-
-            Description += "\n";
+            if (!first)
+            {
+                Description += "\n";
+            }
             switch (Element)
             {
                 case 1:
@@ -1113,14 +1195,49 @@ namespace ByteLike
             position[0] = coordinates[0];
             position[1] = coordinates[1];
 
+            int quality = rand.Next(50);
+
+            if (floor <= 0)
+                quality = 0;
+
+            if (floor >= 100)
+                quality = 50;
+
+            if (quality < 35)
+            {
+                Inventory = new Item[11, 3];
+            }
+            else if (quality < 48)
+            {
+                Inventory = new Item[11, 5];
+                floor += 3;
+                File = "Graphics/ByteLikeGraphics/chest1.png";
+            }
+            else if (quality < 50)
+            {
+                Inventory = new Item[11, 7];
+                floor += 7;
+                File = "Graphics/ByteLikeGraphics/chest2.png";
+            }
+            else
+            {
+                Inventory = new Item[11, 7];
+                floor += 15;
+                File = "Graphics/ByteLikeGraphics/chest3.png";
+            }
+
+            int counter = rand.Next(150);
+
             if (floor > 0)
             {
                 for (int i = 0; i < Inventory.GetLength(1); i++)
                 {
                     for (int j = 0; j < Inventory.GetLength(0); j++)
                     {
-                        if (rand.Next(20) == 0)
+                        counter += rand.Next(15);
+                        if (counter > 150-(quality*2))
                         {
+                            counter = 0;
                             Inventory[j, i] = new Item(floor);
                         }
                     }

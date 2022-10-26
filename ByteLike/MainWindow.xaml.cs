@@ -31,9 +31,12 @@ namespace ByteLike
         static int floor = 0;
         static List<Chest> chests = new List<Chest>();
         static List<Creature> enemies = new List<Creature>();
+        static List<Effect> effects = new List<Effect>();
 
         static int[] sizes = new int[2];
         static string response = "";
+
+        static Random rand = new Random();
 
         // Torch and darkness
         static void ClearLight()
@@ -163,8 +166,8 @@ namespace ByteLike
             using (DrawingContext dc = drawingGroup.Open())
             {
                 // Create dialogues with the response text
-                FormattedText dialogue = new FormattedText(response, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 16, System.Windows.Media.Brushes.White);
-                dialogue.MaxTextWidth = (cameraSize[0] * 16) - 96;
+                FormattedText dialogue = new FormattedText(response, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 14, System.Windows.Media.Brushes.White);
+                dialogue.MaxTextWidth = (cameraSize[0] * 16) - 48;
 
                 // Draw the tiles
                 for (int i = 0; i < level.GetLength(1) && i < cameraSize[1]; i++)
@@ -353,6 +356,12 @@ namespace ByteLike
                         // if partly in darkness, draw partial darkness
                         if (darkness[camera[0] + j, camera[1] + i] == 2)
                         {
+                            foreach (Effect item in effects)
+                            {
+                                if (camera[0] + j == item.position[0] && camera[1] + i == item.position[1])
+                                    dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                            }
+
                             dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Tiles/partialdarkness.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
                         }
                         // if lit (again) draw chest sprites
@@ -360,10 +369,22 @@ namespace ByteLike
                         {
                             foreach (Chest item in chests)
                             {
-                                if (item.position[0] == camera[0] + j && item.position[1] == camera[1] + i)
+                                if (item.position[0] == camera[0] + j && item.position[1] == camera[1] + i && level[item.position[0],item.position[1]] != 2 && level[item.position[0], item.position[1]] != 0 && level[item.position[0], item.position[1]] != 5 && level[item.position[0], item.position[1]] != 4)
                                 {
                                     dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
                                 }
+                            }
+
+                            foreach (Effect item in effects)
+                            {
+                                if (camera[0] + j == item.position[0] && camera[1] + i == item.position[1])
+                                    dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                            }
+
+                            foreach (Creature item in enemies)
+                            {
+                                if (camera[0] + j == item.position[0] && camera[1] + i == item.position[1])
+                                    dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
                             }
                         }
 
@@ -416,7 +437,6 @@ namespace ByteLike
                         }
                         // End player draw code
 
-                        
 
                         // Inventory draw code, still in j-i switch
                         if (player.OpenInventory)
@@ -425,49 +445,72 @@ namespace ByteLike
                             if (!player.OpenSpell)
                             {
                                 // If j-i is in the regular inventory. Mind we have an offset here
-                                if (j >= 5 && j - 5 < player.Inventory.GetLength(0) && i - 1 < player.Inventory.GetLength(1) && i > 0)
+                                if (j >= 4 && j - 4 < player.Inventory.GetLength(0) && i - 1 < player.Inventory.GetLength(1) && i > 0)
                                 {
                                     // Draw the slot
                                     floorImage = "Graphics/ByteLikeGraphics/Hud/invslot";
                                     if (i == 1)
                                     {
-                                        floorImage += (j - 4);
+                                        floorImage += (j - 3);
                                     }
                                     else { floorImage += 0; }
                                     floorImage += ".png";
                                     dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
 
                                     // Draw an item
-                                    if (player.Inventory[j - 5, i - 1] != null)
+                                    if (player.Inventory[j - 4, i - 1] != null)
                                     {
-                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[j - 5, i - 1].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[j - 4, i - 1].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
                                         // Draw quantity
-                                        if (player.Inventory[j - 5, i - 1].Quantity > 1)
+                                        if (player.Inventory[j - 4, i - 1].Quantity > 1)
                                         {
-                                            FormattedText dialogue3 = new FormattedText(player.Inventory[j - 5, i - 1].Quantity.ToString(), System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 8, System.Windows.Media.Brushes.White);
+                                            FormattedText dialogue3 = new FormattedText(player.Inventory[j - 4, i - 1].Quantity.ToString(), System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 8, System.Windows.Media.Brushes.White);
                                             dialogue3.MaxTextWidth = 56;
                                             dc.DrawText(dialogue3, new System.Windows.Point(j * 16, 8 + i * 16));
                                         }
                                     }
                                 }
+                                // If j-i is in spell slots
+                                else if (j - 4 >= player.Inventory.GetLength(0) && j - 4 < player.Inventory.GetLength(0) + 4 && i - 1 < player.Stats["SpellSlots"] && i > 0)
+                                {
+                                    floorImage = "Graphics/ByteLikeGraphics/Hud/spellslot";
+                                    if (j - 4 == player.Inventory.GetLength(0))
+                                    {
+                                        floorImage += "0.png";
+                                    }
+                                    else if (j - 4 == player.Inventory.GetLength(0) + 3)
+                                    {
+                                        floorImage += "2.png";
+                                    }
+                                    else
+                                    {
+                                        floorImage += "1.png";
+                                    }
+                                    dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                }
+                                // Delete spell slot
+                                else if (j - 4 == player.Inventory.GetLength(0) + 4 && i - 1 < player.Stats["SpellSlots"] && i > 0)
+                                {
+                                    dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/spellslot6.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                }
                                 // If j-i is outside of the inventory but we have a chest
                                 else if (currentChest != -1)
                                 {
-                                    if (j >= 5 && j - 5 < player.Inventory.GetLength(0) && i - 1 - player.Inventory.GetLength(1) - 1 < chests[currentChest].Inventory.GetLength(1) && i - 1 > player.Inventory.GetLength(1))
+                                    if (j >= 4 && j - 4 < player.Inventory.GetLength(0) && i - 1 - player.Inventory.GetLength(1) - 1 < chests[currentChest].Inventory.GetLength(1) && i - 1 > player.Inventory.GetLength(1))
                                     {
                                         // Draw slot
                                         floorImage = "Graphics/ByteLikeGraphics/Hud/invslot0.png";
                                         dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
 
                                         // Draw item
-                                        if (chests[currentChest].Inventory[j - 5, i - 2 - player.Inventory.GetLength(1)] != null)
+                                        if (chests[currentChest].Inventory[j - 4, i - 2 - player.Inventory.GetLength(1)] != null)
                                         {
-                                            dc.DrawImage(new BitmapImage(new Uri(chests[currentChest].Inventory[j - 5, i - 2 - player.Inventory.GetLength(1)].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                            
+                                            dc.DrawImage(new BitmapImage(new Uri(chests[currentChest].Inventory[j - 4, i - 2 - player.Inventory.GetLength(1)].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+
                                             // Draw quantity
-                                            if (chests[currentChest].Inventory[j - 5, i - 2 - player.Inventory.GetLength(1)].Quantity > 1)
+                                            if (chests[currentChest].Inventory[j - 4, i - 2 - player.Inventory.GetLength(1)].Quantity > 1)
                                             {
-                                                FormattedText dialogue3 = new FormattedText(chests[currentChest].Inventory[j - 5, i - 2 - player.Inventory.GetLength(1)].Quantity.ToString(), System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 8, System.Windows.Media.Brushes.White);
+                                                FormattedText dialogue3 = new FormattedText(chests[currentChest].Inventory[j - 4, i - 2 - player.Inventory.GetLength(1)].Quantity.ToString(), System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 8, System.Windows.Media.Brushes.White);
                                                 dialogue3.MaxTextWidth = 56;
                                                 dc.DrawText(dialogue3, new System.Windows.Point(j * 16, 8 + i * 16));
                                             }
@@ -477,24 +520,42 @@ namespace ByteLike
 
 
                                 // Selected slot is in inventory
-                                if (j - 5 == player.SelectedSlot[0] && i - 1 == player.SelectedSlot[1] && player.SelectedSlot[1] < player.Inventory.GetLength(1))
+                                if (j - 4 == player.SelectedSlot[0] && i - 1 == player.SelectedSlot[1] && player.SelectedSlot[1] < player.Inventory.GetLength(1))
                                 {
                                     dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/invslot13.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
                                 }
                                 // Selected slot is in chest
-                                else if (j - 5 == player.SelectedSlot[0] && i - 1 == player.SelectedSlot[1] + 1 && player.SelectedSlot[1] >= player.Inventory.GetLength(1))
+                                else if (j - 4 == player.SelectedSlot[0] && i - 1 == player.SelectedSlot[1] + 1 && player.SelectedSlot[1] >= player.Inventory.GetLength(1))
                                 {
                                     dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/invslot13.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
                                 }
 
 
                                 // Current slot is in inventory
-                                if (j - 5 == player.CurrentSlot[0] && i - 1 == player.CurrentSlot[1] && player.CurrentSlot[1] < player.Inventory.GetLength(1))
+                                if ((j - 4 == player.CurrentSlot[0] && player.CurrentSlot[0] < player.Inventory.GetLength(0) || j-4 == player.CurrentSlot[0]+3 && player.CurrentSlot[0] == player.Inventory.GetLength(0)+1) && i - 1 == player.CurrentSlot[1] && (player.CurrentSlot[1] < player.Inventory.GetLength(1) || player.CurrentSlot[0] > player.Inventory.GetLength(0)) && player.CurrentSlot[0] != player.Inventory.GetLength(0))
                                 {
                                     dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/invslot12.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                }
+                                // Current slot in spells
+                                else if (j - 4 >= player.Inventory.GetLength(0) && j - 4 < player.Inventory.GetLength(0) + 4 && i - 1 == player.CurrentSlot[1] && player.CurrentSlot[0] == player.Inventory.GetLength(0))
+                                {
+                                    floorImage = "Graphics/ByteLikeGraphics/Hud/spellslot";
+                                    if (j - 4 == player.Inventory.GetLength(0))
+                                    {
+                                        floorImage += "3.png";
+                                    }
+                                    else if (j - 4 == player.Inventory.GetLength(0) + 3)
+                                    {
+                                        floorImage += "5.png";
+                                    }
+                                    else
+                                    {
+                                        floorImage += "4.png";
+                                    }
+                                    dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
                                 }
                                 // Current slot is in chest
-                                else if (j - 5 == player.CurrentSlot[0] && i - 1 == player.CurrentSlot[1] + 1 && player.CurrentSlot[1] >= player.Inventory.GetLength(1))
+                                else if (j - 4 == player.CurrentSlot[0] && i - 1 == player.CurrentSlot[1] + 1 && player.CurrentSlot[1] >= player.Inventory.GetLength(1) && player.CurrentSlot[0] < player.Inventory.GetLength(0))
                                 {
                                     dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/invslot12.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
                                 }
@@ -502,162 +563,25 @@ namespace ByteLike
 
 
                             }
-                            // Spell casting code
-                            else
-                            {
-                                int[] spellpos = new int[2] { player.position[0], player.position[1] };
-
-                                int counter = 0;
-                                int direction = 0;
-
-                                if (player.CurrentSlot[0] + player.position[0] > camera[0] && player.CurrentSlot[0] + player.position[0] + 1 < camera[0] + cameraSize[0] && player.CurrentSlot[1] + player.position[1] > camera[1] && player.CurrentSlot[1] + player.position[1] + 1 < camera[1] + cameraSize[1])
-                                {
-                                    dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/invslot12.png", UriKind.Relative)), new Rect((player.position[0] + player.CurrentSlot[0] - camera[0]) * 16, (player.position[1] + player.CurrentSlot[1] - camera[1]) * 16, 17, 17));
-                                }
-
-
-                                if (DistanceBetween(new int[2] { player.position[0], player.position[1] }, new int[2] { player.position[0] + player.CurrentSlot[0], player.position[1] }) >= DistanceBetween(new int[2] { player.position[0], player.position[1] }, new int[2] { player.position[0], player.position[1] + player.CurrentSlot[1] }))
-                                {
-                                    if (player.CurrentSlot[0] < 0)
-                                    {
-                                        direction = 180;
-                                    }
-                                }
-                                else
-                                {
-                                    direction = 270;
-                                    if (player.CurrentSlot[1] < 0)
-                                    {
-                                        direction = 90;
-                                    }
-                                }
-
-
-                                while (spellpos[0] > camera[0] && spellpos[0] + 1 < camera[0] + cameraSize[0] && spellpos[1] > camera[1] && spellpos[1] + 1 < camera[1] + cameraSize[1] && (player.CurrentSlot[0] != 0 || player.CurrentSlot[1] != 0) && (darkness[spellpos[0], spellpos[1]] == 1 || darkness[spellpos[0], spellpos[1]] == 2) && level[spellpos[0], spellpos[1]] != 0 && level[spellpos[0], spellpos[1]] != 2 && level[spellpos[0], spellpos[1]] != 5 && level[spellpos[0], spellpos[1]] != 4)
-                                {
-                                    switch (direction)
-                                    {
-                                        case 0:
-                                            spellpos[0]++;
-                                            if (player.CurrentSlot[1] != 0)
-                                            {
-                                                if (player.CurrentSlot[1] < 0)
-                                                {
-                                                    counter++;
-                                                    if (counter >= player.CurrentSlot[0] / (-player.CurrentSlot[1]))
-                                                    {
-                                                        spellpos[1]--;
-                                                        counter = 0;
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    counter++;
-                                                    if (counter >= player.CurrentSlot[0] / player.CurrentSlot[1])
-                                                    {
-                                                        spellpos[1]++;
-                                                        counter = 0;
-                                                    }
-                                                }
-                                            }
-                                            break;
-                                        case 180:
-                                            spellpos[0]--;
-                                            if (player.CurrentSlot[1] != 0)
-                                            {
-                                                if (player.CurrentSlot[1] < 0)
-                                                {
-                                                    counter--;
-                                                    if (counter <= player.CurrentSlot[0] / (-player.CurrentSlot[1]))
-                                                    {
-                                                        spellpos[1]--;
-                                                        counter = 0;
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    counter--;
-                                                    if (counter <= player.CurrentSlot[0] / player.CurrentSlot[1])
-                                                    {
-                                                        spellpos[1]++;
-                                                        counter = 0;
-                                                    }
-                                                }
-                                            }
-                                            break;
-                                        case 90:
-                                            spellpos[1]--;
-                                            if (player.CurrentSlot[0] != 0)
-                                            {
-                                                if (player.CurrentSlot[0] < 0)
-                                                {
-                                                    counter--;
-                                                    if (counter <= player.CurrentSlot[1] / (-player.CurrentSlot[0]))
-                                                    {
-                                                        spellpos[0]--;
-                                                        counter = 0;
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    counter--;
-                                                    if (counter <= player.CurrentSlot[1] / player.CurrentSlot[0])
-                                                    {
-                                                        spellpos[0]++;
-                                                        counter = 0;
-                                                    }
-                                                }
-                                            }
-                                            break;
-                                        case 270:
-                                            spellpos[1]++;
-                                            if (player.CurrentSlot[0] != 0)
-                                            {
-                                                if (player.CurrentSlot[0] < 0)
-                                                {
-                                                    counter++;
-                                                    if (counter >= player.CurrentSlot[1] / (-player.CurrentSlot[0]))
-                                                    {
-                                                        spellpos[0]--;
-                                                        counter = 0;
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    counter++;
-                                                    if (counter >= player.CurrentSlot[1] / player.CurrentSlot[0])
-                                                    {
-                                                        spellpos[0]++;
-                                                        counter = 0;
-                                                    }
-                                                }
-                                            }
-                                            break;
-                                    }
-                                    dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/invslot13.png", UriKind.Relative)), new Rect((spellpos[0] - camera[0]) * 16, (spellpos[1] - camera[1]) * 16, 17, 17));
-                                }
-
-                            }
-                            // End spell casting
 
                         }
                         // End inventory draw code
 
 
                         // Draw the response dialogue box
-                        if (response != "" && j>4)
+                        if (response != "" && j>1)
                         {
                             if (i * 16 >= (cameraSize[1] * 16) - dialogue.Height - 16)
                             {
                                 if ((i - 1) * 16 < (cameraSize[1] * 16) - dialogue.Height - 16)
                                 {
-                                    if (j == 5) { dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/dialoguebox1.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17)); }
+                                    if (j == 2) { dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/dialoguebox1.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17)); }
                                     else if (j + 1 == cameraSize[0]) { dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/dialoguebox4.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17)); }
                                     else { dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/dialoguebox2.png", UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16)); }
                                 }
                                 else
                                 {
-                                    if (j == 5) { dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/dialoguebox3.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17)); }
+                                    if (j == 2) { dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/dialoguebox3.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17)); }
                                     else if (j + 1 == cameraSize[0]) { dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/dialoguebox5.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17)); }
                                     else { dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/dialoguebox6.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17)); }
                                 }
@@ -671,6 +595,145 @@ namespace ByteLike
                 //
 
 
+                // Spell casting
+                if (player.OpenSpell)
+                {
+                    int[] spellpos = new int[2] { player.position[0], player.position[1] };
+
+                    int counter = 0;
+                    int direction = 0;
+
+                    if (player.CurrentSlot[0] + player.position[0] > camera[0] && player.CurrentSlot[0] + player.position[0] + 1 < camera[0] + cameraSize[0] && player.CurrentSlot[1] + player.position[1] > camera[1] && player.CurrentSlot[1] + player.position[1] + 1 < camera[1] + cameraSize[1])
+                    {
+                        dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/invslot12.png", UriKind.Relative)), new Rect((player.position[0] + player.CurrentSlot[0] - camera[0]) * 16, (player.position[1] + player.CurrentSlot[1] - camera[1]) * 16, 17, 17));
+                    }
+
+
+                    if (DistanceBetween(new int[2] { player.position[0], player.position[1] }, new int[2] { player.position[0] + player.CurrentSlot[0], player.position[1] }) >= DistanceBetween(new int[2] { player.position[0], player.position[1] }, new int[2] { player.position[0], player.position[1] + player.CurrentSlot[1] }))
+                    {
+                        if (player.CurrentSlot[0] < 0)
+                        {
+                            direction = 180;
+                        }
+                    }
+                    else
+                    {
+                        direction = 270;
+                        if (player.CurrentSlot[1] < 0)
+                        {
+                            direction = 90;
+                        }
+                    }
+
+
+                    while (spellpos[0] > camera[0] && spellpos[0] + 1 < camera[0] + cameraSize[0] && spellpos[1] > camera[1] && spellpos[1] + 1 < camera[1] + cameraSize[1] && (player.CurrentSlot[0] != 0 || player.CurrentSlot[1] != 0) && (darkness[spellpos[0], spellpos[1]] == 1 || darkness[spellpos[0], spellpos[1]] == 2) && level[spellpos[0], spellpos[1]] != 0 && level[spellpos[0], spellpos[1]] != 2 && level[spellpos[0], spellpos[1]] != 5 && level[spellpos[0], spellpos[1]] != 4 && player.DrawSpellLine)
+                    {
+                        switch (direction)
+                        {
+                            case 0:
+                                spellpos[0]++;
+                                if (player.CurrentSlot[1] != 0)
+                                {
+                                    if (player.CurrentSlot[1] < 0)
+                                    {
+                                        counter++;
+                                        if (counter >= player.CurrentSlot[0] / (-player.CurrentSlot[1]))
+                                        {
+                                            spellpos[1]--;
+                                            counter = 0;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        counter++;
+                                        if (counter >= player.CurrentSlot[0] / player.CurrentSlot[1])
+                                        {
+                                            spellpos[1]++;
+                                            counter = 0;
+                                        }
+                                    }
+                                }
+                                break;
+                            case 180:
+                                spellpos[0]--;
+                                if (player.CurrentSlot[1] != 0)
+                                {
+                                    if (player.CurrentSlot[1] < 0)
+                                    {
+                                        counter--;
+                                        if (counter <= player.CurrentSlot[0] / (-player.CurrentSlot[1]))
+                                        {
+                                            spellpos[1]--;
+                                            counter = 0;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        counter--;
+                                        if (counter <= player.CurrentSlot[0] / player.CurrentSlot[1])
+                                        {
+                                            spellpos[1]++;
+                                            counter = 0;
+                                        }
+                                    }
+                                }
+                                break;
+                            case 90:
+                                spellpos[1]--;
+                                if (player.CurrentSlot[0] != 0)
+                                {
+                                    if (player.CurrentSlot[0] < 0)
+                                    {
+                                        counter--;
+                                        if (counter <= player.CurrentSlot[1] / (-player.CurrentSlot[0]))
+                                        {
+                                            spellpos[0]--;
+                                            counter = 0;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        counter--;
+                                        if (counter <= player.CurrentSlot[1] / player.CurrentSlot[0])
+                                        {
+                                            spellpos[0]++;
+                                            counter = 0;
+                                        }
+                                    }
+                                }
+                                break;
+                            case 270:
+                                spellpos[1]++;
+                                if (player.CurrentSlot[0] != 0)
+                                {
+                                    if (player.CurrentSlot[0] < 0)
+                                    {
+                                        counter++;
+                                        if (counter >= player.CurrentSlot[1] / (-player.CurrentSlot[0]))
+                                        {
+                                            spellpos[0]--;
+                                            counter = 0;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        counter++;
+                                        if (counter >= player.CurrentSlot[1] / player.CurrentSlot[0])
+                                        {
+                                            spellpos[0]++;
+                                            counter = 0;
+                                        }
+                                    }
+                                }
+                                break;
+                        }
+                        if (spellpos[0] - camera[0] != (player.position[0] + player.CurrentSlot[0] - camera[0]) || spellpos[1] - camera[1] != (player.position[1] + player.CurrentSlot[1] - camera[1]))
+                            dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/invslot13.png", UriKind.Relative)), new Rect((spellpos[0] - camera[0]) * 16, (spellpos[1] - camera[1]) * 16, 17, 17));
+                    }
+
+                }
+                // End spell casting
+
 
                 // Draw stats hud
                 for (int i = 0; i < 9; i++)
@@ -679,7 +742,11 @@ namespace ByteLike
                     floorImage += i;
                     floorImage += ".png";
                     if (i == 0)
+                    {
                         dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(0, i * 32, 17, 17));
+                        if (effects.Count > 0)
+                            dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/effectplayout.png", UriKind.Relative)), new Rect(cameraSize[0]*16 - 16, i * 32, 17, 17));
+                    }
                     else
                         dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(0, i * 32 - 16, 17, 17));
 
@@ -723,10 +790,23 @@ namespace ByteLike
                 // End stats hud
 
 
+                // Spell names
+                if (player.OpenInventory && !player.OpenSpell)
+                {
+                    int i = 0;
+                    foreach (string item in player.Spells)
+                    {
+                        FormattedText dialogue3 = new FormattedText(item, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 10, System.Windows.Media.Brushes.White);
+                        dialogue3.MaxTextWidth = 80;
+                        dc.DrawText(dialogue3, new System.Windows.Point((player.Inventory.GetLength(0)+4)*16 + 4, 18 + i * 16));
+                        i++;
+                    }
+                }
+
                 // Response text
                 if (response != "")
                 {
-                    dc.DrawText(dialogue, new System.Windows.Point(88, (cameraSize[1]*16)-dialogue.Height-8));
+                    dc.DrawText(dialogue, new System.Windows.Point(40, (cameraSize[1]*16)-dialogue.Height-8));
                 }
                 //
 
@@ -815,12 +895,85 @@ namespace ByteLike
                 cameraSize[0]++;
             }
 
-            response = player.Logics(ref level, ref chests);
+
+
+            if (effects.Count > 0)
+            {
+                List<int> deleteus = new List<int>();
+                for (int i = 0; i < effects.Count; i++)
+                {
+                    if (!effects[i].Logics(ref level, ref enemies, ref effects, ref player, out response, response))
+                        deleteus.Add(i);
+                }
+
+                for (int i = 0; i < deleteus.Count; i++)
+                {
+                    effects.RemoveAt(deleteus[i]);
+                }
+            }
+            else
+            {
+                response = player.Logics(ref level, ref chests, ref effects, ref enemies, ref player);
+
+
+                List<int> deletusXL = new List<int>();
+                int pos = 0;
+
+                if (!player.OpenInventory)
+                {
+
+                    foreach (Creature enemy in enemies)
+                    {
+                        response += enemy.Logics(ref level, ref chests, ref effects, ref enemies, ref player);
+
+                        if (enemy.Stats["HP"] <= 0)
+                            deletusXL.Add(pos);
+
+                        pos++;
+
+                    }
+
+                }
+
+                for (int i = 0; i < deletusXL.Count; i++)
+                {
+                    try
+                    {
+                        enemies.RemoveAt(deletusXL[i]);
+                    }
+                    catch { }
+                }
+
+                if (effects.Count > 0)
+                {
+                    List<int> deleteus = new List<int>();
+                    for (int i = 0; i < effects.Count; i++)
+                    {
+                        if (!effects[i].Logics(ref level, ref enemies, ref effects, ref player, out response, response))
+                            deleteus.Add(i);
+                    }
+
+                    for (int i = 0; i < deleteus.Count; i++)
+                    {
+                        effects.RemoveAt(deleteus[i]);
+                    }
+                }
+
+
+                if (enemies.Count < 20)
+                {
+                    int[] newPos = new int[] { rand.Next(level.GetLength(0)), rand.Next(level.GetLength(1)) };
+
+                    if (level[newPos[0], newPos[1]] == 1)
+                    {
+                        enemies.Add(new Critter(floor, new int[] { newPos[0], newPos[1] }));
+                    }
+                }
+            }
 
             // Set camera to player's position
             camera[0] = player.position[0];
             camera[1] = player.position[1];
-
 
 
 
@@ -852,6 +1005,424 @@ namespace ByteLike
         }
     }
 
+
+
+    public class Effect
+    {
+        public int[] position = new int[2];
+        int[] target = new int[2];
+        int direction = 0;
+        int counter = 0;
+        public string File = "Graphics/ByteLikeGraphics/placeholder.png";
+        int strength = 0;
+        int element = 0;
+        int spawntile = 0;
+        int radius = -100;
+
+        bool isBullet = false;
+        bool isExplosion = false;
+        bool isWide = false;
+        bool isDamaging = true;
+
+        string stat = "";
+
+        static double DistanceBetween(int[] x, int[] y)
+        {
+            int disx = 0;
+            int disy = 0;
+            if (x[0] >= y[0]) { disx = x[0] - y[0]; }
+            else { disx = y[0] - x[0]; }
+
+            if (x[1] >= y[1]) { disy = x[1] - y[1]; }
+            else { disy = y[1] - x[1]; }
+
+            return Math.Sqrt(Math.Pow(disx, 2) + Math.Pow(disy, 2));
+        }
+
+        public Effect(int[] pos, int[] targt, int power, string spell)
+        {
+            position[0] = pos[0];
+            position[1] = pos[1];
+
+            target[0] = targt[0];
+            target[1] = targt[1];
+
+            strength = power;
+
+            direction = 0;
+
+            if (DistanceBetween(new int[2] { position[0], position[1] }, new int[2] { position[0] + target[0], position[1] }) >= DistanceBetween(new int[2] { position[0], position[1] }, new int[2] { position[0], position[1] + target[1] }))
+            {
+                if (target[0] < 0)
+                {
+                    direction = 180;
+                }
+            }
+            else
+            {
+                direction = 270;
+                if (target[1] < 0)
+                {
+                    direction = 90;
+                }
+            }
+
+            switch (spell)
+            {
+                case "Search":
+                    spawntile = -1;
+                    isDamaging = false;
+                    strength = 0;
+                    break;
+                case "Fire Explosion":
+                    element = 1;
+                    break;
+                case "Shoot Arrow":
+                    isBullet = true;
+                    break;
+
+            }
+
+
+            if (!isBullet)
+            {
+                position[0] += target[0];
+                position[1] += target[1];
+            }
+        }
+
+        public bool Logics(ref int[,] level, ref List<Creature> enemies, ref List<Effect> effects, ref Player player, out string response, string currentresponse)
+        {
+            bool result = true;
+
+            response = currentresponse;
+
+            if (isBullet)
+            {
+                Move();
+                if (level[position[0], position[1]] == 0 || level[position[0], position[1]] == 5 || level[position[0], position[1]] == 4 || level[position[0], position[1]] == 2)
+                {
+                    result = false;
+                }
+
+                if (isWide)
+                {
+                    string spell = "";
+                    switch (element)
+                    {
+                        case 1:
+                            spell = "Fire ";
+                            break;
+                        case 2:
+                            spell = "Poison ";
+                            break;
+                        case 3:
+                            spell = "Ice ";
+                            break;
+                        case 4:
+                            spell = "Lightning ";
+                            break;
+                    }
+                    spell += "Explosion";
+                    switch (direction)
+                    {
+                        case 0:
+                        case 180:
+                            for (int i = -radius; i <= radius; i++)
+                            {
+                                effects.Add(new Effect(new int[] { position[0], position[1] + i }, new int[] { position[0], position[1] + i }, strength, spell));
+                            }
+                            break;
+                        case 270:
+                        case 90:
+                            for (int i = -radius; i <= radius; i++)
+                            {
+                                effects.Add(new Effect(new int[] { position[0] + i, position[1] }, new int[] { position[0] + i, position[1] }, strength, spell));
+                            }
+                            break;
+                    }
+                }
+            }
+
+            if (strength == 0)
+                result = false;
+
+            int xp = 0;
+            bool check = false;
+
+            // Damage/buff
+            if (strength != 0)
+            {
+                foreach (Creature enemy in enemies)
+                {
+                    if (position[0] == enemy.position[0] && position[1] == enemy.position[1])
+                    {
+                        if (isDamaging)
+                            xp = enemy.TakeDamage(strength, element);
+                        else
+                        {
+                            if (enemy.Buffs[stat] <= 0)
+                            {
+                                enemy.Buffs[stat] = element;
+                                enemy.BuffLevels[stat] = strength;
+                            }
+                            else
+                            {
+                                enemy.Buffs[stat] = element;
+                                enemy.BuffLevels[stat] = (int)((enemy.BuffLevels[stat] + strength) / 2);
+                            }
+                        }
+                        check = true;
+                    }
+                }
+
+                if (check || !isBullet)
+                    strength = 0;
+            }
+            // end Damage/buff
+
+            // XP yield
+            if (xp > 0)
+            {
+                response += $"{player.Name} gained {xp} XP!\n";
+                player.Stats["XP"] += xp;
+            }
+            //
+
+            if (!result)
+            {
+                // Tile spawning
+                if (spawntile > 0)
+                {
+                    for (int i = -radius - 5; i <= radius + 5; i++)
+                    {
+                        for (int j = -radius - 5; j <= radius + 5; j++)
+                        {
+                            if (position[0] + j > 0 && position[0] + j < level.GetLength(0) && position[1] + i > 0 && position[1] + i < level.GetLength(1) && DistanceBetween(new int[] { position[0], position[1] }, new int[] { position[0] + j, position[1] + i }) <= radius)
+                            {
+                                switch (level[position[0] + j, position[1] + i])
+                                {
+                                    // Void wall
+                                    case 0:
+                                        level[position[0] + j, position[1] + i] = 2;
+                                        break;
+                                    // Floor
+                                    case 1:
+                                    // Wall
+                                    case 2:
+                                    // Center of the room, really only needed for debug
+                                    case 3:
+                                    // Door
+                                    case 4:
+                                    // Water
+                                    case 6:
+                                    // Lava
+                                    case 7:
+                                    // Grass
+                                    case 8:
+                                    case 9:
+                                    case 10:
+                                    case 16:
+                                    // Trap
+                                    case 11:
+                                    // Posion Trap
+                                    case 12:
+                                    // Poisonous vines
+                                    case 13:
+                                    // Electro terrain
+                                    case 14:
+                                        level[position[0] + j, position[1] + i] = spawntile;
+                                        break;
+
+                                    // Outter wall
+                                    case 5:
+                                    // Exit
+                                    case 15:
+                                        break;
+                                } // end switch
+                            }
+                        } // end j
+                    } // end i
+                }
+                // end tile spawning
+                else if (spawntile < 0)
+                {
+                    if (position[0] >= 0 && position[0] < level.GetLength(0) && position[1] >= 0 && position[1] < level.GetLength(1))
+                    {
+                        if (level[position[0], position[1]] == 8) { level[position[0], position[1]] = 1; }
+                        else if (level[position[0], position[1]] == 9) { level[position[0], position[1]] = 11; }
+                        else if (level[position[0], position[1]] == 10) { level[position[0], position[1]] = 12; }
+
+                        if (position[0] + 1 < level.GetLength(0))
+                        {
+                            if (level[position[0] + 1, position[1]] == 8) { level[position[0] + 1, position[1]] = 1; }
+                            else if (level[position[0] + 1, position[1]] == 9) { level[position[0] + 1, position[1]] = 11; }
+                            else if (level[position[0] + 1, position[1]] == 10) { level[position[0] + 1, position[1]] = 12; }
+                        }
+                        if (position[0] - 1 >= 0)
+                        {
+                            if (level[position[0] - 1, position[1]] == 8) { level[position[0] - 1, position[1]] = 1; }
+                            else if (level[position[0] - 1, position[1]] == 9) { level[position[0] - 1, position[1]] = 11; }
+                            else if (level[position[0] - 1, position[1]] == 10) { level[position[0] - 1, position[1]] = 12; }
+                        }
+
+                        if (position[1] + 1 < level.GetLength(1))
+                        {
+                            if (level[position[0], position[1] + 1] == 8) { level[position[0], position[1] + 1] = 1; }
+                            else if (level[position[0], position[1] + 1] == 9) { level[position[0], position[1] + 1] = 11; }
+                            else if (level[position[0], position[1] + 1] == 10) { level[position[0], position[1] + 1] = 12; }
+                        }
+                        if (position[1] - 1 >= 0)
+                        {
+                            if (level[position[0], position[1] - 1] == 8) { level[position[0], position[1] - 1] = 1; }
+                            else if (level[position[0], position[1] - 1] == 9) { level[position[0], position[1] - 1] = 11; }
+                            else if (level[position[0], position[1] - 1] == 10) { level[position[0], position[1] - 1] = 12; }
+                        }
+                    }
+                }
+
+                // Explosions
+                if (isExplosion)
+                {
+                    for (int i = -radius; i <= radius; i++)
+                    {
+                        for (int j = -radius; j <= radius; j++)
+                        {
+                            if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { position[0] + j, position[1] + i }) < radius)
+                            {
+                                string spell = "";
+                                switch (element)
+                                {
+                                    case 1:
+                                        spell = "Fire ";
+                                        break;
+                                    case 2:
+                                        spell = "Poison ";
+                                        break;
+                                    case 3:
+                                        spell = "Ice ";
+                                        break;
+                                    case 4:
+                                        spell = "Lightning ";
+                                        break;
+                                }
+                                spell += "Explosion";
+
+                                effects.Add(new Effect(new int[] { position[0] + j, position[1] + i }, new int[] { position[0] + j, position[1] + i }, strength, spell));
+                            }
+                        }
+                    }
+                }
+                // end Explosions
+
+            }
+            
+            return result;
+        }
+
+        void Move()
+        {
+            switch (direction)
+            {
+                case 0:
+                    position[0]++;
+                    if (target[1] != 0)
+                    {
+                        if (target[1] < 0)
+                        {
+                            counter++;
+                            if (counter >= target[0] / (-target[1]))
+                            {
+                                position[1]--;
+                                counter = 0;
+                            }
+                        }
+                        else
+                        {
+                            counter++;
+                            if (counter >= target[0] / target[1])
+                            {
+                                position[1]++;
+                                counter = 0;
+                            }
+                        }
+                    }
+                    break;
+                case 180:
+                    position[0]--;
+                    if (target[1] != 0)
+                    {
+                        if (target[1] < 0)
+                        {
+                            counter--;
+                            if (counter <= target[0] / (-target[1]))
+                            {
+                                position[1]--;
+                                counter = 0;
+                            }
+                        }
+                        else
+                        {
+                            counter--;
+                            if (counter <= target[0] / target[1])
+                            {
+                                position[1]++;
+                                counter = 0;
+                            }
+                        }
+                    }
+                    break;
+                case 90:
+                    position[1]--;
+                    if (target[0] != 0)
+                    {
+                        if (target[0] < 0)
+                        {
+                            counter--;
+                            if (counter <= target[1] / (-target[0]))
+                            {
+                                position[0]--;
+                                counter = 0;
+                            }
+                        }
+                        else
+                        {
+                            counter--;
+                            if (counter <= target[1] / target[0])
+                            {
+                                position[0]++;
+                                counter = 0;
+                            }
+                        }
+                    }
+                    break;
+                case 270:
+                    position[1]++;
+                    if (target[0] != 0)
+                    {
+                        if (target[0] < 0)
+                        {
+                            counter++;
+                            if (counter >= target[1] / (-target[0]))
+                            {
+                                position[0]--;
+                                counter = 0;
+                            }
+                        }
+                        else
+                        {
+                            counter++;
+                            if (counter >= target[1] / target[0])
+                            {
+                                position[0]++;
+                                counter = 0;
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+    }
 
    
 }

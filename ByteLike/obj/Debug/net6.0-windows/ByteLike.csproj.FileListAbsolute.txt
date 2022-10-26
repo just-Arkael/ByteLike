@@ -316,3 +316,17 @@ C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windo
 C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Tiles\water1101.png
 C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Tiles\water1110.png
 C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Tiles\water1111.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\spellslot0.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\spellslot1.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\spellslot2.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\spellslot3.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\spellslot4.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\spellslot5.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\spellslot6.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\effectplayout.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Items\torch0.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Items\torch1.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Items\torch2.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Items\torch3.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Items\torch4.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Items\torch5.png
