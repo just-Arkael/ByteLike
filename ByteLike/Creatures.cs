@@ -635,7 +635,7 @@ namespace ByteLike
     public class Player : Creature
     {
 
-        public new Item[,] Inventory = new Item[11, 4];
+        public new Item[,] Inventory = new Item[11, 3];
 
         public bool OpenInventory = false;
         public int[] SelectedSlot = new int[2] { -100, -1 };
@@ -953,18 +953,10 @@ namespace ByteLike
             Spells.Add("Search");
             Spells.Add("Focus");
 
-            switch (rand.Next(2))
-            {
-                case 0:
-                    File = "Graphics/ByteLikeGraphics/Creatures/player1.png";
-                    break;
-                case 1:
-                    File = "Graphics/ByteLikeGraphics/Creatures/player2.png";
-                    break;
-                case 2:
-                    File = "Graphics/ByteLikeGraphics/Creatures/player3.png";
-                    break;
-            }
+            File = "Graphics/ByteLikeGraphics/Creatures/player";
+            File += (rand.Next(3)+1).ToString();
+            File += ".png";
+
             Name = name;
             Stats["HP"] = 20;
             Stats["Mana"] = 10;
@@ -978,7 +970,7 @@ namespace ByteLike
             bool TorchCheck = false;
             bool WeaponCheck = false;
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 5; i++)
             {
                 if (!TorchCheck && rand.Next(2) == 0)
                 {
@@ -1428,27 +1420,118 @@ namespace ByteLike
                                                 // if it is type 10, use it
                                                 else
                                                 {
-                                                    bool bowcheck = false;
-                                                    if (Inventory[3, 0] != null)
+                                                    // Arrows/Scrolls, aka using spells inside items
+                                                    if (Inventory[SelectedSlot[0], SelectedSlot[1]].Name.Contains("Arrow") || Inventory[SelectedSlot[0], SelectedSlot[1]].Name.Contains("Scroll"))
                                                     {
-                                                        if (Inventory[3, 0].Name.ToLower().Contains("bow"))
-                                                            bowcheck = true;
-                                                    }
 
-                                                    if (!Inventory[SelectedSlot[0], SelectedSlot[1]].Name.Contains("Arrow") || bowcheck)
-                                                    {
-                                                        CurrentSlot[0] = 0;
-                                                        CurrentSlot[1] = 0;
-                                                        OpenSpell = true;
-                                                        UseMana = false;
-                                                        RemSpell = Inventory[SelectedSlot[0], SelectedSlot[1]].Spell;
-                                                        DrawSpellLine = isALineSpell(RemSpell);
-                                                        ArrowSlot[0] = SelectedSlot[0];
-                                                        ArrowSlot[1] = SelectedSlot[1];
+                                                        bool bowcheck = false;
+                                                        if (Inventory[3, 0] != null)
+                                                        {
+                                                            if (Inventory[3, 0].Name.ToLower().Contains("bow"))
+                                                                bowcheck = true;
+                                                        }
+
+                                                        if (!Inventory[SelectedSlot[0], SelectedSlot[1]].Name.Contains("Arrow") || bowcheck)
+                                                        {
+                                                            CurrentSlot[0] = 0;
+                                                            CurrentSlot[1] = 0;
+                                                            OpenSpell = true;
+                                                            UseMana = false;
+                                                            RemSpell = Inventory[SelectedSlot[0], SelectedSlot[1]].Spell;
+                                                            DrawSpellLine = isALineSpell(RemSpell);
+                                                            ArrowSlot[0] = SelectedSlot[0];
+                                                            ArrowSlot[1] = SelectedSlot[1];
+                                                        }
+                                                        else
+                                                        {
+                                                            response += $"{Name}: I need a bow to use that.\n";
+                                                        }
                                                     }
+                                                    // Learning new spells
+                                                    else if (Inventory[SelectedSlot[0], SelectedSlot[1]].Name.Contains("Book"))
+                                                    {
+                                                        if (Stats["SpellSlots"] > Spells.Count)
+                                                        {
+                                                            Spells.Add(Inventory[SelectedSlot[0], SelectedSlot[1]].Spell);
+                                                            Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity--;
+                                                            if (Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity <= 0)
+                                                                Inventory[SelectedSlot[0], SelectedSlot[1]] = null;
+                                                            SelectedSlot[0] = -100;
+                                                        }
+                                                        else
+                                                        {
+                                                            response += $"{Name}: I can't remember more spells.\n";
+                                                        }
+                                                    }
+                                                    // Healing items
                                                     else
                                                     {
-                                                        response += $"{Name}: I need a bow to use that.\n";
+                                                        if (Inventory[SelectedSlot[0], SelectedSlot[1]].Name == "Improvement Potion")
+                                                        {
+                                                            Statuses[0] = 0;
+                                                            Statuses[1] = 0;
+                                                            Statuses[2] = 0;
+                                                            Statuses[3] = 0;
+                                                        }
+                                                        else
+                                                        {
+                                                            Stats["HP"] += Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["MaxHP"];
+                                                            Stats["Mana"] += Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["MaxMana"];
+
+                                                            if (Stats["HP"] > GetStat("MaxHP"))
+                                                                Stats["HP"] = GetStat("MaxHP");
+                                                            if (Stats["Mana"] > GetStat("MaxMana"))
+                                                                Stats["Mana"] = GetStat("MaxMana");
+
+                                                            if (Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Strength"] > 0)
+                                                            {
+                                                                if (Buffs["Strength"] > 0)
+                                                                    BuffLevels["Strength"] = (int)((BuffLevels["Strength"] + Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Strength"]) / 2);
+                                                                else
+                                                                    BuffLevels["Strength"] = Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Strength"];
+                                                                Buffs["Strength"] = 100;
+                                                            }
+
+                                                            if (Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Agility"] > 0)
+                                                            {
+                                                                if (Buffs["Agility"] > 0)
+                                                                    BuffLevels["Agility"] = (int)((BuffLevels["Agility"] + Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Agility"]) / 2);
+                                                                else
+                                                                    BuffLevels["Agility"] = Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Agility"];
+                                                                Buffs["Agility"] = 100;
+                                                            }
+
+                                                            if (Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Magic"] > 0)
+                                                            {
+                                                                if (Buffs["Magic"] > 0)
+                                                                    BuffLevels["Magic"] = (int)((BuffLevels["Magic"] + Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Magic"]) / 2);
+                                                                else
+                                                                    BuffLevels["Magic"] = Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Magic"];
+                                                                Buffs["Magic"] = 100;
+                                                            }
+
+                                                            if (Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Defense"] > 0)
+                                                            {
+                                                                if (Buffs["Defense"] > 0)
+                                                                    BuffLevels["Defense"] = (int)((BuffLevels["Defense"] + Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Defense"]) / 2);
+                                                                else
+                                                                    BuffLevels["Defense"] = Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Defense"];
+                                                                Buffs["Defense"] = 100;
+                                                            }
+
+                                                            if (Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["MagicDefense"] > 0)
+                                                            {
+                                                                if (Buffs["MagicDefense"] > 0)
+                                                                    BuffLevels["MagicDefense"] = (int)((BuffLevels["MagicDefense"] + Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["MagicDefense"]) / 2);
+                                                                else
+                                                                    BuffLevels["MagicDefense"] = Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["MagicDefense"];
+                                                                Buffs["MagicDefense"] = 100;
+                                                            }
+                                                        }
+                                                        Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity--;
+                                                        if (Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity <= 0)
+                                                            Inventory[SelectedSlot[0], SelectedSlot[1]] = null;
+                                                        SelectedSlot[0] = -100;
                                                     }
                                                 }
                                             }
@@ -1564,7 +1647,7 @@ namespace ByteLike
                 {
                     if (Keyboard.IsKeyDown(Key.E))
                     {
-                        if (CurrentSlot[0] == 0 && CurrentSlot[1] == 0)
+                        if (CurrentSlot[0] == 0 && CurrentSlot[1] == 0 && DrawSpellLine)
                         {
                             OpenSpell = false;
                             if (SelectedSlot[0] >= 0)
@@ -1643,7 +1726,7 @@ namespace ByteLike
             }
 
             // leveling up
-            if (Stats["XP"] >= (int)(90 + Math.Pow(Stats["Level"], 3) * 10))
+            if (Stats["XP"] >= (int)(90 + Math.Pow(Stats["Level"], 2) * 10))
                 response += LevelUp();
 
 

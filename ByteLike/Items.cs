@@ -10,7 +10,7 @@ namespace ByteLike
 
     public class Item
     {
-        // 0 - Useless, 1 - Head, 2 - Torso, 3 - Legs, 4 - Weapon, 5 - OffHand, 6 - Torch, 7 - Necklace, 8 - Ring, 9 - (For safety, none), 10 - Usable, 11 - Ammo
+        // 0 - Useless, 1 - Head, 2 - Torso, 3 - Legs, 4 - Weapon, 5 - OffHand, 6 - Torch, 7 - Necklace, 8 - Ring, 9 - (For safety, none), 10 - Usable/Ammo
         public int GearType = 0;
         public int ClassType = 0;
         public string Name = "???";
@@ -39,8 +39,8 @@ namespace ByteLike
 
             if (type == 0)
             {
-                GearType = rand.Next(6) + 1;
-                if (rand.Next(3) == 0) { GearType = 10; }
+                GearType = 10;
+                if (rand.Next(5) == 0) { GearType = rand.Next(6) + 1; }
             }
             else { GearType = type; }
 
@@ -1131,33 +1131,135 @@ namespace ByteLike
 
                     break;
                 case 10:
-                    if (rand.Next(3) == 0)
+                    int itemtype = rand.Next(20);
+                    switch (itemtype)
                     {
-                        Element = rand.Next(5);
-                    }
-                    File = "Graphics/ByteLikeGraphics/Items/arrow";
-                    File += Element;
-                    Name = "";
-                    switch (Element)
-                    {
+                        case 0:
+                            File = "Graphics/ByteLikeGraphics/Items/food0.png";
+                            Name = "Apple";
+                            Description = "A regular apple. A good snack in a pinch\n";
+                            Stats["MaxHP"] = 3;
+                            break;
                         case 1:
-                            Name += "Fire ";
+                            File = "Graphics/ByteLikeGraphics/Items/food1.png";
+                            Name = "Bread Stick";
+                            Description = "A stick of fine bread. Food that unites fools and gods\n";
+                            Stats["MaxHP"] = 5;
                             break;
                         case 2:
-                            Name += "Poison ";
+                            File = "Graphics/ByteLikeGraphics/Items/food2.png";
+                            Name = "Small Meal";
+                            Description = "A small meal composed of peas, oats, a small bun and a glass of vegetable juice\n";
+                            Stats["MaxHP"] = 10;
                             break;
                         case 3:
-                            Name += "Ice ";
+                            File = "Graphics/ByteLikeGraphics/Items/food3.png";
+                            Name = "Cooked Meat";
+                            Description = "A veal steak. Perfect for a strong warrior!\n";
+                            Stats["MaxHP"] = 7;
                             break;
                         case 4:
-                            Name += "Lightning ";
+                            File = "Graphics/ByteLikeGraphics/Items/food4.png";
+                            Name = "Large Meal";
+                            Description = "A large meal composed of peas, oats, a small steak, a large bun and a big glass of vegetable juice\n";
+                            Stats["MaxHP"] = 15;
+                            break;
+                        case 5:
+                            File = "Graphics/ByteLikeGraphics/Items/food5.png";
+                            Name = "Health Potion";
+                            Description = "A vial of red liquid. It's bubbling\n";
+                            Stats["MaxHP"] = 25;
+                            break;
+                        case 6:
+                            File = "Graphics/ByteLikeGraphics/Items/food6.png";
+                            Name = "Ironleaf";
+                            Description = "A plant that improves one's pain tolerance. It grows in caves\n";
+                            Stats["Defense"] = 5;
+                            break;
+                        case 7:
+                            File = "Graphics/ByteLikeGraphics/Items/food7.png";
+                            Name = "Hellroot";
+                            Description = "A plant that improves one's physical capabilities. It grows near moster infected areas\n";
+                            Stats["Strength"] = 5;
+                            break;
+                        case 8:
+                            File = "Graphics/ByteLikeGraphics/Items/food8.png";
+                            Name = "Moonglow";
+                            Description = "A plant that improves one's concentration. It grows in mountains and blooms at night\n";
+                            Stats["Magic"] = 5;
+                            break;
+                        case 9:
+                            File = "Graphics/ByteLikeGraphics/Items/food9.png";
+                            Name = "Speedroot";
+                            Description = "A plant that improves one's reaction time. It grows in lush forests\n";
+                            Stats["Agility"] = 5;
+                            break;
+                        case 10:
+                            File = "Graphics/ByteLikeGraphics/Items/food10.png";
+                            Name = "Nightswipe";
+                            Description = "A plant that improves one's focus. It grows in twighlight swamps\n";
+                            Stats["MagicDefense"] = 5;
+                            break;
+                        case 11:
+                            File = "Graphics/ByteLikeGraphics/Items/food11.png";
+                            Name = "Tiny Mana Drop";
+                            Description = "A small drop of pure mana. Its smell is enchanting\n";
+                            Stats["MaxMana"] = 5;
+                            break;
+                        case 12:
+                            File = "Graphics/ByteLikeGraphics/Items/food12.png";
+                            Name = "Medium Mana Drop";
+                            Description = "A moderately sized drop of pure mana. It feels both hot and cold on touch\n";
+                            Stats["MaxMana"] = 10;
+                            break;
+                        case 13:
+                            File = "Graphics/ByteLikeGraphics/Items/food13.png";
+                            Name = "Large Mana Drop";
+                            Description = "A large drop of pure mana. Physics seem to bend around it\n";
+                            Stats["MaxMana"] = 20;
+                            break;
+                        case 14:
+                            File = "Graphics/ByteLikeGraphics/Items/food14.png";
+                            Name = "Mana Potion";
+                            Description = "A vial of blue liquid. It sparkles\n";
+                            Stats["MaxMana"] = 50;
+                            break;
+                        case 15:
+                            File = "Graphics/ByteLikeGraphics/Items/food15.png";
+                            Name = "Improvement Potion";
+                            Description = "A vial of yellow liquid. It seems lighter than air\nRemoves any negative effects\n";
+                            break;
+                        // Arrows
+                        default:
+                            if (rand.Next(3) == 0)
+                            {
+                                Element = rand.Next(5);
+                            }
+                            File = "Graphics/ByteLikeGraphics/Items/arrow";
+                            File += Element;
+                            Name = "";
+                            switch (Element)
+                            {
+                                case 1:
+                                    Name += "Fire ";
+                                    break;
+                                case 2:
+                                    Name += "Poison ";
+                                    break;
+                                case 3:
+                                    Name += "Ice ";
+                                    break;
+                                case 4:
+                                    Name += "Lightning ";
+                                    break;
+                            }
+                            Name += "Arrow";
+                            File += ".png";
+                            Spell = $"Shoot {Name}";
+                            Quantity = rand.Next(4) + 1;
+                            Description += "Can be shot using a bow\n";
                             break;
                     }
-                    Name += "Arrow";
-                    File += ".png";
-                    Spell = $"Shoot {Name}";
-                    Quantity = rand.Next(4) + 1;
-                    Description += "Can be shot using a bow\n";
                     break;
             }
 
@@ -1257,17 +1359,17 @@ namespace ByteLike
 
             if (quality < 35)
             {
-                Inventory = new Item[11, 3];
+                Inventory = new Item[11, 2];
             }
             else if (quality < 48)
             {
-                Inventory = new Item[11, 5];
+                Inventory = new Item[11, 4];
                 floor += 3;
                 File = "Graphics/ByteLikeGraphics/chest1.png";
             }
             else if (quality < 50)
             {
-                Inventory = new Item[11, 7];
+                Inventory = new Item[11, 6];
                 floor += 7;
                 File = "Graphics/ByteLikeGraphics/chest2.png";
             }

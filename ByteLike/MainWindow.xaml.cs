@@ -1108,6 +1108,7 @@ namespace ByteLike
                     spawntile = -1;
                     isDamaging = false;
                     strength = 0;
+                    File = "Graphics/ByteLikeGraphics/Effects/search.png";
                     break;
                 case "Fire Explosion":
                     element = 1;
@@ -1144,6 +1145,9 @@ namespace ByteLike
                 case "Focus":
                     isBullet = true;
                     element = rand.Next(5);
+                    File = "Graphics/ByteLikeGraphics/Effects/blast0";
+                    File += direction;
+                    File += ".png";
                     break;
 
             }
