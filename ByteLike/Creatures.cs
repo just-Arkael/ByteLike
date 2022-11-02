@@ -42,12 +42,13 @@ namespace ByteLike
             damage -= (int)(defense / Math.Sqrt(Math.Sqrt(defense)));
 
             Stats["HP"] -= damage;
+            Stats["HP"]--;
 
             if (type > 0)
                 Potentials[type - 1] += 5;
 
             if (Stats["HP"] <= 0)
-                result = Stats["Level"] * rand.Next(10, 20);
+                result = Stats["Level"] * rand.Next(2, 10) + 1;
 
             return result;
         }
@@ -163,44 +164,46 @@ namespace ByteLike
 
             // Regeneration
 
-
-            Stats["MaxHPRegen"]++;
-            Stats["MaxManaRegen"]++;
-
-
-            foreach (KeyValuePair<string, int> item in Buffs)
+            if (Stats["HP"] > 0)
             {
-                if (item.Value > 0) { Buffs[item.Key]--; }
-            }
+
+                Stats["MaxHPRegen"]++;
+                Stats["MaxManaRegen"]++;
 
 
-            if (Stats["MaxHPRegen"] >= GetStat("HPRegen"))
-            {
-                Stats["HP"] += 2;
-
-                if (GetStat("HPRegen") < 0)
+                foreach (KeyValuePair<string, int> item in Buffs)
                 {
-                    Stats["HP"] -= GetStat("HPRegen");
+                    if (item.Value > 0) { Buffs[item.Key]--; }
                 }
 
-                Stats["MaxHPRegen"] = 0;
-            }
 
-
-            if (Stats["MaxManaRegen"] >= GetStat("ManaRegen"))
-            {
-                Stats["Mana"] += 2;
-
-                if (GetStat("ManaRegen") < 0)
+                if (Stats["MaxHPRegen"] >= GetStat("HPRegen"))
                 {
-                    Stats["Mana"] -= GetStat("ManaRegen");
+                    Stats["HP"] += 2;
+
+                    if (GetStat("HPRegen") < 0)
+                    {
+                        Stats["HP"] -= GetStat("HPRegen");
+                    }
+
+                    Stats["MaxHPRegen"] = 0;
                 }
 
-                Stats["MaxManaRegen"] = 0;
+
+                if (Stats["MaxManaRegen"] >= GetStat("ManaRegen"))
+                {
+                    Stats["Mana"] += 2;
+
+                    if (GetStat("ManaRegen") < 0)
+                    {
+                        Stats["Mana"] -= GetStat("ManaRegen");
+                    }
+
+                    Stats["MaxManaRegen"] = 0;
+                }
+
+
             }
-
-
-
             // Conditions
             // Burn - 0, Poison - 1, Freeze - 2, Parallysis - 3
 
@@ -278,6 +281,7 @@ namespace ByteLike
             switch (spell)
             {
                 case "Search":
+                case "Focus":
                     result = 5;
                     break;
             }
@@ -298,7 +302,16 @@ namespace ByteLike
                     if (item.position[0] == position[0] + movement[0] && item.position[1] == position[1] + movement[1])
                     {
                         InTheWay = true;
-                        int xp = item.TakeDamage(GetStat("Strength"), 0);
+                        int element = 0;
+                        for (int f = 0; f < 9; f++)
+                        {
+                            if (Inventory[f, 0] != null)
+                            {
+                                if (Inventory[f, 0].Element != 0)
+                                    element = Inventory[f, 0].Element;
+                            }
+                        }
+                        int xp = item.TakeDamage(GetStat("Strength"), element);
 
                         switch (rand.Next(6))
                         {
@@ -321,6 +334,16 @@ namespace ByteLike
 
                         if (Stats.ContainsKey("XP") && xp > 0)
                         {
+                            int extraxp = 0;
+                            for (int f = 0; f < 9; f++)
+                            {
+                                if (Inventory[f, 0] != null)
+                                {
+                                    if (Inventory[f, 0].Name.Contains("XP"))
+                                        extraxp += (int)(xp * 0.25);
+                                }
+                            }
+                            xp += extraxp;
                             Stats["XP"] += xp;
                             response += $"{Name} has gained {xp} XP!\n";
                         }
@@ -612,7 +635,7 @@ namespace ByteLike
     public class Player : Creature
     {
 
-        public new Item[,] Inventory = new Item[11, 7];
+        public new Item[,] Inventory = new Item[11, 4];
 
         public bool OpenInventory = false;
         public int[] SelectedSlot = new int[2] { -100, -1 };
@@ -624,6 +647,10 @@ namespace ByteLike
 
         string RemSpell = "";
 
+        public void ReceiveXP(int xp)
+        {
+            Stats["XP"] += xp;
+        }
 
         protected string LevelUp()
         {
@@ -900,6 +927,24 @@ namespace ByteLike
             return false;
         }
 
+        public int GetArrows()
+        {
+            int result = 0;
+
+            for (int i = 0; i < Inventory.GetLength(1); i++)
+            {
+                for (int j = 0; j < Inventory.GetLength(0); j++)
+                {
+                    if (Inventory[j, i] != null)
+                    {
+                        if (Inventory[j, i].Name.Contains("Arrow"))
+                            result += Inventory[j, i].Quantity;
+                    }
+                }
+            }
+
+            return result;
+        }
 
         public Player(string name)
             : base()
@@ -930,10 +975,23 @@ namespace ByteLike
             Stats["Torch"] = 1;
             Stats.Add("SpellSlots", 3);
 
+            bool TorchCheck = false;
+            bool WeaponCheck = false;
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 4; i++)
             {
-                Inventory[i, 1] = new Item(1);
+                if (!TorchCheck && rand.Next(2) == 0)
+                {
+                    TorchCheck = true;
+                    Inventory[i, 1] = new Item(-1, 6);
+                }
+                else if (!WeaponCheck && rand.Next(2) == 0)
+                {
+                    WeaponCheck = true;
+                    Inventory[i, 1] = new Item(-1, 4);
+                }
+                else
+                    Inventory[i, 1] = new Item(-1, 0);
             }
         }
 
@@ -988,6 +1046,27 @@ namespace ByteLike
                                         RemSpell = $"Shoot {Inventory[j, i].Name}";
                                         ArrowSlot[0] = j;
                                         ArrowSlot[1] = i;
+                                        for (int f = 0; f < 9; f++)
+                                        {
+                                            if (Inventory[f, 0] != null)
+                                            {
+                                                switch (Inventory[f, 0].Element)
+                                                {
+                                                    case 1:
+                                                        RemSpell = $"Shoot Fire Arrow";
+                                                        break;
+                                                    case 2:
+                                                        RemSpell = $"Shoot Poison Arrow";
+                                                        break;
+                                                    case 3:
+                                                        RemSpell = $"Shoot Ice Arrow";
+                                                        break;
+                                                    case 4:
+                                                        RemSpell = $"Shoot Lightning Arrow";
+                                                        break;
+                                                }
+                                            }
+                                        }
                                     }
 
                                 }
@@ -1010,10 +1089,13 @@ namespace ByteLike
                 response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player);
             }
             // if in inventory
-            else if (OpenInventory)
+            else
             {
-                CurrentSlot[0] += movement[0];
-                CurrentSlot[1] += movement[1];
+                if (!OpenSpell || DistanceBetween(new int[] { position[0], position[1] }, new int[] { position[0] + CurrentSlot[0] + movement[0], position[1] + CurrentSlot[1] + movement[1] }) <= GetStat("Torch"))
+                {
+                    CurrentSlot[0] += movement[0];
+                    CurrentSlot[1] += movement[1];
+                }
                 // Actual inventory, not a spell usage
                 if (!OpenSpell)
                 {
@@ -1216,7 +1298,7 @@ namespace ByteLike
 
 
                                 }
-                                // Equipment
+                                // non Equipment
 
 
                                 // if selected something from equipment
@@ -1292,6 +1374,12 @@ namespace ByteLike
                                     // just too lazy to make a bilion checks for gear types when switching equipment from a chest
                                     else
                                     {
+                                        if (chests[GetChest(ref chests)].Inventory[CurrentSlot[0], CurrentSlot[1] - Inventory.GetLength(1)] == null || (chests[GetChest(ref chests)].Inventory[CurrentSlot[0], CurrentSlot[1] - Inventory.GetLength(1)].GearType == SelectedSlot[0] + 1 || chests[GetChest(ref chests)].Inventory[CurrentSlot[0], CurrentSlot[1] - Inventory.GetLength(1)].GearType == SelectedSlot[0] && chests[GetChest(ref chests)].Inventory[CurrentSlot[0], CurrentSlot[1] - Inventory.GetLength(1)].GearType == 8))
+                                        {
+                                            Inventory[SelectedSlot[0], SelectedSlot[1]] = chests[GetChest(ref chests)].PutIn(Inventory[SelectedSlot[0], SelectedSlot[1]], new int[] { CurrentSlot[0], CurrentSlot[1] - Inventory.GetLength(1) });
+                                            SelectedSlot[0] = -100;
+                                        }
+                                        else
                                         response += $"{Name}: I need to take it off first.\n";
                                     }
                                 }
@@ -1333,22 +1421,35 @@ namespace ByteLike
                                             if (Inventory[SelectedSlot[0], SelectedSlot[1]] != null)
                                             {
                                                 // If not a usable (GearType 10), don't use
-                                                // if it is type 10, use it (MUST REWRITE CODE HERE)
                                                 if (Inventory[SelectedSlot[0], SelectedSlot[1]].GearType != 10)
                                                 {
                                                     response += $"{Name}: I can't directly use that.\n";
                                                 }
-                                                // REWRITE CODE HERE PLEASE
+                                                // if it is type 10, use it
                                                 else
                                                 {
-                                                    CurrentSlot[0] = 0;
-                                                    CurrentSlot[1] = 0;
-                                                    OpenSpell = true;
-                                                    UseMana = false;
-                                                    RemSpell = Inventory[SelectedSlot[0], SelectedSlot[1]].Spell;
-                                                    DrawSpellLine = isALineSpell(RemSpell);
-                                                    ArrowSlot[0] = 0;
-                                                    ArrowSlot[1] = 0;
+                                                    bool bowcheck = false;
+                                                    if (Inventory[3, 0] != null)
+                                                    {
+                                                        if (Inventory[3, 0].Name.ToLower().Contains("bow"))
+                                                            bowcheck = true;
+                                                    }
+
+                                                    if (!Inventory[SelectedSlot[0], SelectedSlot[1]].Name.Contains("Arrow") || bowcheck)
+                                                    {
+                                                        CurrentSlot[0] = 0;
+                                                        CurrentSlot[1] = 0;
+                                                        OpenSpell = true;
+                                                        UseMana = false;
+                                                        RemSpell = Inventory[SelectedSlot[0], SelectedSlot[1]].Spell;
+                                                        DrawSpellLine = isALineSpell(RemSpell);
+                                                        ArrowSlot[0] = SelectedSlot[0];
+                                                        ArrowSlot[1] = SelectedSlot[1];
+                                                    }
+                                                    else
+                                                    {
+                                                        response += $"{Name}: I need a bow to use that.\n";
+                                                    }
                                                 }
                                             }
                                         }
@@ -1382,6 +1483,12 @@ namespace ByteLike
                                     // if selected something from a chest and trying to put it into equipment
                                     else
                                     {
+                                        if (chests[GetChest(ref chests)].Inventory[SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1)] == null || (chests[GetChest(ref chests)].Inventory[SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1)].GearType == CurrentSlot[0] + 1 || chests[GetChest(ref chests)].Inventory[SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1)].GearType == CurrentSlot[0] && chests[GetChest(ref chests)].Inventory[SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1)].GearType == 8))
+                                        {
+                                            Inventory[CurrentSlot[0], CurrentSlot[1]] = chests[GetChest(ref chests)].TakeOut(Inventory[CurrentSlot[0], CurrentSlot[1]], new int[] { SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1) });
+                                            SelectedSlot[0] = -100;
+                                        }
+                                        else
                                         response += $"{Name}: I need to take it out first.\n";
                                     }
                                 }
@@ -1536,7 +1643,7 @@ namespace ByteLike
             }
 
             // leveling up
-            if (Stats["XP"] >= (int)(90 + Math.Pow(Stats["Level"], 2) * 10))
+            if (Stats["XP"] >= (int)(90 + Math.Pow(Stats["Level"], 3) * 10))
                 response += LevelUp();
 
 
@@ -1595,6 +1702,7 @@ namespace ByteLike
                 case "Shoot Poison Arrow":
                 case "Shoot Ice Arrow":
                 case "Shoot Lightning Arrow":
+                case "Focus":
                     return true;
                 default:
                     return false;
@@ -1616,10 +1724,12 @@ namespace ByteLike
 
             double statModifier = 1;
 
-            floor += rand.Next(-23, 23);
+            floor += rand.Next(-5, 10);
 
             
             Stats["Level"] = floor;
+            if (Stats["Level"] <= 0)
+                Stats["Level"] = 1;
 
             if ((floor / 23) >= 4)
             {
@@ -1646,11 +1756,11 @@ namespace ByteLike
             Stats["HP"] = Stats["MaxHP"];
             Stats["MaxMana"] = (int)(((floor / 8) + 10) * statModifier);
             Stats["Mana"] = Stats["MaxMana"];
-            Stats["Strength"] = (int)(((floor / 4) + 1) * statModifier);
-            Stats["Agility"] = (int)(((floor / 8) + 1) * statModifier);
-            Stats["Magic"] = (int)(((floor / 7) + 2) * statModifier);
-            Stats["Defense"] = (int)(((floor / 10) + 2) * statModifier);
-            Stats["MagicDefense"] = (int)(((floor / 12) + 2) * statModifier);
+            Stats["Strength"] = (int)(((floor / 4) + 3) * statModifier);
+            Stats["Agility"] = (int)(((floor / 8) + 3) * statModifier);
+            Stats["Magic"] = (int)(((floor / 7) + 4) * statModifier);
+            Stats["Defense"] = (int)(((floor / 10) + 4) * statModifier);
+            Stats["MagicDefense"] = (int)(((floor / 12) + 4) * statModifier);
 
         }
 
@@ -1664,24 +1774,40 @@ namespace ByteLike
                 response = $"{Name} notices {player.Name}!\n";
             }
 
+            int movementdirection = rand.Next(4) * 90;
+
             if (Aggressive)
             {
-                switch (FindDirection(new int[] { player.position[0], player.position[1] }, ref level))
-                {
-                    case 0:
-                        response += WalkTo(new int[] { 1, 0 }, ref level, response, ref enemies, ref player);
-                        break;
-                    case 180:
-                        response += WalkTo(new int[] { -1, 0 }, ref level, response, ref enemies, ref player);
-                        break;
-                    case 270:
-                        response += WalkTo(new int[] { 0, 1 }, ref level, response, ref enemies, ref player);
-                        break;
-                    case 90:
-                        response += WalkTo(new int[] { 0, -1 }, ref level, response, ref enemies, ref player);
-                        break;
-                }
+                movementdirection = FindDirection(new int[] { player.position[0], player.position[1] }, ref level);
             }
+
+            int[] movement = new int[2];
+            switch (movementdirection)
+            {
+                case 0:
+                    movement[0] = 1;
+                    movement[1] = 0;
+                    break;
+                case 180:
+                    movement[0] = -1;
+                    movement[1] = 0;
+                    break;
+                case 270:
+                    movement[0] = 0;
+                    movement[1] = 1;
+                    break;
+                case 90:
+                    movement[0] = 0;
+                    movement[1] = -1;
+                    break;
+            }
+
+            if (Statuses[2] != 0 || Statuses[3] % 2 != 0 || Stats["HP"] <= 0)
+            {
+                movement[0] = 0;
+                movement[1] = 0;
+            }
+            response += WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player);
 
             response = Conditions(response);
 
@@ -1691,7 +1817,9 @@ namespace ByteLike
             if (Stats["HP"] < GetStat("MaxHP"))
                 response += $"{Name} has {Stats["HP"]} HP left!\n";
 
-            return response;
+            if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= player.GetStat("Torch") + 1)
+                return response;
+            else return "";
         }
 
 
@@ -1727,6 +1855,12 @@ namespace ByteLike
             foreach (int[] item in movements)
             {
                 if (item[0] + item[1] < movement[0] + movement[1])
+                {
+                    movement[0] = item[0];
+                    movement[1] = item[1];
+                    direction = item[2];
+                }
+                else if (item[0] + item[1] == movement[0] + movement[1] && rand.Next(2) == 0)
                 {
                     movement[0] = item[0];
                     movement[1] = item[1];

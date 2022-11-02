@@ -447,6 +447,66 @@
     <None Update="Graphics\ByteLikeGraphics\Creatures\player4.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow00.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow0180.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow0270.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow090.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow10.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow1180.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow1270.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow190.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow20.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow2180.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow2270.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow290.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow30.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow3180.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow3270.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow390.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow40.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow4180.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow4270.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Effects\arrow490.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Graphics\ByteLikeGraphics\Hud\dialoguebox1.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -493,6 +553,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Graphics\ByteLikeGraphics\Hud\hud8.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Hud\hud9.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Graphics\ByteLikeGraphics\Hud\invslot0.png">

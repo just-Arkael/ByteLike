@@ -22,8 +22,8 @@ namespace ByteLike
     /// </summary>
     public partial class MainWindow : Window
     {
-        static int[,] level = new int[100, 100];
-        static int[,] darkness = new int[100, 100];
+        static int[,] level = new int[40, 40];
+        static int[,] darkness = new int[40, 40];
 
         static Player player = new Player("Player");
         static int[] camera = new int[2];
@@ -138,6 +138,7 @@ namespace ByteLike
         }
 
 
+        // DRAW MAP
 
         static System.Windows.Controls.Image DrawMap(string response)
         {
@@ -736,7 +737,7 @@ namespace ByteLike
 
 
                 // Draw stats hud
-                for (int i = 0; i < 9; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     string floorImage = "Graphics/ByteLikeGraphics/Hud/hud";
                     floorImage += i;
@@ -778,6 +779,9 @@ namespace ByteLike
                             break;
                         case 8:
                             floorImage = player.GetStat("Agility").ToString();
+                            break;
+                        case 9:
+                            floorImage = player.GetArrows().ToString();
                             break;
                     }
                     FormattedText dialogue2 = new FormattedText(floorImage, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 16, System.Windows.Media.Brushes.White);
@@ -828,6 +832,9 @@ namespace ByteLike
 
         static void NewLevel()
         {
+            level = new int[40 + floor*2, 40 + floor*2];
+            darkness = new int[40 + floor*2, 40 + floor*2];
+
             for (int i = 0; i < level.GetLength(1); i++)
             {
                 for (int j = 0; j < level.GetLength(0); j++)
@@ -876,73 +883,40 @@ namespace ByteLike
 
         }
 
+        // MAIN LOGIC
+
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (Keyboard.IsKeyToggled(Key.Up) && Keyboard.IsKeyDown(Key.Up) && cameraSize[1] > 20)
+            bool cameraManagment = false;
+
+            if (Keyboard.IsKeyToggled(Key.Up) && Keyboard.IsKeyDown(Key.Up))
             {
+                if (cameraSize[1] > 20)
                 cameraSize[1]--;
+                cameraManagment = true;
             }
-            if (Keyboard.IsKeyToggled(Key.Down) && Keyboard.IsKeyDown(Key.Down) && cameraSize[1] < 100)
+            if (Keyboard.IsKeyToggled(Key.Down) && Keyboard.IsKeyDown(Key.Down))
             {
+                if (cameraSize[1] < level.GetLength(1) - 1)
                 cameraSize[1]++;
+                cameraManagment = true;
             }
-            if (Keyboard.IsKeyToggled(Key.Left) && Keyboard.IsKeyDown(Key.Left) && cameraSize[0] > 20)
+            if (Keyboard.IsKeyToggled(Key.Left) && Keyboard.IsKeyDown(Key.Left))
             {
+                if (cameraSize[0] > 20)
                 cameraSize[0]--;
+                cameraManagment = true;
             }
-            if (Keyboard.IsKeyToggled(Key.Right) && Keyboard.IsKeyDown(Key.Right) && cameraSize[0] < 100)
+            if (Keyboard.IsKeyToggled(Key.Right) && Keyboard.IsKeyDown(Key.Right))
             {
+                if (cameraSize[0] < level.GetLength(0) - 1)
                 cameraSize[0]++;
+                cameraManagment = true;
             }
 
-
-
-            if (effects.Count > 0)
+            if (!cameraManagment)
             {
-                List<int> deleteus = new List<int>();
-                for (int i = 0; i < effects.Count; i++)
-                {
-                    if (!effects[i].Logics(ref level, ref enemies, ref effects, ref player, out response, response))
-                        deleteus.Add(i);
-                }
 
-                for (int i = 0; i < deleteus.Count; i++)
-                {
-                    effects.RemoveAt(deleteus[i]);
-                }
-            }
-            else
-            {
-                response = player.Logics(ref level, ref chests, ref effects, ref enemies, ref player);
-
-
-                List<int> deletusXL = new List<int>();
-                int pos = 0;
-
-                if (!player.OpenInventory)
-                {
-
-                    foreach (Creature enemy in enemies)
-                    {
-                        response += enemy.Logics(ref level, ref chests, ref effects, ref enemies, ref player);
-
-                        if (enemy.Stats["HP"] <= 0)
-                            deletusXL.Add(pos);
-
-                        pos++;
-
-                    }
-
-                }
-
-                for (int i = 0; i < deletusXL.Count; i++)
-                {
-                    try
-                    {
-                        enemies.RemoveAt(deletusXL[i]);
-                    }
-                    catch { }
-                }
 
                 if (effects.Count > 0)
                 {
@@ -958,19 +932,69 @@ namespace ByteLike
                         effects.RemoveAt(deleteus[i]);
                     }
                 }
-
-
-                if (enemies.Count < 20)
+                else
                 {
-                    int[] newPos = new int[] { rand.Next(level.GetLength(0)), rand.Next(level.GetLength(1)) };
+                    response = player.Logics(ref level, ref chests, ref effects, ref enemies, ref player);
 
-                    if (level[newPos[0], newPos[1]] == 1)
+                    if (enemies.Count < 20 + floor)
                     {
-                        enemies.Add(new Critter(floor, new int[] { newPos[0], newPos[1] }));
+                        int[] newPos = new int[] { rand.Next(level.GetLength(0)), rand.Next(level.GetLength(1)) };
+
+                        if (level[newPos[0], newPos[1]] == 1)
+                        {
+                            enemies.Add(new Critter(floor, new int[] { newPos[0], newPos[1] }));
+                        }
                     }
                 }
-            }
 
+                if (effects.Count <= 0)
+                {
+                    List<int> deletusXL = new List<int>();
+                    int pos = 0;
+
+                    if (!player.OpenInventory)
+                    {
+
+                        foreach (Creature enemy in enemies)
+                        {
+                            response += enemy.Logics(ref level, ref chests, ref effects, ref enemies, ref player);
+
+                            if (enemy.Stats["HP"] <= 0)
+                                deletusXL.Add(pos);
+
+                            pos++;
+
+                        }
+
+                    }
+
+                    for (int i = 0; i < deletusXL.Count; i++)
+                    {
+                        try
+                        {
+                            enemies.RemoveAt(deletusXL[i]);
+                        }
+                        catch { }
+                    }
+
+                    if (effects.Count > 0)
+                    {
+                        List<int> deleteus = new List<int>();
+                        for (int i = 0; i < effects.Count; i++)
+                        {
+                            if (!effects[i].Logics(ref level, ref enemies, ref effects, ref player, out response, response))
+                                deleteus.Add(i);
+                        }
+
+                        for (int i = 0; i < deleteus.Count; i++)
+                        {
+                            effects.RemoveAt(deleteus[i]);
+                        }
+                    }
+                }
+
+
+            }
             // Set camera to player's position
             camera[0] = player.position[0];
             camera[1] = player.position[1];
@@ -993,6 +1017,10 @@ namespace ByteLike
             if (level[player.position[0], player.position[1]] == 15 && Keyboard.IsKeyDown(Key.E) && !player.OpenInventory && !Keyboard.IsKeyDown(Key.W) && !Keyboard.IsKeyDown(Key.S) && !Keyboard.IsKeyDown(Key.A) && !Keyboard.IsKeyDown(Key.D))
             {
                 NewLevel();
+                if (cameraSize[0] >= level.GetLength(0))
+                    cameraSize[0] = level.GetLength(0) - 1;
+                if (cameraSize[1] >= level.GetLength(1))
+                    cameraSize[1] = level.GetLength(1) - 1;
             }
 
             if (player.Stats["HP"] <= 0)
@@ -1000,6 +1028,11 @@ namespace ByteLike
                 floor = 0;
                 player = new Player("Player");
                 NewLevel();
+
+                if (cameraSize[0] >= level.GetLength(0))
+                    cameraSize[0] = level.GetLength(0) - 1;
+                if (cameraSize[1] >= level.GetLength(1))
+                    cameraSize[1] = level.GetLength(1) - 1;
             }
 
         }
@@ -1009,6 +1042,8 @@ namespace ByteLike
 
     public class Effect
     {
+        static Random rand = new Random();
+
         public int[] position = new int[2];
         int[] target = new int[2];
         int direction = 0;
@@ -1077,8 +1112,38 @@ namespace ByteLike
                 case "Fire Explosion":
                     element = 1;
                     break;
+                case "Poison Explosion":
+                    element = 2;
+                    break;
+                case "Ice Explosion":
+                    element = 3;
+                    break;
+                case "Lightning Explosion":
+                    element = 4;
+                    break;
                 case "Shoot Arrow":
+                case "Shoot Fire Arrow":
+                case "Shoot Poison Arrow":
+                case "Shoot Ice Arrow":
+                case "Shoot Lightning Arrow":
                     isBullet = true;
+                    if (spell.Contains("Fire"))
+                        element = 1;
+                    else if (spell.Contains("Poison"))
+                        element = 2;
+                    else if (spell.Contains("Ice"))
+                        element = 3;
+                    else if (spell.Contains("Lightning"))
+                        element = 4;
+
+                    File = "Graphics/ByteLikeGraphics/Effects/arrow";
+                    File += element;
+                    File += direction;
+                    File += ".png";
+                    break;
+                case "Focus":
+                    isBullet = true;
+                    element = rand.Next(5);
                     break;
 
             }
@@ -1184,8 +1249,18 @@ namespace ByteLike
             // XP yield
             if (xp > 0)
             {
+                int extraxp = 0;
+                for (int f = 0; f < 9; f++)
+                {
+                    if (player.Inventory[f, 0] != null)
+                    {
+                        if (player.Inventory[f, 0].Name.Contains("XP"))
+                            extraxp += (int)(xp * 0.25);
+                    }
+                }
+                xp += extraxp;
                 response += $"{player.Name} gained {xp} XP!\n";
-                player.Stats["XP"] += xp;
+                player.ReceiveXP(xp);
             }
             //
 

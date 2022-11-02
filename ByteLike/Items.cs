@@ -24,7 +24,7 @@ namespace ByteLike
         public int Quantity = 1;
         public string Description = "";
 
-        public Item(int floor)
+        public Item(int floor, int type)
         {
             Stats.Add("Torch", 0);
             Stats.Add("MaxHP", 0);
@@ -37,9 +37,12 @@ namespace ByteLike
             Stats.Add("HPRegen", 0);
             Stats.Add("ManaRegen", 0);
 
-
-            GearType = rand.Next(6) + 1;
-            if (rand.Next(3) == 0) { GearType = 10; }
+            if (type == 0)
+            {
+                GearType = rand.Next(6) + 1;
+                if (rand.Next(3) == 0) { GearType = 10; }
+            }
+            else { GearType = type; }
 
         RandomizeGearType:
             switch (GearType)
@@ -52,6 +55,8 @@ namespace ByteLike
                     bool sideB = false;
                     int typeSwitch = 0;
                     int strength = (floor / 30) + rand.Next(2);
+                    if (floor < 0)
+                        strength = 0;
                     if (strength < 0) { strength = 0; }
                     else if (strength > 4) { strength = 4; }
                     if (rand.Next(2) == 0 && strength != 0 && strength != 4)
@@ -63,8 +68,8 @@ namespace ByteLike
                     typeSwitch += strength * 10000;
 
 
-                    Stats["MaxHP"] += rand.Next(0, strength + 1) * 5;
-                    Stats["MaxMana"] += rand.Next(0, strength + 1) * 5;
+                    Stats["MaxHP"] += rand.Next(0, strength + 1) * rand.Next(4);
+                    Stats["MaxMana"] += rand.Next(0, strength + 1) * rand.Next(4);
                     Stats["Strength"] += rand.Next(0, strength + 1);
                     Stats["Magic"] += rand.Next(0, strength + 1);
                     Stats["Agility"] += rand.Next(0, strength + 1);
@@ -463,34 +468,40 @@ namespace ByteLike
                             Stats["Agility"] += 2;
                             Stats["Defense"] += 2;
                             Stats["MagicDefense"] += 3;
+                            Description = "A hat worn by royal archers. The silky interior feels luxurious\n";
                             break;
                         case 20220:
                             Name = "Royal Vest";
                             Stats["Agility"] += 3;
                             Stats["Defense"] += 3;
                             Stats["MagicDefense"] += 2;
+                            Description = "Armor worn by royal archers. Pointy shoulders allow your arms to move more freely than in a regular platemail\n";
                             break;
                         case 20230:
                             Name = "Royal Leggings";
                             Stats["Agility"] += 2;
                             Stats["Defense"] += 1;
                             Stats["MagicDefense"] += 2;
+                            Description = "Leggings worn by royal archers. Silk helps to combat the cold and magic attacks\n";
                             break;
                         case 20240:
                             Name = "Royal Longbow";
                             Stats["Strength"] += 5;
                             Stats["Agility"] += 8;
+                            Description = "A bow crafted for the royal army. It has a tiny mark on the center on the string for better aiming\n";
                             break;
                         case 20245:
                             Name = "Huntsman's Shortbow";
                             Stats["Strength"] += 3;
                             Stats["Magic"] += 4;
                             Stats["Agility"] += 6;
+                            Description = "A bow carried by novice hunters. When making a bow for hunting, fletchers ask the spirits of the forest for a blessing\n";
                             break;
                         case 20250:
                             Name = "Royal Quiver";
                             Stats["Magic"] += 2;
                             Stats["Agility"] += 4;
+                            Description = "A luxurious quiver sewn for the royal army. Its extra thick to make taking arrows out of it easier\n";
                             break;
                         case 25210:
                             Name = "Wanderer's Hat";
@@ -498,6 +509,7 @@ namespace ByteLike
                             Stats["Agility"] += 3;
                             Stats["Defense"] += 1;
                             Stats["MagicDefense"] += 2;
+                            Description = "A hat usualy worn by those who choose to live alone. It's good for any season or environment\n";
                             break;
                         case 25220:
                             Name = "Wanderer's Clothes";
@@ -505,6 +517,7 @@ namespace ByteLike
                             Stats["Agility"] += 2;
                             Stats["Defense"] += 2;
                             Stats["MagicDefense"] += 3;
+                            Description = "Clothes of some unfortunate adventurer. The soul of its previous owner still protects anybody who puts it on with respect\n";
                             break;
                         case 25230:
                             Name = "Wanderer's Shorts";
@@ -512,6 +525,7 @@ namespace ByteLike
                             Stats["Agility"] += 1;
                             Stats["Defense"] += 1;
                             Stats["MagicDefense"] += 3;
+                            Description = "Summer wears of some unfortunate adventurer. The boots are waterproof to combat rain\n";
                             break;
                         case 25240:
                             Name = "Spiky Longbow";
@@ -519,6 +533,7 @@ namespace ByteLike
                             Stats["Strength"] += 6;
                             Stats["Magic"] += 2;
                             Stats["Agility"] += 5;
+                            Description = "A bow made made from spiky vines. Witches of the forest ask a fortune for these, but its worth it\n";
                             break;
                         case 25245:
                             Name = "Frozen Shortbow";
@@ -526,18 +541,21 @@ namespace ByteLike
                             Stats["Strength"] += 5;
                             Stats["Magic"] += 2;
                             Stats["Agility"] += 4;
+                            Description = "A bow made by a lonely sorcerer from the mountains. The ice crystals don't melt even under extreme heat\n";
                             Element = 3;
                             break;
                         case 25250:
                             Name = "Lava Quiver";
                             Stats["Magic"] += 3;
                             Stats["Agility"] += 3;
+                            Description = "A quiver made by a lonely sorcerer from the mountains. The bottom is warm and metal on the inside\n";
                             Element = 1;
                             break;
                         case 20310:
                             Name = "Cut-up Hood";
                             Stats["Magic"] += 2;
                             Stats["MagicDefense"] += 5;
+                            Description = "A hood from a foreign magic school. You see many different plants weaved in between all the fabric\n";
                             break;
                         case 20320:
                             Name = "Cut-up Cloak";
@@ -545,18 +563,21 @@ namespace ByteLike
                             Stats["Magic"] += 3;
                             Stats["Defense"] += 2;
                             Stats["MagicDefense"] += 6;
+                            Description = "A cloak from a foreign magic school. Yes, it's supposed to be worn like that\n";
                             break;
                         case 20330:
                             Name = "Cut-up Kilt";
                             Stats["MaxMana"] += 5;
                             Stats["Magic"] += 2;
                             Stats["MagicDefense"] += 4;
+                            Description = "A kilt from a foreign magic school. Easters were the first to use kilts, they were always ahead in magic knowledge\n";
                             break;
                         case 20340:
                             Name = "Emerald Staff";
                             Stats["MaxMana"] += 5;
                             Stats["Strength"] += 5;
                             Stats["Magic"] += 10;
+                            Description = "A staff with a rare gem on it. Easters will trade many wares for a single one of these\n";
                             break;
                         case 20345:
                             Name = "Water Wand";
@@ -564,11 +585,13 @@ namespace ByteLike
                             Stats["Strength"] += 6;
                             Stats["Magic"] += 7;
                             Stats["MagicDefense"] += 4;
+                            Description = "A wand with a liquid stone on it. The ''gem'' is actually just liquid keeping form of a gem. The liquid glows slightly\n";
                             break;
                         case 20350:
                             Name = "Scholar's Tome";
                             Stats["MaxMana"] += 10;
                             Stats["Magic"] += 3;
+                            Description = "A tome given to many magic scolars. First few pages are filled with excersises to boost your mana\n";
                             break;
                         case 25310:
                             Name = "Crystal Hood";
@@ -1059,7 +1082,9 @@ namespace ByteLike
                 case 6:
 
                     File = "Graphics/ByteLikeGraphics/Items/torch";
-                    typeSwitch = rand.Next(2);
+                    typeSwitch = rand.Next(6);
+                    if (floor < 0)
+                        typeSwitch = 0;
                     File += typeSwitch;
                     File += ".png";
                     switch (typeSwitch)
@@ -1071,11 +1096,38 @@ namespace ByteLike
                             break;
                         case 1:
                             Name = "Torch";
-                            Stats["Torch"] += 2;
+                            Stats["Torch"] += 3;
+                            while (rand.Next(10) == 0)
+                                Stats["Torch"] += 1;
                             Description = "A regular torch\n";
+                            break;
+                        case 2:
+                            Name = "Mana Torch";
+                            Stats["Torch"] += 2;
+                            Stats["MaxMana"] += (int)(rand.Next(8)+4 + floor/23);
+                            Description = "A torch infused with some mana powder\n";
+                            break;
+                        case 3:
+                            Name = "Heart Torch";
+                            Stats["Torch"] += 2;
+                            Stats["MaxHP"] += (int)(rand.Next(8) + 4 + floor / 23);
+                            Description = "A crystal heart with a burning aura to it\n";
+                            break;
+                        case 4:
+                            Name = "XP Torch";
+                            Stats["Torch"] += 1;
+                            Description = "A magical torch that seems to make you learn faster\n";
+                            break;
+                        case 5:
+                            Name = "Rage Torch";
+                            Stats["Torch"] += 2;
+                            Stats["Strength"] += (int)(rand.Next(6) + 2 + floor / 23);
+                            Description = "A torch with a small pouch of hellroot in it\n";
                             break;
                     }
 
+                    while (rand.Next(15) <= (floor/23)+1)
+                        Stats["Torch"] += 1;
 
                     break;
                 case 10:
@@ -1104,7 +1156,7 @@ namespace ByteLike
                     Name += "Arrow";
                     File += ".png";
                     Spell = $"Shoot {Name}";
-                    Quantity = rand.Next(5) + 1;
+                    Quantity = rand.Next(4) + 1;
                     Description += "Can be shot using a bow\n";
                     break;
             }
@@ -1238,7 +1290,7 @@ namespace ByteLike
                         if (counter > 150-(quality*2))
                         {
                             counter = 0;
-                            Inventory[j, i] = new Item(floor);
+                            Inventory[j, i] = new Item(floor, 0);
                         }
                     }
                 }
@@ -1310,6 +1362,20 @@ namespace ByteLike
                             Inventory[slot[0], slot[1]] = item;
                             return temp;
                         }
+                    }
+                    else
+                    {
+                        Inventory[slot[0], slot[1]] = item;
+                        return null;
+                    }
+                }
+                else
+                {
+                    if (Inventory[slot[0], slot[1]] != null)
+                    {
+                        Item temp = Inventory[slot[0], slot[1]];
+                        Inventory[slot[0], slot[1]] = item;
+                        return temp;
                     }
                     else
                     {
