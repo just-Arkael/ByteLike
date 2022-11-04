@@ -29,7 +29,7 @@ namespace ByteLike
         public string File = "Graphics/ByteLikeGraphics/placeholder.png";
         static protected Random rand = new Random();
 
-        public abstract string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player);
+        public abstract string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness);
 
         public int TakeDamage(int damage, int type)
         {
@@ -41,8 +41,10 @@ namespace ByteLike
 
             damage -= (int)(defense / Math.Sqrt(Math.Sqrt(defense)));
 
+            if (damage <= 0)
+                damage = 1;
+
             Stats["HP"] -= damage;
-            Stats["HP"]--;
 
             if (type > 0)
                 Potentials[type - 1] += 5;
@@ -53,7 +55,191 @@ namespace ByteLike
             return result;
         }
 
-        public string GetSpellDescription(string spell)
+        public static string GetRandomSpell(int? modifier)
+        {
+            string response = "Nothing";
+            int spellthing = rand.Next(54);
+
+            if (modifier != null)
+            {
+                int min = (int)modifier - 25;
+                if (min < 1)
+                    min = 1;
+                int max = (int)modifier + 25;
+                if (max > 54)
+                    max = 54;
+                spellthing = rand.Next(min,max);
+            }
+
+            switch (spellthing + 5)
+            {
+                case 5:
+                    response = "Nothing";
+                    break;
+                case 6:
+                    response = "Search";
+                    break;
+                case 7:
+                    response = "Focus";
+                    break;
+                case 8:
+                    response = "Ember";
+                    break;
+                case 9:
+                    response = "Ice Shard";
+                    break;
+                case 10:
+                    response = "Zap";
+                    break;
+                case 11:
+                    response = "Posion Sting";
+                    break;
+                case 12:
+                    response = "Recover";
+                    break;
+                case 13:
+                    response = "Ironize";
+                    break;
+                case 14:
+                    response = "Enchant";
+                    break;
+                case 15:
+                    response = "Corrode Armor";
+                    break;
+                case 16:
+                    response = "Sharpen";
+                    break;
+                case 17:
+                    response = "Enlighten";
+                    break;
+                case 18:
+                    response = "Prepare";
+                    break;
+                case 19:
+                    response = "Energy Drain";
+                    break;
+                case 20:
+                    response = "Confuse";
+                    break;
+                case 21:
+                    response = "Scare";
+                    break;
+                case 22:
+                    response = "Fireball";
+                    break;
+                case 23:
+                    response = "Ice Storm";
+                    break;
+                case 24:
+                    response = "Electro Bolt";
+                    break;
+                case 25:
+                    response = "Sludge Bomb";
+                    break;
+                case 26:
+                    response = "Heal Wounds";
+                    break;
+                case 27:
+                    response = "Protective Field";
+                    break;
+                case 28:
+                    response = "Regenerate";
+                    break;
+                case 29:
+                    response = "Melt Armor";
+                    break;
+                case 30:
+                    response = "Enchanse Vission";
+                    break;
+                case 31:
+                    response = "Liquify";
+                    break;
+                case 32:
+                    response = "Lavafy";
+                    break;
+                case 33:
+                    response = "Ivy Growth";
+                    break;
+                case 34:
+                    response = "Charge";
+                    break;
+                case 35:
+                    response = "Rage";
+                    break;
+                case 36:
+                    response = "Speed Up";
+                    break;
+                case 37:
+                    response = "Concentrate";
+                    break;
+                case 38:
+                    response = "Weaken";
+                    break;
+                case 39:
+                    response = "Slow Down";
+                    break;
+                case 40:
+                    response = "Terrify";
+                    break;
+                case 41:
+                    response = "Meteor";
+                    break;
+                case 42:
+                    response = "Blizzard";
+                    break;
+                case 43:
+                    response = "Thunder";
+                    break;
+                case 44:
+                    response = "Plague Bomb";
+                    break;
+                case 45:
+                    response = "Restore";
+                    break;
+                case 46:
+                    response = "Full Protection";
+                    break;
+                case 47:
+                    response = "Tsunami";
+                    break;
+                case 48:
+                    response = "Erruption";
+                    break;
+                case 49:
+                    response = "Forest Growth";
+                    break;
+                case 50:
+                    response = "Electrify";
+                    break;
+                case 51:
+                    response = "Manafy";
+                    break;
+                case 52:
+                    response = "Destroy Armor";
+                    break;
+                case 53:
+                    response = "Demonify";
+                    break;
+                case 54:
+                    response = "Featherify";
+                    break;
+                case 55:
+                    response = "Transcend";
+                    break;
+                case 56:
+                    response = "Wither";
+                    break;
+                case 57:
+                    response = "Chain Up";
+                    break;
+                case 58:
+                    response = "Hypnotize";
+                    break;
+            }
+
+            return response;
+        }
+        public static string GetSpellDescription(string spell)
         {
             string response = "You're unsure what this spell does\n";
 
@@ -80,14 +266,164 @@ namespace ByteLike
                 case "Search":
                     response = "Checks a small patch of grass for traps. 5 Mana\n";
                     break;
-                case "Leap":
-                    response = "Makes the user jump several tiles in specified direction. 15 Mana\n";
-                    break;
-                case "Teleport":
-                    response = "Teleports the user to a random location. 30 Mana\n";
-                    break;
                 case "Focus":
                     response = "Shoots a random magical projectile in specified direction. 5 Mana\n";
+                    break;
+                case "Ember":
+                    response = "Shoots an ember in a specified direction, burn potential. 3 Mana\n";
+                    break;
+                case "Ice Shard":
+                    response = "Shoots a shard of ice in a specified direction, freeze potential. 3 Mana\n";
+                    break;
+                case "Zap":
+                    response = "Shoots a lightning bold in a specified direction, paralysis potential. 3 Mana\n";
+                    break;
+                case "Posion Sting":
+                    response = "Shoots a poison blob in a specified direction, poison potential. 3 Mana\n";
+                    break;
+                case "Recover":
+                    response = "Regenerates 10 HP. 10 Mana\n";
+                    break;
+                case "Ironize":
+                    response = "Increases Defense by 5. 10 Mana\n";
+                    break;
+                case "Enchant":
+                    response = "Increases Magic Defense by 5. 10 Mana\n";
+                    break;
+                case "Corrode Armor":
+                    response = "Decreases Defense and Magic Defense by 3. 10 Mana\n";
+                    break;
+                case "Sharpen":
+                    response = "Increases Strength by 3. 10 Mana\n";
+                    break;
+                case "Enlighten":
+                    response = "Increases Agility by 3. 10 Mana\n";
+                    break;
+                case "Prepare":
+                    response = "Increases Magic by 3. 10 Mana\n";
+                    break;
+                case "Energy Drain":
+                    response = "Decreases Strength by 2. 10 Mana\n";
+                    break;
+                case "Confuse":
+                    response = "Decreases Agility by 2. 10 Mana\n";
+                    break;
+                case "Scare":
+                    response = "Decreases Magic by 2. 10 Mana\n";
+                    break;
+                case "Fireball":
+                    response = "Shoots an explosive fireball in a specified direction. 5 Mana\n";
+                    break;
+                case "Ice Storm":
+                    response = "Shoots a wide ice flow in a specified direction. 5 Mana\n";
+                    break;
+                case "Electro Bolt":
+                    response = "Shoots a wide bolt of electricity in a specified direction. 5 Mana\n";
+                    break;
+                case "Sludge Bomb":
+                    response = "Shoots an explosive ball of poison in a specified direction. 5 Mana\n";
+                    break;
+                case "Heal Wounds":
+                    response = "Heals 20 hp. 15 Mana\n";
+                    break;
+                case "Protective Field":
+                    response = "Increases Defense and Magic Defense by 7. 15 Mana\n";
+                    break;
+                case "Regenerate":
+                    response = "Increases HP and Mana regeneration by 1. 10 Mana\n";
+                    break;
+                case "Melt Armor":
+                    response = "Decreases Defense and Magic Defense by 6. 15 Mana\n";
+                    break;
+                case "Enchanse Vission":
+                    response = "Increases Light by 2. 10 Mana\n";
+                    break;
+                case "Liquify":
+                    response = "Creates a spot of water tiles. 10 Mana\n";
+                    break;
+                case "Lavafy":
+                    response = "Creates a spot of lava tiles. 10 Mana\n";
+                    break;
+                case "Ivy Growth":
+                    response = "Creates a spot of poison ivy. 10 Mana\n";
+                    break;
+                case "Charge":
+                    response = "Creates a spot of electrified terrain. 10 Mana\n";
+                    break;
+                case "Rage":
+                    response = "Increases Strength by 7. 15 Mana\n";
+                    break;
+                case "Speed Up":
+                    response = "Increases Agility by 7. 15 Mana\n";
+                    break;
+                case "Concentrate":
+                    response = "Increases Magic by 7. 15 Mana\n";
+                    break;
+                case "Weaken":
+                    response = "Decreases Strength by 5. 15 Mana\n";
+                    break;
+                case "Slow Down":
+                    response = "Decreases Agility by 5. 15 Mana\n";
+                    break;
+                case "Terrify":
+                    response = "Decreases Magic by 5. 15 Mana\n";
+                    break;
+                case "Meteor":
+                    response = "Shoots a large explosive fireball in a specified direction. 7 Mana\n";
+                    break;
+                case "Blizzard":
+                    response = "Shoots a really wide ice storm in a specified direction. 7 Mana\n";
+                    break;
+                case "Thunder":
+                    response = "Shoots a really wide thunder storm in a specified direction. 7 Mana\n";
+                    break;
+                case "Plague Bomb":
+                    response = "Shoots a large explosive poison bomb in a specified direction. 7 Mana\n";
+                    break;
+                case "Restore":
+                    response = "Heals 35 HP. 20 Mana\n";
+                    break;
+                case "Full Protection":
+                    response = "Increase Defense and Magic Defense by 10. 25 Mana\n";
+                    break;
+                case "Tsunami":
+                    response = "Creates a large spot of water tiles. 20 Mana\n";
+                    break;
+                case "Erruption":
+                    response = "Creates a large spot of lava tiles. 20 Mana\n";
+                    break;
+                case "Forest Growth":
+                    response = "Creates a large spot of poison ivy. 20 Mana\n";
+                    break;
+                case "Electrify":
+                    response = "Creates a large spot of electrified terrain. 20 Mana\n";
+                    break;
+                case "Manafy":
+                    response = "Converts 10 HP into 30 Mana\n";
+                    break;
+                case "Destroy Armor":
+                    response = "Decreases Defense and Magic Defense by 10. 25 Mana\n";
+                    break;
+                case "Demonify":
+                    response = "Increases Strength by 10. 25 Mana\n";
+                    break;
+                case "Featherify":
+                    response = "Increases Agility by 10. 25 Mana\n";
+                    break;
+                case "Transcend":
+                    response = "Increases Magic by 10. 25 Mana\n";
+                    break;
+                case "Wither":
+                    response = "Decreases Strength by 8. 25 Mana\n";
+                    break;
+                case "Chain Up":
+                    response = "Decreases Agility by 8. 25 Mana\n";
+                    break;
+                case "Hypnotize":
+                    response = "Decreases Magic by 8. 25 Mana\n";
+                    break;
+                case "Gamble":
+                    response = "Casts a random spell. 20 Mana\n";
                     break;
             }
 
@@ -282,14 +618,77 @@ namespace ByteLike
             {
                 case "Search":
                 case "Focus":
+                case "Fireball":
+                case "Ice Storm":
+                case "Electro Bolt":
+                case "Sludge Bomb":
                     result = 5;
+                    break;
+                case "Ember":
+                case "Ice Shard":
+                case "Zap":
+                case "Poison Sting":
+                    result = 3;
+                    break;
+                case "Recover":
+                case "Ironize":
+                case "Enchant":
+                case "Corrode Armor":
+                case "Sharpen":
+                case "Enlighten":
+                case "Prepare":
+                case "Energy Drain":
+                case "Confuse":
+                case "Scare":
+                case "Regenerate":
+                case "Enchanse Vission":
+                case "Liquify":
+                case "Lavafy":
+                case "Ivy Growth":
+                case "Charge":
+                    result = 10;
+                    break;
+                case "Heal Wounds":
+                case "Protective Field":
+                case "Melt Armor":
+                case "Rage":
+                case "Speed Up":
+                case "Concentrate":
+                case "Weaken":
+                case "Slow Down":
+                case "Terrify":
+                    result = 15;
+                    break;
+                case "Meteor":
+                case "Blizzard":
+                case "Thunder":
+                case "Plague Bomb":
+                    result = 7;
+                    break;
+                case "Restore":
+                case "Tsunami":
+                case "Erruption":
+                case "Forest Growth":
+                case "Electrify":
+                case "Gamble":
+                    result = 20;
+                    break;
+                case "Full Protection":
+                case "Destroy Armor":
+                case "Demonify":
+                case "Featherify":
+                case "Transcend":
+                case "Wither":
+                case "Chain Up":
+                case "Hypnotize":
+                    result = 25;
                     break;
             }
 
             return result;
         }
 
-        protected string WalkTo(int[] movement, ref int[,] level, string response, ref List<Creature> enemies, ref Player player)
+        protected string WalkTo(int[] movement, ref int[,] level, string response, ref List<Creature> enemies, ref Player player, ref int[,] darkness)
         {
         WalkReset:
             bool InTheWay = false;
@@ -464,23 +863,26 @@ namespace ByteLike
                         position[1] += movement[1];
                         if (FloorCheck(level[position[0], position[1]]))
                         {
-                            level[position[0], position[1]] = 1;
-                            if (position[0] + 1 < level.GetLength(0))
+                            if (darkness[position[0], position[1]] > 0 && darkness[position[0], position[1]] != 2)
                             {
-                                if (level[position[0] + 1, position[1]] == 8) { level[position[0] + 1, position[1]] = 1; }
-                            }
-                            if (position[0] - 1 >= 0)
-                            {
-                                if (level[position[0] - 1, position[1]] == 8) { level[position[0] - 1, position[1]] = 1; }
-                            }
+                                level[position[0], position[1]] = 1;
+                                if (position[0] + 1 < level.GetLength(0))
+                                {
+                                    if (level[position[0] + 1, position[1]] == 8) { level[position[0] + 1, position[1]] = 1; }
+                                }
+                                if (position[0] - 1 >= 0)
+                                {
+                                    if (level[position[0] - 1, position[1]] == 8) { level[position[0] - 1, position[1]] = 1; }
+                                }
 
-                            if (position[1] + 1 < level.GetLength(1))
-                            {
-                                if (level[position[0], position[1] + 1] == 8) { level[position[0], position[1] + 1] = 1; }
-                            }
-                            if (position[1] - 1 >= 0)
-                            {
-                                if (level[position[0], position[1] - 1] == 8) { level[position[0], position[1] - 1] = 1; }
+                                if (position[1] + 1 < level.GetLength(1))
+                                {
+                                    if (level[position[0], position[1] + 1] == 8) { level[position[0], position[1] + 1] = 1; }
+                                }
+                                if (position[1] - 1 >= 0)
+                                {
+                                    if (level[position[0], position[1] - 1] == 8) { level[position[0], position[1] - 1] = 1; }
+                                }
                             }
                         }
                         break;
@@ -494,32 +896,36 @@ namespace ByteLike
                         if (FloorCheck(level[position[0], position[1]]))
                         {
                             Stats["HP"] -= (int)(Stats["MaxHP"]*0.2);
-                            level[position[0], position[1]] = 11;
 
-                            if (position[0] + 1 < level.GetLength(0))
+                            if (darkness[position[0], position[1]] > 0 && darkness[position[0], position[1]] != 2)
                             {
-                                if (level[position[0] + 1, position[1]] == 8) { level[position[0] + 1, position[1]] = 1; }
-                                else if (level[position[0] + 1, position[1]] == 9) { level[position[0] + 1, position[1]] = 11; }
-                                else if (level[position[0] + 1, position[1]] == 10) { level[position[0] + 1, position[1]] = 12; }
-                            }
-                            if (position[0] - 1 >= 0)
-                            {
-                                if (level[position[0] - 1, position[1]] == 8) { level[position[0] - 1, position[1]] = 1; }
-                                else if (level[position[0] - 1, position[1]] == 9) { level[position[0] - 1, position[1]] = 11; }
-                                else if (level[position[0] - 1, position[1]] == 10) { level[position[0] - 1, position[1]] = 12; }
-                            }
+                                level[position[0], position[1]] = 11;
 
-                            if (position[1] + 1 < level.GetLength(1))
-                            {
-                                if (level[position[0], position[1] + 1] == 8) { level[position[0], position[1] + 1] = 1; }
-                                else if (level[position[0], position[1] + 1] == 9) { level[position[0], position[1] + 1] = 11; }
-                                else if (level[position[0], position[1] + 1] == 10) { level[position[0], position[1] + 1] = 12; }
-                            }
-                            if (position[1] - 1 >= 0)
-                            {
-                                if (level[position[0], position[1] - 1] == 8) { level[position[0], position[1] - 1] = 1; }
-                                else if (level[position[0], position[1] - 1] == 9) { level[position[0], position[1] - 1] = 11; }
-                                else if (level[position[0], position[1] - 1] == 10) { level[position[0], position[1] - 1] = 12; }
+                                if (position[0] + 1 < level.GetLength(0))
+                                {
+                                    if (level[position[0] + 1, position[1]] == 8) { level[position[0] + 1, position[1]] = 1; }
+                                    else if (level[position[0] + 1, position[1]] == 9) { level[position[0] + 1, position[1]] = 11; }
+                                    else if (level[position[0] + 1, position[1]] == 10) { level[position[0] + 1, position[1]] = 12; }
+                                }
+                                if (position[0] - 1 >= 0)
+                                {
+                                    if (level[position[0] - 1, position[1]] == 8) { level[position[0] - 1, position[1]] = 1; }
+                                    else if (level[position[0] - 1, position[1]] == 9) { level[position[0] - 1, position[1]] = 11; }
+                                    else if (level[position[0] - 1, position[1]] == 10) { level[position[0] - 1, position[1]] = 12; }
+                                }
+
+                                if (position[1] + 1 < level.GetLength(1))
+                                {
+                                    if (level[position[0], position[1] + 1] == 8) { level[position[0], position[1] + 1] = 1; }
+                                    else if (level[position[0], position[1] + 1] == 9) { level[position[0], position[1] + 1] = 11; }
+                                    else if (level[position[0], position[1] + 1] == 10) { level[position[0], position[1] + 1] = 12; }
+                                }
+                                if (position[1] - 1 >= 0)
+                                {
+                                    if (level[position[0], position[1] - 1] == 8) { level[position[0], position[1] - 1] = 1; }
+                                    else if (level[position[0], position[1] - 1] == 9) { level[position[0], position[1] - 1] = 11; }
+                                    else if (level[position[0], position[1] - 1] == 10) { level[position[0], position[1] - 1] = 12; }
+                                }
                             }
                         }
                         break;
@@ -533,32 +939,35 @@ namespace ByteLike
                         if (FloorCheck(level[position[0], position[1]]))
                         {
                             Statuses[1] = 10;
-                            level[position[0], position[1]] = 12;
+                            if (darkness[position[0], position[1]] > 0 && darkness[position[0], position[1]] != 2)
+                            {
+                                level[position[0], position[1]] = 12;
 
-                            if (position[0] + 1 < level.GetLength(0))
-                            {
-                                if (level[position[0] + 1, position[1]] == 8) { level[position[0] + 1, position[1]] = 1; }
-                                else if (level[position[0] + 1, position[1]] == 9) { level[position[0] + 1, position[1]] = 11; }
-                                else if (level[position[0] + 1, position[1]] == 10) { level[position[0] + 1, position[1]] = 12; }
-                            }
-                            if (position[0] - 1 >= 0)
-                            {
-                                if (level[position[0] - 1, position[1]] == 8) { level[position[0] - 1, position[1]] = 1; }
-                                else if (level[position[0] - 1, position[1]] == 9) { level[position[0] - 1, position[1]] = 11; }
-                                else if (level[position[0] - 1, position[1]] == 10) { level[position[0] - 1, position[1]] = 12; }
-                            }
+                                if (position[0] + 1 < level.GetLength(0))
+                                {
+                                    if (level[position[0] + 1, position[1]] == 8) { level[position[0] + 1, position[1]] = 1; }
+                                    else if (level[position[0] + 1, position[1]] == 9) { level[position[0] + 1, position[1]] = 11; }
+                                    else if (level[position[0] + 1, position[1]] == 10) { level[position[0] + 1, position[1]] = 12; }
+                                }
+                                if (position[0] - 1 >= 0)
+                                {
+                                    if (level[position[0] - 1, position[1]] == 8) { level[position[0] - 1, position[1]] = 1; }
+                                    else if (level[position[0] - 1, position[1]] == 9) { level[position[0] - 1, position[1]] = 11; }
+                                    else if (level[position[0] - 1, position[1]] == 10) { level[position[0] - 1, position[1]] = 12; }
+                                }
 
-                            if (position[1] + 1 < level.GetLength(1))
-                            {
-                                if (level[position[0], position[1] + 1] == 8) { level[position[0], position[1] + 1] = 1; }
-                                else if (level[position[0], position[1] + 1] == 9) { level[position[0], position[1] + 1] = 11; }
-                                else if (level[position[0], position[1] + 1] == 10) { level[position[0], position[1] + 1] = 12; }
-                            }
-                            if (position[1] - 1 >= 0)
-                            {
-                                if (level[position[0], position[1] - 1] == 8) { level[position[0], position[1] - 1] = 1; }
-                                else if (level[position[0], position[1] - 1] == 9) { level[position[0], position[1] - 1] = 11; }
-                                else if (level[position[0], position[1] - 1] == 10) { level[position[0], position[1] - 1] = 12; }
+                                if (position[1] + 1 < level.GetLength(1))
+                                {
+                                    if (level[position[0], position[1] + 1] == 8) { level[position[0], position[1] + 1] = 1; }
+                                    else if (level[position[0], position[1] + 1] == 9) { level[position[0], position[1] + 1] = 11; }
+                                    else if (level[position[0], position[1] + 1] == 10) { level[position[0], position[1] + 1] = 12; }
+                                }
+                                if (position[1] - 1 >= 0)
+                                {
+                                    if (level[position[0], position[1] - 1] == 8) { level[position[0], position[1] - 1] = 1; }
+                                    else if (level[position[0], position[1] - 1] == 9) { level[position[0], position[1] - 1] = 11; }
+                                    else if (level[position[0], position[1] - 1] == 10) { level[position[0], position[1] - 1] = 12; }
+                                }
                             }
                         }
                         break;
@@ -647,10 +1056,6 @@ namespace ByteLike
 
         string RemSpell = "";
 
-        public void ReceiveXP(int xp)
-        {
-            Stats["XP"] += xp;
-        }
 
         protected string LevelUp()
         {
@@ -967,28 +1372,25 @@ namespace ByteLike
             Stats["Torch"] = 1;
             Stats.Add("SpellSlots", 3);
 
-            bool TorchCheck = false;
-            bool WeaponCheck = false;
 
-            for (int i = 0; i < 5; i++)
+            if (rand.Next(2) == 0)
             {
-                if (!TorchCheck && rand.Next(2) == 0)
-                {
-                    TorchCheck = true;
-                    Inventory[i, 1] = new Item(-1, 6);
-                }
-                else if (!WeaponCheck && rand.Next(2) == 0)
-                {
-                    WeaponCheck = true;
-                    Inventory[i, 1] = new Item(-1, 4);
-                }
-                else
-                    Inventory[i, 1] = new Item(-1, 0);
+                Inventory[0, 1] = new Item(-1, 6);
+                Inventory[1, 1] = new Item(-1, 4);
             }
+            else
+            {
+                Inventory[0, 1] = new Item(-1, 4);
+                Inventory[1, 1] = new Item(-1, 6);
+            }
+            Inventory[2, 1] = new Item(-1, 10);
+            Inventory[3, 1] = new Item(0, 10);
+            Inventory[4, 1] = new Item(0, 0);
+
         }
 
         // Main Logics
-        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player)
+        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness)
         {
             bool wasAlive = true;
             if (Stats["HP"] <= 0) { wasAlive = false; }
@@ -1078,7 +1480,7 @@ namespace ByteLike
                         
                 }
 
-                response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player);
+                response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness);
             }
             // if in inventory
             else
@@ -1453,6 +1855,7 @@ namespace ByteLike
                                                         if (Stats["SpellSlots"] > Spells.Count)
                                                         {
                                                             Spells.Add(Inventory[SelectedSlot[0], SelectedSlot[1]].Spell);
+                                                            response += $"{Name} has learnt how to use {Inventory[SelectedSlot[0], SelectedSlot[1]].Spell}!\n";
                                                             Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity--;
                                                             if (Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity <= 0)
                                                                 Inventory[SelectedSlot[0], SelectedSlot[1]] = null;
@@ -1486,46 +1889,56 @@ namespace ByteLike
                                                             if (Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Strength"] > 0)
                                                             {
                                                                 if (Buffs["Strength"] > 0)
-                                                                    BuffLevels["Strength"] = (int)((BuffLevels["Strength"] + Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Strength"]) / 2);
+                                                                    BuffLevels["Strength"] = (int)((BuffLevels["Strength"] + Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Strength"]) / 1.5);
                                                                 else
                                                                     BuffLevels["Strength"] = Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Strength"];
-                                                                Buffs["Strength"] = 100;
+                                                                if (BuffLevels["Strength"] >= 0)
+                                                                    Buffs["Strength"] = BuffLevels["Strength"] * 10;
+                                                                else Buffs["Strength"] = -(BuffLevels["Strength"])*10;
                                                             }
 
                                                             if (Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Agility"] > 0)
                                                             {
                                                                 if (Buffs["Agility"] > 0)
-                                                                    BuffLevels["Agility"] = (int)((BuffLevels["Agility"] + Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Agility"]) / 2);
+                                                                    BuffLevels["Agility"] = (int)((BuffLevels["Agility"] + Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Agility"]) / 1.5);
                                                                 else
                                                                     BuffLevels["Agility"] = Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Agility"];
-                                                                Buffs["Agility"] = 100;
+                                                                if (BuffLevels["Agility"] >= 0)
+                                                                    Buffs["Agility"] = BuffLevels["Agility"] * 10;
+                                                                else Buffs["Agility"] = -(BuffLevels["Agility"])*10;
                                                             }
 
                                                             if (Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Magic"] > 0)
                                                             {
                                                                 if (Buffs["Magic"] > 0)
-                                                                    BuffLevels["Magic"] = (int)((BuffLevels["Magic"] + Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Magic"]) / 2);
+                                                                    BuffLevels["Magic"] = (int)((BuffLevels["Magic"] + Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Magic"]) / 1.5);
                                                                 else
                                                                     BuffLevels["Magic"] = Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Magic"];
-                                                                Buffs["Magic"] = 100;
+                                                                if (BuffLevels["Magic"] >= 0)
+                                                                    Buffs["Magic"] = BuffLevels["Magic"] * 10;
+                                                                else Buffs["Magic"] = -(BuffLevels["Magic"])*10;
                                                             }
 
                                                             if (Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Defense"] > 0)
                                                             {
                                                                 if (Buffs["Defense"] > 0)
-                                                                    BuffLevels["Defense"] = (int)((BuffLevels["Defense"] + Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Defense"]) / 2);
+                                                                    BuffLevels["Defense"] = (int)((BuffLevels["Defense"] + Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Defense"]) / 1.5);
                                                                 else
                                                                     BuffLevels["Defense"] = Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Defense"];
-                                                                Buffs["Defense"] = 100;
+                                                                if (BuffLevels["Defense"] >= 0)
+                                                                    Buffs["Defense"] = BuffLevels["Defense"] * 10;
+                                                                else Buffs["Defense"] = -(BuffLevels["Defense"])*10;
                                                             }
 
                                                             if (Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["MagicDefense"] > 0)
                                                             {
                                                                 if (Buffs["MagicDefense"] > 0)
-                                                                    BuffLevels["MagicDefense"] = (int)((BuffLevels["MagicDefense"] + Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["MagicDefense"]) / 2);
+                                                                    BuffLevels["MagicDefense"] = (int)((BuffLevels["MagicDefense"] + Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["MagicDefense"]) / 1.5);
                                                                 else
                                                                     BuffLevels["MagicDefense"] = Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["MagicDefense"];
-                                                                Buffs["MagicDefense"] = 100;
+                                                                if (BuffLevels["MagicDefense"] >= 0)
+                                                                    Buffs["MagicDefense"] = BuffLevels["MagicDefense"] * 10;
+                                                                else Buffs["MagicDefense"] = -(BuffLevels["MagicDefense"])*10;
                                                             }
                                                         }
                                                         Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity--;
@@ -1564,7 +1977,7 @@ namespace ByteLike
                                         }
                                     }
                                     // if selected something from a chest and trying to put it into equipment
-                                    else
+                                    else if (CurrentSlot[0] < 9)
                                     {
                                         if (chests[GetChest(ref chests)].Inventory[SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1)] == null || (chests[GetChest(ref chests)].Inventory[SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1)].GearType == CurrentSlot[0] + 1 || chests[GetChest(ref chests)].Inventory[SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1)].GearType == CurrentSlot[0] && chests[GetChest(ref chests)].Inventory[SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1)].GearType == 8))
                                         {
@@ -1572,8 +1985,10 @@ namespace ByteLike
                                             SelectedSlot[0] = -100;
                                         }
                                         else
-                                        response += $"{Name}: I need to take it out first.\n";
+                                        response += $"{Name}: I can't put that there\n";
                                     }
+                                    // If trying to use/throw away something from a chest
+                                    else response += $"{Name}: I need to take it out first.\n";
                                 }
 
                             }
@@ -1600,8 +2015,8 @@ namespace ByteLike
                                         }
                                     }
                                 }
-                                // DEBUG, REMOVE LATER
-                                else { Stats["XP"] += 10000; }
+                                // Using nothing
+                                else { response += $"{Name}: I need to pick something to use first\n"; }
                             }
 
 
@@ -1642,49 +2057,52 @@ namespace ByteLike
                 }
                 // End actual inventory
 
-                // While using a spell, CHANGE CODE LATER
+                // While using a spell
                 else
                 {
                     if (Keyboard.IsKeyDown(Key.E))
                     {
                         if (CurrentSlot[0] == 0 && CurrentSlot[1] == 0 && DrawSpellLine)
                         {
-                            OpenSpell = false;
-                            if (SelectedSlot[0] >= 0)
+                            if (RemSpell != "Gamble")
                             {
-                                CurrentSlot[0] = SelectedSlot[0];
-                                CurrentSlot[1] = SelectedSlot[1];
+                                CurrentSlot[0] = rand.Next(-1, 2);
+                                CurrentSlot[1] = rand.Next(-1, 2);
                             }
                         }
-                        else
-                        {
-                            if (Stats["Mana"] >= GetSpellCost(RemSpell) || !UseMana)
-                            {
-                                if (ArrowSlot[0] != 0 || ArrowSlot[1] != 0)
-                                {
-                                    Inventory[ArrowSlot[0], ArrowSlot[1]].Quantity--;
-                                    if (Inventory[ArrowSlot[0], ArrowSlot[1]].Quantity <= 0)
-                                        Inventory[ArrowSlot[0], ArrowSlot[1]] = null;
-                                }
 
-                                if (UseMana)
-                                    Stats["Mana"] -= GetSpellCost(RemSpell);
-                                if (!RemSpell.Contains("Arrow"))
-                                {
-                                    response += $"{Name} used {RemSpell}!\n";
+                        if (Stats["Mana"] >= GetSpellCost(RemSpell) || !UseMana)
+                        {
+                            if (ArrowSlot[0] != 0 || ArrowSlot[1] != 0)
+                            {
+                                Inventory[ArrowSlot[0], ArrowSlot[1]].Quantity--;
+                                if (Inventory[ArrowSlot[0], ArrowSlot[1]].Quantity <= 0)
+                                    Inventory[ArrowSlot[0], ArrowSlot[1]] = null;
+                                SelectedSlot[0] = -100;
+                            }
+
+                            if (UseMana)
+                                Stats["Mana"] -= GetSpellCost(RemSpell);
+                            if (!RemSpell.Contains("Arrow"))
+                            {
+                                if (RemSpell == "Gamble")
+                                    RemSpell = GetRandomSpell(null);
+                                response += $"{Name} used {RemSpell}!\n";
+                                if (RemSpell != "Nothing")
                                     effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { CurrentSlot[0], CurrentSlot[1] }, GetStat("Magic"), RemSpell));
-                                }
                                 else
-                                {
-                                    effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { CurrentSlot[0], CurrentSlot[1] }, GetStat("Agility"), RemSpell));
-                                }
-                                OpenInventory = false;
-                                OpenSpell = false;
+                                    response += "... Nothing happened.\n";
                             }
                             else
                             {
-                                response += "You don't have enough mana!\n";
+                                effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { CurrentSlot[0], CurrentSlot[1] }, GetStat("Agility"), RemSpell));
                             }
+                            OpenInventory = false;
+                            OpenSpell = false;
+                        }
+                        else
+                        {
+                            response += "You don't have enough mana!\n";
                         }
                     }
                 }
@@ -1723,6 +2141,8 @@ namespace ByteLike
                 }
 
                 SelectedSlot[0] = -100;
+
+                response = "";
             }
 
             // leveling up
@@ -1786,6 +2206,19 @@ namespace ByteLike
                 case "Shoot Ice Arrow":
                 case "Shoot Lightning Arrow":
                 case "Focus":
+                case "Ember":
+                case "Ice Shard":
+                case "Zap":
+                case "Poison Sting":
+                case "Fireball":
+                case "Ice Storm":
+                case "Electro Bolt":
+                case "Sludge Bomb":
+                case "Meteor":
+                case "Blizzard":
+                case "Thunder":
+                case "Plague Bomb":
+                case "Gamble":
                     return true;
                 default:
                     return false;
@@ -1847,7 +2280,7 @@ namespace ByteLike
 
         }
 
-        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player)
+        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness)
         {
             string response = "";
 
@@ -1861,7 +2294,7 @@ namespace ByteLike
 
             if (Aggressive)
             {
-                movementdirection = FindDirection(new int[] { player.position[0], player.position[1] }, ref level);
+                movementdirection = FindDirection(new int[] { player.position[0], player.position[1] }, ref level, ref enemies);
             }
 
             int[] movement = new int[2];
@@ -1890,7 +2323,7 @@ namespace ByteLike
                 movement[0] = 0;
                 movement[1] = 0;
             }
-            response += WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player);
+            response += WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness);
 
             response = Conditions(response);
 
@@ -1900,13 +2333,13 @@ namespace ByteLike
             if (Stats["HP"] < GetStat("MaxHP"))
                 response += $"{Name} has {Stats["HP"]} HP left!\n";
 
-            if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= player.GetStat("Torch") + 1)
+            if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= player.GetStat("Torch") || Aggressive)
                 return response;
             else return "";
         }
 
 
-        int FindDirection(int[] target, ref int[,] level)
+        int FindDirection(int[] target, ref int[,] level, ref List<Creature> enemies)
         {
             int[] movement = new int[2] { 999, 999 };
             int direction = -1;
@@ -1916,23 +2349,59 @@ namespace ByteLike
             if (position[0] + 1 < level.GetLength(0))
             {
                 if (!IsGhost || (level[position[0] + 1, position[1]] != 2 && level[position[0] + 1, position[1]] != 0 && level[position[0] + 1, position[1]] != 5))
-                    movements.Add(new int[] { DifferenceBetween(position[0] + 1, target[0]), DifferenceBetween(position[1], target[1]), 0 });
+                {
+                    bool enemycheck = false;
+                    foreach (Creature item in enemies)
+                    {
+                        if (position[0] + 1 == item.position[0] && position[1] == item.position[1])
+                            enemycheck = true;
+                    }
+                    if (!enemycheck)
+                        movements.Add(new int[] { DifferenceBetween(position[0] + 1, target[0]), DifferenceBetween(position[1], target[1]), 0 });
+                }
             }
             if (position[0] - 1 >= 0)
             {
                 if (!IsGhost || (level[position[0] - 1, position[1]] != 2 && level[position[0] - 1, position[1]] != 0 && level[position[0] - 1, position[1]] != 5))
-                    movements.Add(new int[] { DifferenceBetween(position[0] - 1, target[0]), DifferenceBetween(position[1], target[1]), 180 });
+                {
+                    bool enemycheck = false;
+                    foreach (Creature item in enemies)
+                    {
+                        if (position[0] - 1 == item.position[0] && position[1] == item.position[1])
+                            enemycheck = true;
+                    }
+                    if (!enemycheck)
+                        movements.Add(new int[] { DifferenceBetween(position[0] - 1, target[0]), DifferenceBetween(position[1], target[1]), 180 });
+                }
             }
 
             if (position[1] + 1 < level.GetLength(1))
             {
                 if (!IsGhost || (level[position[0], position[1] + 1] != 2 && level[position[0], position[1] + 1] != 0 && level[position[0], position[1] + 1] != 5))
-                    movements.Add(new int[] { DifferenceBetween(position[0], target[0]), DifferenceBetween(position[1] + 1, target[1]), 270 });
+                {
+                    bool enemycheck = false;
+                    foreach (Creature item in enemies)
+                    {
+                        if (position[0] == item.position[0] && position[1] + 1 == item.position[1])
+                            enemycheck = true;
+                    }
+                    if (!enemycheck)
+                        movements.Add(new int[] { DifferenceBetween(position[0], target[0]), DifferenceBetween(position[1] + 1, target[1]), 270 });
+                }
             }
             if (position[1] - 1 >= 0)
             {
                 if (!IsGhost || (level[position[0], position[1] - 1] != 2 && level[position[0], position[1] - 1] != 0 && level[position[0], position[1] - 1] != 5))
-                    movements.Add(new int[] { DifferenceBetween(position[0], target[0]), DifferenceBetween(position[1] - 1, target[1]), 90 });
+                {
+                    bool enemycheck = false;
+                    foreach (Creature item in enemies)
+                    {
+                        if (position[0] == item.position[0] && position[1] - 1 == item.position[1])
+                            enemycheck = true;
+                    }
+                    if (!enemycheck)
+                        movements.Add(new int[] { DifferenceBetween(position[0], target[0]), DifferenceBetween(position[1] - 1, target[1]), 90 });
+                }
             }
 
             foreach (int[] item in movements)

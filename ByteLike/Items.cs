@@ -24,6 +24,43 @@ namespace ByteLike
         public int Quantity = 1;
         public string Description = "";
 
+        public static int GetSpellElement(string Spell)
+        {
+            switch (Spell)
+            {
+                case "Ember":
+                case "Shoot Fire Arrow":
+                case "Fireball":
+                case "Meteor":
+                case "Lavafy":
+                case "Erruption":
+                    return 1;
+                case "Posion Sting":
+                case "Shoot Poison Arrow":
+                case "Sludge Bomb":
+                case "Ivy Growth":
+                case "Plague Bomb":
+                case "Forest Growth":
+                    return 2;
+                case "Ice Shard":
+                case "Shoot Ice Arrow":
+                case "Ice Storm":
+                case "Liquify":
+                case "Blizzard":
+                case "Tsunami":
+                    return 3;
+                case "Zap":
+                case "Shoot Lightning Arrow":
+                case "Electro Bolt":
+                case "Charge":
+                case "Thunder":
+                case "Electrify":
+                    return 4;
+                default:
+                    return 0;
+            }
+        }
+
         public Item(int floor, int type)
         {
             Stats.Add("Torch", 0);
@@ -1131,7 +1168,7 @@ namespace ByteLike
 
                     break;
                 case 10:
-                    int itemtype = rand.Next(20);
+                    int itemtype = rand.Next(27);
                     switch (itemtype)
                     {
                         case 0:
@@ -1228,6 +1265,33 @@ namespace ByteLike
                             File = "Graphics/ByteLikeGraphics/Items/food15.png";
                             Name = "Improvement Potion";
                             Description = "A vial of yellow liquid. It seems lighter than air\nRemoves any negative effects\n";
+                            break;
+                        case 16:
+                        case 17:
+                        case 18:
+                        case 19:
+                        case 20:
+                            File = "Graphics/ByteLikeGraphics/Items/scroll";
+                            Spell = Creature.GetRandomSpell(floor);
+                            if (rand.Next(10) == 0)
+                                Element = 0;
+                            else
+                                Element = GetSpellElement(Spell) + 1;
+
+                            File += Element.ToString();
+                            File += ".png";
+
+                            if (Element == 0)
+                            {
+                                Name = $"Book of {Spell}";
+                                Description = $"Teaches you {Spell}\n{Spell}: {Creature.GetSpellDescription(Spell)}";
+                            }
+                            else
+                            {
+                                Name = $"Scroll of {Spell}";
+                                Description = $"Casts {Spell} with no Mana cost\n{Spell}: {Creature.GetSpellDescription(Spell)}";
+                            }
+                            Element = 0;
                             break;
                         // Arrows
                         default:

@@ -55,10 +55,6 @@ namespace ByteLike
                         {
                             darkness[player.position[0] + j, player.position[1] + i] = 2;
                         }
-                        else
-                        {
-                            darkness[player.position[0] + j, player.position[1] + i] = 0;
-                        }
                     }
                 }
             }
@@ -376,67 +372,68 @@ namespace ByteLike
                                 }
                             }
 
-                            foreach (Effect item in effects)
+                            // Player draw code
+                            if (player.position[0] == camera[0] + j && player.position[1] == camera[1] + i)
                             {
-                                if (camera[0] + j == item.position[0] && camera[1] + i == item.position[1])
-                                    dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                // Draw quiver if slot is full and is a quiver
+                                if (player.Inventory[4, 0] != null)
+                                {
+                                    if (player.Inventory[4, 0].Name.Contains("Quiver"))
+                                    {
+                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                    }
+                                }
+
+                                // If not a ghost, draw regular sprite
+                                if (!player.IsGhost)
+                                {
+                                    dc.DrawImage(new BitmapImage(new Uri(player.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                }
+                                // Otherwise, draw the ghosty appearance
+                                else
+                                {
+                                    dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Creatures/player4.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                }
+
+
+                                // Draw legs
+                                if (player.Inventory[2, 0] != null)
+                                    dc.DrawImage(new BitmapImage(new Uri(player.Inventory[2, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                // Draw chestplate
+                                if (player.Inventory[1, 0] != null)
+                                    dc.DrawImage(new BitmapImage(new Uri(player.Inventory[1, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                // Draw hat
+                                if (player.Inventory[0, 0] != null)
+                                    dc.DrawImage(new BitmapImage(new Uri(player.Inventory[0, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                // Draw weapon
+                                if (player.Inventory[3, 0] != null)
+                                    dc.DrawImage(new BitmapImage(new Uri(player.Inventory[3, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+
+                                // Draw offhand if not a quiver (drew quiver earlier)
+                                if (player.Inventory[4, 0] != null)
+                                {
+                                    if (!player.Inventory[4, 0].Name.Contains("Quiver"))
+                                    {
+                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                    }
+                                }
+
                             }
+                            // End player draw code
+
 
                             foreach (Creature item in enemies)
                             {
                                 if (camera[0] + j == item.position[0] && camera[1] + i == item.position[1])
                                     dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
                             }
+
+                            foreach (Effect item in effects)
+                            {
+                                if (camera[0] + j == item.position[0] && camera[1] + i == item.position[1])
+                                    dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                            }
                         }
-
-                        // Player draw code
-                        if (player.position[0] == camera[0] + j && player.position[1] == camera[1] + i)
-                        {
-                            // Draw quiver if slot is full and is a quiver
-                            if (player.Inventory[4, 0] != null)
-                            {
-                                if (player.Inventory[4, 0].Name.Contains("Quiver"))
-                                {
-                                    dc.DrawImage(new BitmapImage(new Uri(player.Inventory[4,0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                }
-                            }
-
-                            // If not a ghost, draw regular sprite
-                            if (!player.IsGhost)
-                            {
-                                dc.DrawImage(new BitmapImage(new Uri(player.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                            }
-                            // Otherwise, draw the ghosty appearance
-                            else
-                            {
-                                dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Creatures/player4.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                            }
-
-
-                            // Draw legs
-                            if (player.Inventory[2, 0] != null)
-                                dc.DrawImage(new BitmapImage(new Uri(player.Inventory[2, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                            // Draw chestplate
-                            if (player.Inventory[1, 0] != null)
-                                dc.DrawImage(new BitmapImage(new Uri(player.Inventory[1, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                            // Draw hat
-                            if (player.Inventory[0, 0] != null)
-                                dc.DrawImage(new BitmapImage(new Uri(player.Inventory[0, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                            // Draw weapon
-                            if (player.Inventory[3, 0] != null)
-                                dc.DrawImage(new BitmapImage(new Uri(player.Inventory[3, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-
-                            // Draw offhand if not a quiver (drew quiver earlier)
-                            if (player.Inventory[4, 0] != null)
-                            {   
-                                if (!player.Inventory[4, 0].Name.Contains("Quiver"))
-                                {
-                                    dc.DrawImage(new BitmapImage(new Uri(player.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                }
-                            }
-
-                        }
-                        // End player draw code
 
 
                         // Inventory draw code, still in j-i switch
@@ -739,6 +736,7 @@ namespace ByteLike
                 // Draw stats hud
                 for (int i = 0; i < 10; i++)
                 {
+                    string floorImage2 = "";
                     string floorImage = "Graphics/ByteLikeGraphics/Hud/hud";
                     floorImage += i;
                     floorImage += ".png";
@@ -746,10 +744,18 @@ namespace ByteLike
                     {
                         dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(0, i * 32, 17, 17));
                         if (effects.Count > 0)
-                            dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/effectplayout.png", UriKind.Relative)), new Rect(cameraSize[0]*16 - 16, i * 32, 17, 17));
+                            dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/effectplayout.png", UriKind.Relative)), new Rect(cameraSize[0] * 16 - 16, i * 32, 17, 17));
                     }
-                    else
+                    else if (i != 9)
                         dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(0, i * 32 - 16, 17, 17));
+                    else
+                    {
+                        if (player.Inventory[3, 0] != null)
+                        {
+                            if (player.Inventory[3, 0].Name.ToLower().Contains("bow"))
+                                dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(0, i * 32 - 16, 17, 17));
+                        }
+                    }
 
                     switch (i)
                     {
@@ -761,35 +767,67 @@ namespace ByteLike
                             break;
                         case 2:
                             floorImage = String.Format("{0}/{1}", player.Stats["HP"].ToString(), player.GetStat("MaxHP"));
+                            if (player.GetStat("HPRegen") > 0)
+                                floorImage2 = $"| {player.Stats["MaxHPRegen"]}/{player.GetStat("HPRegen")}";
+                            else
+                                floorImage2 = $"| {-player.GetStat("HPRegen") + 2}";
                             break;
                         case 3:
                             floorImage = String.Format("{0}/{1}", player.Stats["Mana"].ToString(), player.GetStat("MaxMana"));
+                            if (player.GetStat("ManaRegen") > 0)
+                                floorImage2 = $"| {player.Stats["MaxManaRegen"]}/{player.GetStat("ManaRegen")}";
+                            else
+                                floorImage2 = $"| {-player.GetStat("ManaRegen") + 2}";
                             break;
                         case 4:
                             floorImage = player.GetStat("Defense").ToString();
+                            if (player.Buffs["Defense"] > 0)
+                                floorImage2 = $"| {player.BuffLevels["Defense"]}:{player.Buffs["Defense"]}";
                             break;
                         case 5:
                             floorImage = player.GetStat("MagicDefense").ToString();
+                            if (player.Buffs["MagicDefense"] > 0)
+                                floorImage2 = $"| {player.BuffLevels["MagicDefense"]}:{player.Buffs["MagicDefense"]}";
                             break;
                         case 6:
                             floorImage = player.GetStat("Strength").ToString();
+                            if (player.Buffs["Strength"] > 0)
+                                floorImage2 = $"| {player.BuffLevels["Strength"]}:{player.Buffs["Strength"]}";
                             break;
                         case 7:
                             floorImage = player.GetStat("Magic").ToString();
+                            if (player.Buffs["Magic"] > 0)
+                                floorImage2 = $"| {player.BuffLevels["Magic"]}:{player.Buffs["Magic"]}";
                             break;
                         case 8:
                             floorImage = player.GetStat("Agility").ToString();
+                            if (player.Buffs["Agility"] > 0)
+                                floorImage2 = $"| {player.BuffLevels["Agility"]}:{player.Buffs["Agility"]}";
                             break;
                         case 9:
                             floorImage = player.GetArrows().ToString();
                             break;
                     }
                     FormattedText dialogue2 = new FormattedText(floorImage, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 16, System.Windows.Media.Brushes.White);
+                    FormattedText dialogue3 = new FormattedText(floorImage2, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 8, System.Windows.Media.Brushes.White);
                     dialogue2.MaxTextWidth = 320;
-                    if (i != 0)
+                    dialogue3.MaxTextWidth = 320;
+                    if (i != 0 && i != 9)
+                    {
                         dc.DrawText(dialogue2, new System.Windows.Point(4, 14 + i * 32 - 16));
-                    else
+                        if (floorImage2 != "")
+                            dc.DrawText(dialogue3, new System.Windows.Point(20, 4 + i * 32 - 16));
+                    }
+                    else if (i != 9)
                         dc.DrawText(dialogue2, new System.Windows.Point(20, 0));
+                    else
+                    {
+                        if (player.Inventory[3, 0] != null)
+                        {
+                            if (player.Inventory[3, 0].Name.ToLower().Contains("bow"))
+                                dc.DrawText(dialogue2, new System.Windows.Point(20, 0));
+                        }
+                    }
                 }
                 // End stats hud
 
@@ -864,6 +902,7 @@ namespace ByteLike
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {
             NewLevel();
+            response = $"{player.Name} enters the dungeon.\n";
             Border imageBorder = new Border();
             imageBorder.BorderBrush = System.Windows.Media.Brushes.Gray;
             imageBorder.BorderThickness = new Thickness(0);
@@ -926,21 +965,24 @@ namespace ByteLike
                         if (!effects[i].Logics(ref level, ref enemies, ref effects, ref player, out response, response))
                             deleteus.Add(i);
                     }
-
-                    for (int i = 0; i < deleteus.Count; i++)
+                    if (deleteus.Count > 0)
                     {
-                        effects.RemoveAt(deleteus[i]);
+                        for (int i = deleteus.Count - 1; i >= 0; i--)
+                        {
+                            effects.RemoveAt(deleteus[i]);
+                        }
                     }
+
                 }
                 else
                 {
-                    response = player.Logics(ref level, ref chests, ref effects, ref enemies, ref player);
+                    response = player.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness);
 
-                    if (enemies.Count < 20 + floor)
+                    if (enemies.Count < 10 + floor/2)
                     {
                         int[] newPos = new int[] { rand.Next(level.GetLength(0)), rand.Next(level.GetLength(1)) };
 
-                        if (level[newPos[0], newPos[1]] == 1)
+                        if (level[newPos[0], newPos[1]] == 1 && (darkness[newPos[0], newPos[1]] <= 0 || darkness[newPos[0], newPos[1]] == 2))
                         {
                             enemies.Add(new Critter(floor, new int[] { newPos[0], newPos[1] }));
                         }
@@ -952,12 +994,12 @@ namespace ByteLike
                     List<int> deletusXL = new List<int>();
                     int pos = 0;
 
-                    if (!player.OpenInventory)
+                    if (!player.OpenInventory && !Keyboard.IsKeyDown(Key.Q))
                     {
 
                         foreach (Creature enemy in enemies)
                         {
-                            response += enemy.Logics(ref level, ref chests, ref effects, ref enemies, ref player);
+                            response += enemy.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness);
 
                             if (enemy.Stats["HP"] <= 0)
                                 deletusXL.Add(pos);
@@ -968,13 +1010,12 @@ namespace ByteLike
 
                     }
 
-                    for (int i = 0; i < deletusXL.Count; i++)
+                    if (deletusXL.Count > 0)
                     {
-                        try
+                        for (int i = deletusXL.Count - 1; i >= 0; i--)
                         {
                             enemies.RemoveAt(deletusXL[i]);
                         }
-                        catch { }
                     }
 
                     if (effects.Count > 0)
@@ -986,9 +1027,12 @@ namespace ByteLike
                                 deleteus.Add(i);
                         }
 
-                        for (int i = 0; i < deleteus.Count; i++)
+                        if (deleteus.Count > 0)
                         {
-                            effects.RemoveAt(deleteus[i]);
+                            for (int i = deleteus.Count - 1; i >= 0; i--)
+                            {
+                                effects.RemoveAt(deleteus[i]);
+                            }
                         }
                     }
                 }
@@ -1000,6 +1044,28 @@ namespace ByteLike
             camera[1] = player.position[1];
 
 
+            if (level[player.position[0], player.position[1]] == 15 && Keyboard.IsKeyDown(Key.E) && !player.OpenInventory && !Keyboard.IsKeyDown(Key.W) && !Keyboard.IsKeyDown(Key.S) && !Keyboard.IsKeyDown(Key.A) && !Keyboard.IsKeyDown(Key.D) && effects.Count <= 0)
+            {
+                NewLevel();
+                response = $"{player.Name} finds their way to floor #{floor}!\n";
+                if (cameraSize[0] >= level.GetLength(0))
+                    cameraSize[0] = level.GetLength(0) - 1;
+                if (cameraSize[1] >= level.GetLength(1))
+                    cameraSize[1] = level.GetLength(1) - 1;
+            }
+
+            if (player.Stats["HP"] <= 0)
+            {
+                floor = 0;
+                player = new Player("Player");
+                NewLevel();
+                response = $"{player.Name} enters the dungeon.\nScreams of an unfortunate adventurer echo somewhere in the depths...\n";
+
+                if (cameraSize[0] >= level.GetLength(0))
+                    cameraSize[0] = level.GetLength(0) - 1;
+                if (cameraSize[1] >= level.GetLength(1))
+                    cameraSize[1] = level.GetLength(1) - 1;
+            }
 
 
             Border imageBorder = new Border();
@@ -1014,26 +1080,7 @@ namespace ByteLike
             this.Margin = new Thickness(0);
             this.Content = imageBorder;
 
-            if (level[player.position[0], player.position[1]] == 15 && Keyboard.IsKeyDown(Key.E) && !player.OpenInventory && !Keyboard.IsKeyDown(Key.W) && !Keyboard.IsKeyDown(Key.S) && !Keyboard.IsKeyDown(Key.A) && !Keyboard.IsKeyDown(Key.D))
-            {
-                NewLevel();
-                if (cameraSize[0] >= level.GetLength(0))
-                    cameraSize[0] = level.GetLength(0) - 1;
-                if (cameraSize[1] >= level.GetLength(1))
-                    cameraSize[1] = level.GetLength(1) - 1;
-            }
-
-            if (player.Stats["HP"] <= 0)
-            {
-                floor = 0;
-                player = new Player("Player");
-                NewLevel();
-
-                if (cameraSize[0] >= level.GetLength(0))
-                    cameraSize[0] = level.GetLength(0) - 1;
-                if (cameraSize[1] >= level.GetLength(1))
-                    cameraSize[1] = level.GetLength(1) - 1;
-            }
+            
 
         }
     }
@@ -1084,8 +1131,9 @@ namespace ByteLike
 
             strength = power;
 
+            // Directions
             direction = 0;
-
+            // Horrizontal
             if (DistanceBetween(new int[2] { position[0], position[1] }, new int[2] { position[0] + target[0], position[1] }) >= DistanceBetween(new int[2] { position[0], position[1] }, new int[2] { position[0], position[1] + target[1] }))
             {
                 if (target[0] < 0)
@@ -1093,6 +1141,7 @@ namespace ByteLike
                     direction = 180;
                 }
             }
+            // Vertical
             else
             {
                 direction = 270;
@@ -1101,27 +1150,39 @@ namespace ByteLike
                     direction = 90;
                 }
             }
+            // End Direction
 
+
+            // SPELL SWITCH
             switch (spell)
             {
+                // Search
                 case "Search":
                     spawntile = -1;
                     isDamaging = false;
                     strength = 0;
                     File = "Graphics/ByteLikeGraphics/Effects/search.png";
                     break;
+                // Explosions
+                case "Explosion":
                 case "Fire Explosion":
-                    element = 1;
-                    break;
                 case "Poison Explosion":
-                    element = 2;
-                    break;
                 case "Ice Explosion":
-                    element = 3;
-                    break;
                 case "Lightning Explosion":
-                    element = 4;
+                    if (spell.Contains("Fire"))
+                        element = 1;
+                    else if (spell.Contains("Poison"))
+                        element = 2;
+                    else if (spell.Contains("Ice"))
+                        element = 3;
+                    else if (spell.Contains("Lightning"))
+                        element = 4;
+
+                    File = "Graphics/ByteLikeGraphics/Effects/explosion";
+                    File += element.ToString();
+                    File += ".png";
                     break;
+                // Arrows
                 case "Shoot Arrow":
                 case "Shoot Fire Arrow":
                 case "Shoot Poison Arrow":
@@ -1142,22 +1203,375 @@ namespace ByteLike
                     File += direction;
                     File += ".png";
                     break;
+                // Projectiles
                 case "Focus":
+                case "Ember":
+                case "Ice Shard":
+                case "Zap":
+                case "Posion Sting":
+                case "Fireball":
+                case "Ice Storm":
+                case "Electro Bolt":
+                case "Sludge Bomb":
+                case "Meteor":
+                case "Blizzard":
+                case "Thunder":
+                case "Plague Bomb":
                     isBullet = true;
-                    element = rand.Next(5);
-                    File = "Graphics/ByteLikeGraphics/Effects/blast0";
+
+                    // Setting up elemental spells
+                    switch (spell)
+                    {
+                        case "Ember":
+                            element = 1;
+                            break;
+                        case "Ice Shard":
+                            element = 3;
+                            break;
+                        case "Zap":
+                            element = 4;
+                            break;
+                        case "Poison Sting":
+                            element = 2;
+                            break;
+                        case "Fireball":
+                            element = 1;
+                            isExplosion = true;
+                            radius = 1;
+                            break;
+                        case "Ice Storm":
+                            element = 3;
+                            isWide = true;
+                            radius = 1;
+                            break;
+                        case "Electro Bolt":
+                            element = 4;
+                            isWide = true;
+                            radius = 1;
+                            break;
+                        case "Sludge Bomb":
+                            element = 2;
+                            isExplosion = true;
+                            radius = 1;
+                            break;
+                        case "Meteor":
+                            element = 1;
+                            isExplosion = true;
+                            radius = 2;
+                            break;
+                        case "Blizzard":
+                            element = 3;
+                            isWide = true;
+                            radius = 2;
+                            break;
+                        case "Thunder":
+                            element = 4;
+                            isWide = true;
+                            radius = 2;
+                            break;
+                        case "Plague Bomb":
+                            element = 2;
+                            isExplosion = true;
+                            isWide = true;
+                            radius = 2;
+                            break;
+                    }
+                    // end set up
+
+
+                    File = "Graphics/ByteLikeGraphics/Effects/blast";
+                    File += element;
                     File += direction;
                     File += ".png";
+
+                    if (spell == "Focus")
+                        element = rand.Next(5);
                     break;
+                // Tile Spawners
+                case "Liquify":
+                    spawntile = 6;
+                    isDamaging = false;
+                    element = 3;
+                    radius = 2;
+                    File = "Graphics/ByteLikeGraphics/Effects/explosion3.png";
+                    break;
+                case "Lavafy":
+                    spawntile = 7;
+                    isDamaging = false;
+                    element = 1;
+                    radius = 2;
+                    File = "Graphics/ByteLikeGraphics/Effects/explosion1.png";
+                    break;
+                case "Ivy Growth":
+                    spawntile = 13;
+                    isDamaging = false;
+                    element = 2;
+                    radius = 2;
+                    File = "Graphics/ByteLikeGraphics/Effects/explosion2.png";
+                    break;
+                case "Charge":
+                    spawntile = 14;
+                    isDamaging = false;
+                    element = 4;
+                    radius = 2;
+                    File = "Graphics/ByteLikeGraphics/Effects/explosion4.png";
+                    break;
+                case "Tsunami":
+                    spawntile = 6;
+                    isDamaging = false;
+                    element = 3;
+                    radius = 3;
+                    File = "Graphics/ByteLikeGraphics/Effects/explosion3.png";
+                    break;
+                case "Erruption":
+                    spawntile = 7;
+                    isDamaging = false;
+                    element = 1;
+                    radius = 3;
+                    File = "Graphics/ByteLikeGraphics/Effects/explosion1.png";
+                    break;
+                case "Forest Growth":
+                    spawntile = 13;
+                    isDamaging = false;
+                    element = 2;
+                    radius = 3;
+                    File = "Graphics/ByteLikeGraphics/Effects/explosion2.png";
+                    break;
+                case "Electrify":
+                    spawntile = 14;
+                    isDamaging = false;
+                    element = 4;
+                    radius = 3;
+                    File = "Graphics/ByteLikeGraphics/Effects/explosion4.png";
+                    break;
+                // End tile spawners
 
+                // Statuses
+                case "Recover":
+                    stat = "HP";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 10;
+                    break;
+                case "Ironize":
+                    stat = "Defense";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 5;
+                    strength *= 5;
+                    break;
+                case "Enchant":
+                    stat = "MagicDefense";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 5;
+                    strength *= 5;
+                    break;
+                case "Corrode armor":
+                    stat = "MagicDefense|Defense";
+                    File = "Graphics/ByteLikeGraphics/Effects/debuff.png";
+                    isDamaging = false;
+                    element = -3;
+                    strength *= 5;
+                    break;
+                case "Sharpen":
+                    stat = "Strength";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 3;
+                    strength *= 5;
+                    break;
+                case "Enlighten":
+                    stat = "Agility";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 3;
+                    strength *= 5;
+                    break;
+                case "Prepare":
+                    stat = "Magic";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 3;
+                    strength *= 5;
+                    break;
+                case "Energy Drain":
+                    stat = "Strength";
+                    File = "Graphics/ByteLikeGraphics/Effects/debuff.png";
+                    isDamaging = false;
+                    element = -2;
+                    strength *= 5;
+                    break;
+                case "Confuse":
+                    stat = "Agility";
+                    File = "Graphics/ByteLikeGraphics/Effects/debuff.png";
+                    isDamaging = false;
+                    element = -2;
+                    strength *= 5;
+                    break;
+                case "Scare":
+                    stat = "Magic";
+                    File = "Graphics/ByteLikeGraphics/Effects/debuff.png";
+                    isDamaging = false;
+                    element = -2;
+                    strength *= 5;
+                    break;
+                case "Heal Wounds":
+                    stat = "HP";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 20;
+                    break;
+                case "Protective Field":
+                    stat = "Defense|MagicDefense";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 7;
+                    strength *= 5;
+                    break;
+                case "Regenerate":
+                    stat = "HPRegen|ManaRegen";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 1;
+                    strength *= 5;
+                    break;
+                case "Melt Armor":
+                    stat = "Defense|MagicDefense";
+                    File = "Graphics/ByteLikeGraphics/Effects/debuff.png";
+                    isDamaging = false;
+                    element = -6;
+                    strength *= 5;
+                    break;
+                case "Enchanse Vission":
+                    stat = "Torch";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 2;
+                    strength *= 5;
+                    break;
+                case "Rage":
+                    stat = "Strength";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 7;
+                    strength *= 5;
+                    break;
+                case "Speed Up":
+                    stat = "Agility";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 7;
+                    strength *= 5;
+                    break;
+                case "Concentrate":
+                    stat = "Magic";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 7;
+                    strength *= 5;
+                    break;
+                case "Weaken":
+                    stat = "Strength";
+                    File = "Graphics/ByteLikeGraphics/Effects/debuff.png";
+                    isDamaging = false;
+                    element = -5;
+                    strength *= 5;
+                    break;
+                case "Slow Down":
+                    stat = "Agility";
+                    File = "Graphics/ByteLikeGraphics/Effects/debuff.png";
+                    isDamaging = false;
+                    element = -5;
+                    strength *= 5;
+                    break;
+                case "Terrify":
+                    stat = "Magic";
+                    File = "Graphics/ByteLikeGraphics/Effects/debuff.png";
+                    isDamaging = false;
+                    element = -5;
+                    strength *= 5;
+                    break;
+                case "Restore":
+                    stat = "HP";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 35;
+                    break;
+                case "Full Protection":
+                    stat = "Defense|MagicDefense";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 10;
+                    strength *= 5;
+                    break;
+                case "Manafy":
+                    stat = "Mana";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 30;
+                    break;
+                case "Destroy Armor":
+                    stat = "Defense|MagicDefense";
+                    File = "Graphics/ByteLikeGraphics/Effects/debuff.png";
+                    isDamaging = false;
+                    element = -10;
+                    strength *= 5;
+                    break;
+                case "Demonify":
+                    stat = "Strength";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 10;
+                    strength *= 5;
+                    break;
+                case "Featherify":
+                    stat = "Agility";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 10;
+                    strength *= 5;
+                    break;
+                case "Transcend":
+                    stat = "Magic";
+                    File = "Graphics/ByteLikeGraphics/Effects/buff.png";
+                    isDamaging = false;
+                    element = 10;
+                    strength *= 5;
+                    break;
+                case "Wither":
+                    stat = "Strength";
+                    File = "Graphics/ByteLikeGraphics/Effects/debuff.png";
+                    isDamaging = false;
+                    element = -8;
+                    strength *= 5;
+                    break;
+                case "Chain Up":
+                    stat = "Agility";
+                    File = "Graphics/ByteLikeGraphics/Effects/debuff.png";
+                    isDamaging = false;
+                    element = -8;
+                    strength *= 5;
+                    break;
+                case "Hypnotize":
+                    stat = "Torch";
+                    File = "Graphics/ByteLikeGraphics/Effects/debuff.png";
+                    isDamaging = false;
+                    element = -8;
+                    strength *= 5;
+                    break;
+                // End statuses
             }
+            // end Spell switch
 
 
+            // Moving towards right position
             if (!isBullet)
             {
                 position[0] += target[0];
                 position[1] += target[1];
             }
+            else { Move(); }
         }
 
         public bool Logics(ref int[,] level, ref List<Creature> enemies, ref List<Effect> effects, ref Player player, out string response, string currentresponse)
@@ -1166,14 +1580,225 @@ namespace ByteLike
 
             response = currentresponse;
 
-            if (isBullet)
+            if (strength == 0)
+                result = false;
+
+            int xp = 0;
+            bool check = false;
+
+            // Damage/buff
+            if (strength != 0)
             {
-                Move();
-                if (level[position[0], position[1]] == 0 || level[position[0], position[1]] == 5 || level[position[0], position[1]] == 4 || level[position[0], position[1]] == 2)
+                foreach (Creature enemy in enemies)
                 {
-                    result = false;
+                    if (position[0] == enemy.position[0] && position[1] == enemy.position[1])
+                    {
+                        if (isDamaging)
+                            xp += enemy.TakeDamage(strength, element);
+                        else if (stat != "Mana" && stat != "HP" && stat != "")
+                        {
+                            string trueStat = stat;
+                            if (stat.Contains("|"))
+                            {
+                                trueStat = stat.Split("|")[0];
+                                if (enemy.Buffs[trueStat] <= 0)
+                                {
+                                    enemy.Buffs[trueStat] = strength;
+                                    enemy.BuffLevels[trueStat] = element;
+                                }
+                                else
+                                {
+                                    enemy.Buffs[trueStat] = strength;
+                                    enemy.BuffLevels[trueStat] = (int)((enemy.BuffLevels[trueStat] + element) / 1.5);
+                                }
+                                trueStat = stat.Split("|")[1];
+                            }
+
+                            if (enemy.Buffs[trueStat] <= 0)
+                            {
+                                enemy.Buffs[trueStat] = strength;
+                                enemy.BuffLevels[trueStat] = element;
+                            }
+                            else
+                            {
+                                enemy.Buffs[trueStat] = strength;
+                                enemy.BuffLevels[trueStat] = (int)((enemy.BuffLevels[trueStat] + element) / 1.5);
+                            }
+                        }
+                        // Manafy
+                        else if (stat == "Mana")
+                        {
+                            enemy.Stats["Mana"] += 30;
+                            enemy.Stats["HP"] -= 10;
+                            if (enemy.Stats["Mana"] > enemy.GetStat("MaxMana"))
+                                enemy.Stats["Mana"] = enemy.GetStat("MaxMana");
+                        }
+                        // Healing
+                        else if (stat != "")
+                        {
+                            enemy.Stats["HP"] += element;
+                            if (enemy.Stats["HP"] > enemy.GetStat("MaxHP"))
+                                enemy.Stats["HP"] = enemy.GetStat("MaxHP");
+                        }
+                        check = true;
+                    }
                 }
 
+                if (position[0] == player.position[0] && position[1] == player.position[1])
+                {
+                    if (isDamaging)
+                        player.TakeDamage(strength, element);
+                    else if (stat != "Mana" && stat != "HP" && stat != "")
+                    {
+                        string trueStat = stat;
+                        if (stat.Contains("|"))
+                        {
+                            trueStat = stat.Split("|")[0];
+                            if (player.Buffs[trueStat] <= 0)
+                            {
+                                player.Buffs[trueStat] = strength;
+                                player.BuffLevels[trueStat] = element;
+                            }
+                            else
+                            {
+                                player.Buffs[trueStat] = strength;
+                                player.BuffLevels[trueStat] = (int)((player.BuffLevels[trueStat] + element) / 1.5);
+                            }
+                            trueStat = stat.Split("|")[1];
+                        }
+
+                        if (player.Buffs[trueStat] <= 0)
+                        {
+                            player.Buffs[trueStat] = strength;
+                            player.BuffLevels[trueStat] = element;
+                        }
+                        else
+                        {
+                            player.Buffs[trueStat] = strength;
+                            player.BuffLevels[trueStat] = (int)((player.BuffLevels[trueStat] + element) / 1.5);
+                        }
+                    }
+                    // Manafy
+                    else if (stat == "Mana")
+                    {
+                        player.Stats["Mana"] += 30;
+                        player.Stats["HP"] -= 10;
+                        if (player.Stats["Mana"] > player.GetStat("MaxMana"))
+                            player.Stats["Mana"] = player.GetStat("MaxMana");
+                    }
+                    else if (stat != "")
+                    {
+                        player.Stats["HP"] += element;
+                        if (player.Stats["HP"] > player.GetStat("MaxHP"))
+                            player.Stats["HP"] = player.GetStat("MaxHP");
+                    }
+                    check = true;
+                }
+
+                if (check || !isBullet)
+                {
+                    // Spawn explosions for wide spells
+                    if (isWide)
+                    {
+                        string spell = "";
+                        switch (element)
+                        {
+                            case 1:
+                                spell = "Fire ";
+                                break;
+                            case 2:
+                                spell = "Poison ";
+                                break;
+                            case 3:
+                                spell = "Ice ";
+                                break;
+                            case 4:
+                                spell = "Lightning ";
+                                break;
+                        }
+                        spell += "Explosion";
+                        switch (direction)
+                        {
+                            case 0:
+                            case 180:
+                                for (int i = -radius; i <= radius; i++)
+                                {
+                                    effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { 0, i }, strength, spell));
+                                }
+                                break;
+                            case 270:
+                            case 90:
+                                for (int i = -radius; i <= radius; i++)
+                                {
+                                    effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { i, 0 }, strength, spell));
+                                }
+                                break;
+                        }
+                    }
+
+                    // Explosions
+                    if (isExplosion)
+                    {
+                        for (int i = -radius - 1; i <= radius + 1; i++)
+                        {
+                            for (int j = -radius - 1; j <= radius + 1; j++)
+                            {
+                                if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { position[0] + j, position[1] + i }) <= radius)
+                                {
+                                    string spell = "";
+                                    switch (element)
+                                    {
+                                        case 1:
+                                            spell = "Fire ";
+                                            break;
+                                        case 2:
+                                            spell = "Poison ";
+                                            break;
+                                        case 3:
+                                            spell = "Ice ";
+                                            break;
+                                        case 4:
+                                            spell = "Lightning ";
+                                            break;
+                                    }
+                                    spell += "Explosion";
+
+                                    effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { j, i }, strength, spell));
+                                }
+                            }
+                        }
+                    }
+                    // end Explosions
+                    strength = 0;
+                }
+
+
+            }
+            // end Damage/buff
+
+            // XP yield
+            if (xp > 0)
+            {
+                int extraxp = 0;
+                for (int f = 0; f < 9; f++)
+                {
+                    if (player.Inventory[f, 0] != null)
+                    {
+                        if (player.Inventory[f, 0].Name.Contains("XP"))
+                            extraxp += (int)(xp * 0.25);
+                    }
+                }
+                xp += extraxp;
+                response += $"{player.Name} gained {xp} XP!\n";
+                player.Stats["XP"] += xp;
+            }
+            //
+
+
+            // Movement for bullets
+            if (isBullet)
+            {
+                // Spawn explosions for wide spells
                 if (isWide)
                 {
                     string spell = "";
@@ -1199,75 +1824,30 @@ namespace ByteLike
                         case 180:
                             for (int i = -radius; i <= radius; i++)
                             {
-                                effects.Add(new Effect(new int[] { position[0], position[1] + i }, new int[] { position[0], position[1] + i }, strength, spell));
+                                effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { 0, i }, strength, spell));
                             }
                             break;
                         case 270:
                         case 90:
                             for (int i = -radius; i <= radius; i++)
                             {
-                                effects.Add(new Effect(new int[] { position[0] + i, position[1] }, new int[] { position[0] + i, position[1] }, strength, spell));
+                                effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { i, 0 }, strength, spell));
                             }
                             break;
                     }
                 }
-            }
 
-            if (strength == 0)
-                result = false;
-
-            int xp = 0;
-            bool check = false;
-
-            // Damage/buff
-            if (strength != 0)
-            {
-                foreach (Creature enemy in enemies)
+                // Move, check for collison
+                Move();
+                if (level[position[0], position[1]] == 0 || level[position[0], position[1]] == 5 || level[position[0], position[1]] == 4 || level[position[0], position[1]] == 2)
                 {
-                    if (position[0] == enemy.position[0] && position[1] == enemy.position[1])
-                    {
-                        if (isDamaging)
-                            xp = enemy.TakeDamage(strength, element);
-                        else
-                        {
-                            if (enemy.Buffs[stat] <= 0)
-                            {
-                                enemy.Buffs[stat] = element;
-                                enemy.BuffLevels[stat] = strength;
-                            }
-                            else
-                            {
-                                enemy.Buffs[stat] = element;
-                                enemy.BuffLevels[stat] = (int)((enemy.BuffLevels[stat] + strength) / 2);
-                            }
-                        }
-                        check = true;
-                    }
+                    result = false;
                 }
 
-                if (check || !isBullet)
-                    strength = 0;
-            }
-            // end Damage/buff
 
-            // XP yield
-            if (xp > 0)
-            {
-                int extraxp = 0;
-                for (int f = 0; f < 9; f++)
-                {
-                    if (player.Inventory[f, 0] != null)
-                    {
-                        if (player.Inventory[f, 0].Name.Contains("XP"))
-                            extraxp += (int)(xp * 0.25);
-                    }
-                }
-                xp += extraxp;
-                response += $"{player.Name} gained {xp} XP!\n";
-                player.ReceiveXP(xp);
             }
-            //
 
+            // On collison (for tile spawning, explosions, etc)
             if (!result)
             {
                 // Tile spawning
@@ -1324,6 +1904,8 @@ namespace ByteLike
                     } // end i
                 }
                 // end tile spawning
+
+                // Search
                 else if (spawntile < 0)
                 {
                     if (position[0] >= 0 && position[0] < level.GetLength(0) && position[1] >= 0 && position[1] < level.GetLength(1))
@@ -1359,46 +1941,95 @@ namespace ByteLike
                         }
                     }
                 }
+                // end Search
 
-                // Explosions
-                if (isExplosion)
+                if (strength != 0)
                 {
-                    for (int i = -radius; i <= radius; i++)
+                    // Spawn explosions for wide spells
+                    if (isWide)
                     {
-                        for (int j = -radius; j <= radius; j++)
+                        string spell = "";
+                        switch (element)
                         {
-                            if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { position[0] + j, position[1] + i }) < radius)
-                            {
-                                string spell = "";
-                                switch (element)
+                            case 1:
+                                spell = "Fire ";
+                                break;
+                            case 2:
+                                spell = "Poison ";
+                                break;
+                            case 3:
+                                spell = "Ice ";
+                                break;
+                            case 4:
+                                spell = "Lightning ";
+                                break;
+                        }
+                        spell += "Explosion";
+                        switch (direction)
+                        {
+                            case 0:
+                            case 180:
+                                for (int i = -radius; i <= radius; i++)
                                 {
-                                    case 1:
-                                        spell = "Fire ";
-                                        break;
-                                    case 2:
-                                        spell = "Poison ";
-                                        break;
-                                    case 3:
-                                        spell = "Ice ";
-                                        break;
-                                    case 4:
-                                        spell = "Lightning ";
-                                        break;
+                                    effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { 0, i }, strength, spell));
                                 }
-                                spell += "Explosion";
+                                break;
+                            case 270:
+                            case 90:
+                                for (int i = -radius; i <= radius; i++)
+                                {
+                                    effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { i, 0 }, strength, spell));
+                                }
+                                break;
+                        }
+                    }
 
-                                effects.Add(new Effect(new int[] { position[0] + j, position[1] + i }, new int[] { position[0] + j, position[1] + i }, strength, spell));
+
+                    // Explosions
+                    if (isExplosion)
+                    {
+                        for (int i = -radius - 1; i <= radius + 1; i++)
+                        {
+                            for (int j = -radius - 1; j <= radius + 1; j++)
+                            {
+                                if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { position[0] + j, position[1] + i }) <= radius)
+                                {
+                                    string spell = "";
+                                    switch (element)
+                                    {
+                                        case 1:
+                                            spell = "Fire ";
+                                            break;
+                                        case 2:
+                                            spell = "Poison ";
+                                            break;
+                                        case 3:
+                                            spell = "Ice ";
+                                            break;
+                                        case 4:
+                                            spell = "Lightning ";
+                                            break;
+                                    }
+                                    spell += "Explosion";
+
+                                    effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { j, i }, strength, spell));
+                                }
                             }
                         }
                     }
+                    // end Explosions
+                    strength = 0;
                 }
-                // end Explosions
+
 
             }
+            // end On Collison
             
             return result;
         }
 
+
+        // Self explanatory
         void Move()
         {
             switch (direction)
