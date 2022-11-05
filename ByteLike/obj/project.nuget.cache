@@ -1,11 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "Jt+8++mjwUmSB9SUhLMtZtQ18T68y5/uJz3OeuBbTaULh0zkh5iD7eLllwRi5DG+/KsuB2Q0G/JWRGPU2R8rqA==",
+  "dgSpecHash": "j4LeTiZ09Q6VOCHvRHnYqeRpMl39JjS+C2YH+VQM7ZRSVXHmtqCMF3djPXTH369D4sqU5ioRmmqQAxWHSOoTxA==",
   "success": true,
   "projectFilePath": "C:\\Users\\Arkael\\source\\repos\\homeworks2\\ByteLike\\ByteLike\\ByteLike.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Arkael\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
-    "C:\\Users\\Arkael\\.nuget\\packages\\system.drawing.common\\6.0.0\\system.drawing.common.6.0.0.nupkg.sha512"
+    "C:\\Users\\Arkael\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512"
   ],
   "logs": []
 }

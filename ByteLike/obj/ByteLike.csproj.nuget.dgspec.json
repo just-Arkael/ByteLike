@@ -40,9 +40,9 @@
         "net6.0-windows7.0": {
           "targetAlias": "net6.0-windows",
           "dependencies": {
-            "System.Drawing.Common": {
+            "Newtonsoft.Json": {
               "target": "Package",
-              "version": "[6.0.0, )"
+              "version": "[13.0.1, )"
             }
           },
           "imports": [

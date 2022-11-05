@@ -406,3 +406,12 @@ C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windo
 C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Items\scroll3.png
 C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Items\scroll4.png
 C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Items\scroll5.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Newtonsoft.Json.dll
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\obj\Debug\net6.0-windows\ByteLike.csproj.CopyComplete
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\statuses0.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\statuses1.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\statuses2.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\statuses3.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Creatures\undeadplayer1.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Creatures\undeadplayer2.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Creatures\undeadplayer3.png

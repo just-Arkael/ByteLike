@@ -65,11 +65,21 @@ namespace ByteLike
                 }
             }
 
+            int[] chestPosition = new int[] { -100, -100 };
+
+            if (rand.Next(3) != 0)
+            {
+                chestPosition[0] = rand.Next(-(room[0] / 2), room[0] / 2);
+                chestPosition[1] = rand.Next(-(room[1] / 2), room[1] / 2);
+            }
+
             // Generate tiles
             for (int i = -(room[1] / 2); i < room[1] / 2; i++)
             {
                 for (int j = -(room[0] / 2); j < room[0] / 2; j++)
                 {
+                    if (j == chestPosition[0] && i == chestPosition[1])
+                        chest = new Chest(new int[] { position[0] + j, position[1] + i }, currentFloor);
                     // If we're in boundaries
                     if (position[0] + j >= 0 && position[0] + j < level.GetLength(0) && position[1] + i >= 0 && position[1] + i < level.GetLength(1))
                     {
@@ -82,7 +92,6 @@ namespace ByteLike
                         else if (j == 0 && i == 0)
                         {
                             level[position[0] + j, position[1] + i] = 3;
-                            chest = new Chest(new int[] { position[0] + j, position[1] + i }, currentFloor);
                         }
                         // Else, set to floor
                         else

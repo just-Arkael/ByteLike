@@ -1421,7 +1421,9 @@ namespace ByteLike
             if (floor >= 100)
                 quality = 50;
 
-            if (quality < 35)
+            if (floor < -1)
+                Inventory = new Item[11, -(floor + 1)];
+            else if (quality < 35)
             {
                 Inventory = new Item[11, 2];
             }

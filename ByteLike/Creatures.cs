@@ -10,6 +10,10 @@ namespace ByteLike
 
     public abstract class Creature
     {
+        public bool DrawEquipment = false;
+
+        public bool DropEquipment = false;
+
         public string Name;
         // x - 0, y - 1
         public int[] position = new int[2];
@@ -577,6 +581,9 @@ namespace ByteLike
                         break;
                 }
             }
+
+
+
             return response;
 
         }
@@ -1036,14 +1043,165 @@ namespace ByteLike
             return Math.Sqrt(Math.Pow(disx, 2) + Math.Pow(disy, 2));
         }
 
+
+        protected int FindDirection(int[] target, ref int[,] level, ref List<Creature> enemies)
+        {
+            int[] movement = new int[2] { 999, 999 };
+            int direction = -1;
+
+            List<int[]> movements = new List<int[]>();
+
+            if (position[0] + 1 < level.GetLength(0))
+            {
+                if (!IsGhost || (level[position[0] + 1, position[1]] != 2 && level[position[0] + 1, position[1]] != 0 && level[position[0] + 1, position[1]] != 5))
+                {
+                    bool enemycheck = false;
+                    foreach (Creature item in enemies)
+                    {
+                        if (position[0] + 1 == item.position[0] && position[1] == item.position[1])
+                            enemycheck = true;
+                    }
+                    if (!enemycheck)
+                        movements.Add(new int[] { DifferenceBetween(position[0] + 1, target[0]), DifferenceBetween(position[1], target[1]), 0 });
+                }
+            }
+            if (position[0] - 1 >= 0)
+            {
+                if (!IsGhost || (level[position[0] - 1, position[1]] != 2 && level[position[0] - 1, position[1]] != 0 && level[position[0] - 1, position[1]] != 5))
+                {
+                    bool enemycheck = false;
+                    foreach (Creature item in enemies)
+                    {
+                        if (position[0] - 1 == item.position[0] && position[1] == item.position[1])
+                            enemycheck = true;
+                    }
+                    if (!enemycheck)
+                        movements.Add(new int[] { DifferenceBetween(position[0] - 1, target[0]), DifferenceBetween(position[1], target[1]), 180 });
+                }
+            }
+
+            if (position[1] + 1 < level.GetLength(1))
+            {
+                if (!IsGhost || (level[position[0], position[1] + 1] != 2 && level[position[0], position[1] + 1] != 0 && level[position[0], position[1] + 1] != 5))
+                {
+                    bool enemycheck = false;
+                    foreach (Creature item in enemies)
+                    {
+                        if (position[0] == item.position[0] && position[1] + 1 == item.position[1])
+                            enemycheck = true;
+                    }
+                    if (!enemycheck)
+                        movements.Add(new int[] { DifferenceBetween(position[0], target[0]), DifferenceBetween(position[1] + 1, target[1]), 270 });
+                }
+            }
+            if (position[1] - 1 >= 0)
+            {
+                if (!IsGhost || (level[position[0], position[1] - 1] != 2 && level[position[0], position[1] - 1] != 0 && level[position[0], position[1] - 1] != 5))
+                {
+                    bool enemycheck = false;
+                    foreach (Creature item in enemies)
+                    {
+                        if (position[0] == item.position[0] && position[1] - 1 == item.position[1])
+                            enemycheck = true;
+                    }
+                    if (!enemycheck)
+                        movements.Add(new int[] { DifferenceBetween(position[0], target[0]), DifferenceBetween(position[1] - 1, target[1]), 90 });
+                }
+            }
+
+            foreach (int[] item in movements)
+            {
+                if (item[0] + item[1] < movement[0] + movement[1])
+                {
+                    movement[0] = item[0];
+                    movement[1] = item[1];
+                    direction = item[2];
+                }
+                else if (item[0] + item[1] == movement[0] + movement[1] && rand.Next(2) == 0)
+                {
+                    movement[0] = item[0];
+                    movement[1] = item[1];
+                    direction = item[2];
+                }
+            }
+
+            return direction;
+        }
+
+        protected int DifferenceBetween(int point1, int point2)
+        {
+            if (point1 > point2)
+                return (point1 - point2);
+            else return (point2 - point1);
+        }
+
+        protected bool IsAggresiveSpell(string spell)
+        {
+
+            switch (spell)
+            {
+                // Explosions
+                case "Explosion":
+                case "Fire Explosion":
+                case "Poison Explosion":
+                case "Ice Explosion":
+                case "Lightning Explosion":
+                // Arrows
+                case "Shoot Arrow":
+                case "Shoot Fire Arrow":
+                case "Shoot Poison Arrow":
+                case "Shoot Ice Arrow":
+                case "Shoot Lightning Arrow":
+                // Projectiles
+                case "Focus":
+                case "Ember":
+                case "Ice Shard":
+                case "Zap":
+                case "Posion Sting":
+                case "Fireball":
+                case "Ice Storm":
+                case "Electro Bolt":
+                case "Sludge Bomb":
+                case "Meteor":
+                case "Blizzard":
+                case "Thunder":
+                case "Plague Bomb":
+                // Tile Spawners
+                case "Liquify":
+                case "Lavafy":
+                case "Ivy Growth":
+                case "Charge":
+                case "Tsunami":
+                case "Erruption":
+                case "Forest Growth":
+                case "Electrify":
+                // End tile spawners
+
+                // Statuses
+                case "Corrode armor":
+                case "Energy Drain":
+                case "Confuse":
+                case "Scare":
+                case "Melt Armor":
+                case "Weaken":
+                case "Slow Down":
+                case "Terrify":
+                case "Destroy Armor":
+                case "Wither":
+                case "Chain Up":
+                case "Hypnotize":
+                    return true;
+                // End statuses
+                default:
+                    return false;
+            }
+        }
     }
-
-
 
 
     public class Player : Creature
     {
-
+        public int DangerLevel = 0;
         public new Item[,] Inventory = new Item[11, 3];
 
         public bool OpenInventory = false;
@@ -1354,7 +1512,7 @@ namespace ByteLike
         public Player(string name)
             : base()
         {
-
+            DrawEquipment = true;
             Spells.Add("Search");
             Spells.Add("Focus");
 
@@ -2087,7 +2245,7 @@ namespace ByteLike
                             {
                                 if (RemSpell == "Gamble")
                                     RemSpell = GetRandomSpell(null);
-                                response += $"{Name} used {RemSpell}!\n";
+                                response += $"{Name} casts {RemSpell}!\n";
                                 if (RemSpell != "Nothing")
                                     effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { CurrentSlot[0], CurrentSlot[1] }, GetStat("Magic"), RemSpell));
                                 else
@@ -2323,8 +2481,425 @@ namespace ByteLike
                 movement[0] = 0;
                 movement[1] = 0;
             }
-            response += WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness);
+            response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness);
 
+
+            // Default logics ending
+            response = Conditions(response);
+
+            if (Stats["HP"] > GetStat("MaxHP")) { Stats["HP"] = GetStat("MaxHP"); }
+            if (Stats["Mana"] > GetStat("MaxMana")) { Stats["Mana"] = GetStat("MaxMana"); }
+
+            if (Stats["HP"] < GetStat("MaxHP"))
+                response += $"{Name} has {Stats["HP"]} HP left!\n";
+
+
+            if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= player.GetStat("Torch") || Aggressive)
+                return response;
+            else return "";
+        }
+
+
+    }
+
+
+    public class DoppleGanger : Creature
+    {
+        bool Aggressive = false;
+
+        public DoppleGanger(Player player, int[] spawnpoint)
+            :base()
+        {
+            DrawEquipment = true;
+            DropEquipment = true;
+            position[0] = spawnpoint[0];
+            position[1] = spawnpoint[1];
+            Stats["Level"] = player.Stats["Level"];
+            Stats["MaxHP"] = player.Stats["MaxHP"]+5;
+            Stats["HP"] = player.Stats["MaxHP"];
+            Stats["Mana"] = player.Stats["MaxMana"];
+            Stats["MaxMana"] = player.Stats["MaxMana"]+5;
+            Stats["Strength"] = player.Stats["Strength"]+3;
+            Stats["Magic"] = player.Stats["Magic"]+3;
+            Stats["Agility"] = player.Stats["Agility"]+3;
+            Stats["Defense"] = player.Stats["Defense"]+3;
+            Stats["MagicDefense"] = player.Stats["MagicDefense"]+3;
+            Stats["HPRegen"] = player.Stats["HPRegen"];
+            Stats["MaxHPRegen"] = player.Stats["MaxHPRegen"];
+            Stats["ManaRegen"] = player.Stats["ManaRegen"];
+            Stats["MaxManaRegen"] = player.Stats["MaxManaRegen"];
+            Stats["Torch"] = player.Stats["Torch"]+1;
+            Name = "Ghost of ";
+            Name += player.Name;
+
+            for (int i = 0; i < player.Spells.Count; i++)
+            {
+                Spells.Add(player.Spells[i]);
+            }
+
+            switch (player.File)
+            {
+                case "Graphics/ByteLikeGraphics/Creatures/player1.png":
+                    File = "Graphics/ByteLikeGraphics/Creatures/undeadplayer1.png";
+                    break;
+                case "Graphics/ByteLikeGraphics/Creatures/player2.png":
+                    File = "Graphics/ByteLikeGraphics/Creatures/undeadplayer2.png";
+                    break;
+                case "Graphics/ByteLikeGraphics/Creatures/player3.png":
+                    File = "Graphics/ByteLikeGraphics/Creatures/undeadplayer3.png";
+                    break;
+                default:
+                    File = "Graphics/ByteLikeGraphics/Creatures/undeadplayer";
+                    File += (rand.Next(3) + 1).ToString();
+                    File += ".png";
+                    break;
+            }
+
+            Inventory = new Item[player.Inventory.GetLength(0), player.Inventory.GetLength(1)];
+
+            for (int i = 0; i < Inventory.GetLength(1); i++)
+            {
+                for (int j = 0; j < Inventory.GetLength(0); j++)
+                {
+                    Inventory[j, i] = player.Inventory[j, i];
+                }
+            }
+        }
+        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness)
+        {
+            string response = "";
+
+            // Aggressive check
+            if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= GetStat("Torch") && !Aggressive)
+            {
+                Aggressive = true;
+                response = $"{Name} notices {player.Name}!\n";
+            }
+
+            // ACTION
+            if (Aggressive)
+            {
+                List<int> actions = new List<int>();
+
+                int chosenSpell = 0;
+
+                int[] arrowSlot = new int[] { 0, 0 };
+                int[] healSlot = new int[] { 0, 0 };
+                int[] manaSlot = new int[] { 0, 0 };
+                int[] itemSlot = new int[] { 0, 0 };
+
+
+                // 0 - Nothing, 1 - Walk, 2 - Spell, 3 - Bow shot, 4 - Use Healing Item, 5 - Use Mana Item, 6 - Use random item
+
+                actions.Add(0);
+
+                // deciding to - Walk
+                if (Statuses[2] == 0 && Statuses[3] % 2 == 0 && Stats["HP"] > 0)
+                {
+                    for (byte i = 0; i < 5; i++)
+                        actions.Add(1);
+                }
+
+                // deciding to - Cast a spell
+                if (Spells.Count > 0)
+                {
+                    chosenSpell = rand.Next(Spells.Count);
+                    if (Stats["Mana"] >= GetSpellCost(Spells[chosenSpell]))
+                    {
+                        for (byte i = 0; i < 10; i++)
+                            actions.Add(2);
+                    }
+                }
+
+                // deciding to - Shooting an arrow
+                if (Inventory[3, 0] != null)
+                {
+                    if (Inventory[3, 0].Name.ToLower().Contains("bow"))
+                    {
+                        bool stop = false;
+                        for (int i = 0; i < Inventory.GetLength(1) && !stop; i++)
+                        {
+                            for (int j = 0; j < Inventory.GetLength(0) && !stop; j++)
+                            {
+                                if (Inventory[j, i] != null)
+                                {
+                                    if (Inventory[j, i].Name.Contains("Arrow") && Inventory[j, i].GearType == 10)
+                                    {
+                                        stop = true;
+                                        arrowSlot[0] = j;
+                                        arrowSlot[1] = i;
+
+                                        for (byte f = 0; f < 10; f++)
+                                            actions.Add(3);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // deciding to - Use a healing item
+                if (Stats["HP"] < GetStat("MaxHP") * 0.6)
+                {
+                    bool stop = false;
+                    for (int i = 0; i < Inventory.GetLength(1) && !stop; i++)
+                    {
+                        for (int j = 0; j < Inventory.GetLength(0) && !stop; j++)
+                        {
+                            if (Inventory[j, i] != null)
+                            {
+                                if (Inventory[j, i].Stats["MaxHP"] > 0 && Inventory[j, i].GearType == 10)
+                                {
+                                    stop = true;
+                                    healSlot[0] = j;
+                                    healSlot[1] = i;
+
+                                    for (byte f = 0; f < 15; f++)
+                                        actions.Add(4);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // deciding to - Use a mana item
+                if (Stats["Mana"] < GetStat("MaxMana") * 0.8)
+                {
+                    bool stop = false;
+                    for (int i = 0; i < Inventory.GetLength(1) && !stop; i++)
+                    {
+                        for (int j = 0; j < Inventory.GetLength(0) && !stop; j++)
+                        {
+                            if (Inventory[j, i] != null)
+                            {
+                                if (Inventory[j, i].Stats["MaxMana"] > 0 && Inventory[j, i].GearType == 10)
+                                {
+                                    stop = true;
+                                    manaSlot[0] = j;
+                                    manaSlot[1] = i;
+
+                                    for (byte f = 0; f < 12; f++)
+                                        actions.Add(5);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // deciding to - Use a random item
+                itemSlot[0] = rand.Next(Inventory.GetLength(0));
+                itemSlot[1] = rand.Next(Inventory.GetLength(1));
+                if (Inventory[itemSlot[0], itemSlot[1]] != null)
+                {
+                    if (Inventory[itemSlot[0], itemSlot[1]].GearType == 10 && !Inventory[itemSlot[0], itemSlot[1]].Name.Contains("Arrow") && !Inventory[itemSlot[0], itemSlot[1]].Name.Contains("Book"))
+                    {
+                        for (byte i = 0; i < 7; i++)
+                            actions.Add(6);
+                    }
+                }
+
+                // ACTUAL ACTION
+                switch (rand.Next(actions.Count))
+                {
+                    case 0:
+                        response += $"{Name} is watching carefully...\n";
+                        break;
+                    case 1:
+                        int movementdirection = FindDirection(new int[] { player.position[0], player.position[1] }, ref level, ref enemies);
+                        int[] movement = new int[2];
+                        switch (movementdirection)
+                        {
+                            case 0:
+                                movement[0] = 1;
+                                movement[1] = 0;
+                                break;
+                            case 180:
+                                movement[0] = -1;
+                                movement[1] = 0;
+                                break;
+                            case 270:
+                                movement[0] = 0;
+                                movement[1] = 1;
+                                break;
+                            case 90:
+                                movement[0] = 0;
+                                movement[1] = -1;
+                                break;
+                        }
+                        response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness);
+                        break;
+                    case 2:
+                        Stats["Mana"] -= GetSpellCost(Spells[chosenSpell]);
+                        arrowSlot[0] = 0;
+                        arrowSlot[1] = 0;
+                        if (IsAggresiveSpell(Spells[chosenSpell]))
+                        {
+                            arrowSlot[0] = player.position[0] - position[0];
+                            arrowSlot[1] = player.position[1] - position[1];
+                        }
+                        effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { arrowSlot[0], arrowSlot[1] }, GetStat("Magic"), Spells[chosenSpell]));
+                        response += $"{Name} casts {Spells[chosenSpell]}!\n";
+                        break;
+                    case 3:
+                        healSlot[0] = player.position[0] - position[0];
+                        healSlot[1] = player.position[1] - position[1];
+
+                        effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { healSlot[0], healSlot[1] }, GetStat("Agility"), $"Shoot {Inventory[arrowSlot[0], arrowSlot[1]].Name}"));
+
+                        Inventory[arrowSlot[0], arrowSlot[1]].Quantity--;
+                        if (Inventory[arrowSlot[0], arrowSlot[1]].Quantity <= 0)
+                            Inventory[arrowSlot[0], arrowSlot[1]] = null;
+                        break;
+                    case 4:
+                        Stats["HP"] += Inventory[healSlot[0], healSlot[1]].Stats["MaxHP"];
+
+                        response += $"{Name} used a {Inventory[healSlot[0], healSlot[1]].Name}!\n";
+                        Inventory[healSlot[0], healSlot[1]].Quantity--;
+                        if (Inventory[healSlot[0], healSlot[1]].Quantity <= 0)
+                            Inventory[healSlot[0], healSlot[1]] = null;
+                        break;
+                    case 5:
+                        Stats["Mana"] += Inventory[manaSlot[0], manaSlot[1]].Stats["MaxMana"];
+
+                        response += $"{Name} used a {Inventory[manaSlot[0], manaSlot[1]].Name}!\n";
+                        Inventory[manaSlot[0], manaSlot[1]].Quantity--;
+                        if (Inventory[manaSlot[0], manaSlot[1]].Quantity <= 0)
+                            Inventory[manaSlot[0], manaSlot[1]] = null;
+                        break;
+                        break;
+                    case 6:
+                        // Arrows/Scrolls, aka using spells inside items
+                        if (Inventory[itemSlot[0], itemSlot[1]].Name.Contains("Scroll"))
+                        {
+                            arrowSlot[0] = 0;
+                            arrowSlot[1] = 0;
+                            if (IsAggresiveSpell(Inventory[itemSlot[0], itemSlot[1]].Spell))
+                            {
+                                arrowSlot[0] = player.position[0] - position[0];
+                                arrowSlot[1] = player.position[1] - position[1];
+                            }
+                            effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { arrowSlot[0], arrowSlot[1] }, GetStat("Magic"), Inventory[itemSlot[0], itemSlot[1]].Spell));
+                        }
+                        // Healing items
+                        else
+                        {
+                            if (Inventory[itemSlot[0], itemSlot[1]].Name == "Improvement Potion")
+                            {
+                                Statuses[0] = 0;
+                                Statuses[1] = 0;
+                                Statuses[2] = 0;
+                                Statuses[3] = 0;
+                            }
+                            else
+                            {
+                                Stats["HP"] += Inventory[itemSlot[0], itemSlot[1]].Stats["MaxHP"];
+                                Stats["Mana"] += Inventory[itemSlot[0], itemSlot[1]].Stats["MaxMana"];
+
+                                if (Stats["HP"] > GetStat("MaxHP"))
+                                    Stats["HP"] = GetStat("MaxHP");
+                                if (Stats["Mana"] > GetStat("MaxMana"))
+                                    Stats["Mana"] = GetStat("MaxMana");
+
+                                if (Inventory[itemSlot[0], itemSlot[1]].Stats["Strength"] > 0)
+                                {
+                                    if (Buffs["Strength"] > 0)
+                                        BuffLevels["Strength"] = (int)((BuffLevels["Strength"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Strength"]) / 1.5);
+                                    else
+                                        BuffLevels["Strength"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Strength"];
+                                    if (BuffLevels["Strength"] >= 0)
+                                        Buffs["Strength"] = BuffLevels["Strength"] * 10;
+                                    else Buffs["Strength"] = -(BuffLevels["Strength"]) * 10;
+                                }
+
+                                if (Inventory[itemSlot[0], itemSlot[1]].Stats["Agility"] > 0)
+                                {
+                                    if (Buffs["Agility"] > 0)
+                                        BuffLevels["Agility"] = (int)((BuffLevels["Agility"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Agility"]) / 1.5);
+                                    else
+                                        BuffLevels["Agility"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Agility"];
+                                    if (BuffLevels["Agility"] >= 0)
+                                        Buffs["Agility"] = BuffLevels["Agility"] * 10;
+                                    else Buffs["Agility"] = -(BuffLevels["Agility"]) * 10;
+                                }
+
+                                if (Inventory[itemSlot[0], itemSlot[1]].Stats["Magic"] > 0)
+                                {
+                                    if (Buffs["Magic"] > 0)
+                                        BuffLevels["Magic"] = (int)((BuffLevels["Magic"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Magic"]) / 1.5);
+                                    else
+                                        BuffLevels["Magic"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Magic"];
+                                    if (BuffLevels["Magic"] >= 0)
+                                        Buffs["Magic"] = BuffLevels["Magic"] * 10;
+                                    else Buffs["Magic"] = -(BuffLevels["Magic"]) * 10;
+                                }
+
+                                if (Inventory[itemSlot[0], itemSlot[1]].Stats["Defense"] > 0)
+                                {
+                                    if (Buffs["Defense"] > 0)
+                                        BuffLevels["Defense"] = (int)((BuffLevels["Defense"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Defense"]) / 1.5);
+                                    else
+                                        BuffLevels["Defense"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Defense"];
+                                    if (BuffLevels["Defense"] >= 0)
+                                        Buffs["Defense"] = BuffLevels["Defense"] * 10;
+                                    else Buffs["Defense"] = -(BuffLevels["Defense"]) * 10;
+                                }
+
+                                if (Inventory[itemSlot[0], itemSlot[1]].Stats["MagicDefense"] > 0)
+                                {
+                                    if (Buffs["MagicDefense"] > 0)
+                                        BuffLevels["MagicDefense"] = (int)((BuffLevels["MagicDefense"] + Inventory[itemSlot[0], itemSlot[1]].Stats["MagicDefense"]) / 1.5);
+                                    else
+                                        BuffLevels["MagicDefense"] = Inventory[itemSlot[0], itemSlot[1]].Stats["MagicDefense"];
+                                    if (BuffLevels["MagicDefense"] >= 0)
+                                        Buffs["MagicDefense"] = BuffLevels["MagicDefense"] * 10;
+                                    else Buffs["MagicDefense"] = -(BuffLevels["MagicDefense"]) * 10;
+                                }
+                            }
+                        }
+
+                        response += $"{Name} used a {Inventory[itemSlot[0], itemSlot[1]].Name}!\n";
+                        Inventory[itemSlot[0], itemSlot[1]].Quantity--;
+                        if (Inventory[itemSlot[0], itemSlot[1]].Quantity <= 0)
+                            Inventory[itemSlot[0], itemSlot[1]] = null;
+                        break;
+                }
+
+            }
+            else
+            {
+                int movementdirection = rand.Next(4) * 90;
+                int[] movement = new int[2];
+                switch (movementdirection)
+                {
+                    case 0:
+                        movement[0] = 1;
+                        movement[1] = 0;
+                        break;
+                    case 180:
+                        movement[0] = -1;
+                        movement[1] = 0;
+                        break;
+                    case 270:
+                        movement[0] = 0;
+                        movement[1] = 1;
+                        break;
+                    case 90:
+                        movement[0] = 0;
+                        movement[1] = -1;
+                        break;
+                }
+
+                if (Statuses[2] != 0 || Statuses[3] % 2 != 0 || Stats["HP"] <= 0)
+                {
+                    movement[0] = 0;
+                    movement[1] = 0;
+                }
+                response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness);
+
+            }
+
+
+            // Default logics ending really
             response = Conditions(response);
 
             if (Stats["HP"] > GetStat("MaxHP")) { Stats["HP"] = GetStat("MaxHP"); }
@@ -2337,100 +2912,5 @@ namespace ByteLike
                 return response;
             else return "";
         }
-
-
-        int FindDirection(int[] target, ref int[,] level, ref List<Creature> enemies)
-        {
-            int[] movement = new int[2] { 999, 999 };
-            int direction = -1;
-
-            List<int[]> movements = new List<int[]>();
-
-            if (position[0] + 1 < level.GetLength(0))
-            {
-                if (!IsGhost || (level[position[0] + 1, position[1]] != 2 && level[position[0] + 1, position[1]] != 0 && level[position[0] + 1, position[1]] != 5))
-                {
-                    bool enemycheck = false;
-                    foreach (Creature item in enemies)
-                    {
-                        if (position[0] + 1 == item.position[0] && position[1] == item.position[1])
-                            enemycheck = true;
-                    }
-                    if (!enemycheck)
-                        movements.Add(new int[] { DifferenceBetween(position[0] + 1, target[0]), DifferenceBetween(position[1], target[1]), 0 });
-                }
-            }
-            if (position[0] - 1 >= 0)
-            {
-                if (!IsGhost || (level[position[0] - 1, position[1]] != 2 && level[position[0] - 1, position[1]] != 0 && level[position[0] - 1, position[1]] != 5))
-                {
-                    bool enemycheck = false;
-                    foreach (Creature item in enemies)
-                    {
-                        if (position[0] - 1 == item.position[0] && position[1] == item.position[1])
-                            enemycheck = true;
-                    }
-                    if (!enemycheck)
-                        movements.Add(new int[] { DifferenceBetween(position[0] - 1, target[0]), DifferenceBetween(position[1], target[1]), 180 });
-                }
-            }
-
-            if (position[1] + 1 < level.GetLength(1))
-            {
-                if (!IsGhost || (level[position[0], position[1] + 1] != 2 && level[position[0], position[1] + 1] != 0 && level[position[0], position[1] + 1] != 5))
-                {
-                    bool enemycheck = false;
-                    foreach (Creature item in enemies)
-                    {
-                        if (position[0] == item.position[0] && position[1] + 1 == item.position[1])
-                            enemycheck = true;
-                    }
-                    if (!enemycheck)
-                        movements.Add(new int[] { DifferenceBetween(position[0], target[0]), DifferenceBetween(position[1] + 1, target[1]), 270 });
-                }
-            }
-            if (position[1] - 1 >= 0)
-            {
-                if (!IsGhost || (level[position[0], position[1] - 1] != 2 && level[position[0], position[1] - 1] != 0 && level[position[0], position[1] - 1] != 5))
-                {
-                    bool enemycheck = false;
-                    foreach (Creature item in enemies)
-                    {
-                        if (position[0] == item.position[0] && position[1] - 1 == item.position[1])
-                            enemycheck = true;
-                    }
-                    if (!enemycheck)
-                        movements.Add(new int[] { DifferenceBetween(position[0], target[0]), DifferenceBetween(position[1] - 1, target[1]), 90 });
-                }
-            }
-
-            foreach (int[] item in movements)
-            {
-                if (item[0] + item[1] < movement[0] + movement[1])
-                {
-                    movement[0] = item[0];
-                    movement[1] = item[1];
-                    direction = item[2];
-                }
-                else if (item[0] + item[1] == movement[0] + movement[1] && rand.Next(2) == 0)
-                {
-                    movement[0] = item[0];
-                    movement[1] = item[1];
-                    direction = item[2];
-                }
-            }
-
-            return direction;
-        }
-
-        int DifferenceBetween(int point1, int point2)
-        {
-            if (point1 > point2)
-                return (point1 - point2);
-            else return (point2 - point1);
-        }
     }
-
-    
-
 }

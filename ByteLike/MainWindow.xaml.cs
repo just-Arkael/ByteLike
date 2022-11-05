@@ -1,7 +1,6 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,12 +13,15 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Newtonsoft.Json;
 
 namespace ByteLike
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+
+
     public partial class MainWindow : Window
     {
         static int[,] level = new int[40, 40];
@@ -136,7 +138,7 @@ namespace ByteLike
 
         // DRAW MAP
 
-        static System.Windows.Controls.Image DrawMap(string response)
+        static Image DrawMap(string response)
         {
             // Clear darkness
             if (!player.OpenSpell)
@@ -176,6 +178,7 @@ namespace ByteLike
                         if (darkness[camera[0] + j, camera[1] + i] > 0)
                         {
                             floorImage = "Graphics/ByteLikeGraphics/Tiles/darkness.png";
+                            // TILE SWITCH
                             switch (level[camera[0] + j, camera[1] + i])
                             {
                                 // Void wall
@@ -339,7 +342,6 @@ namespace ByteLike
 
                             }
 
-
                         }
                         // if covered in darkness
                         else
@@ -353,6 +355,7 @@ namespace ByteLike
                         // if partly in darkness, draw partial darkness
                         if (darkness[camera[0] + j, camera[1] + i] == 2)
                         {
+                            // EFFECTS IN PARTIAL DARKNESS
                             foreach (Effect item in effects)
                             {
                                 if (camera[0] + j == item.position[0] && camera[1] + i == item.position[1])
@@ -364,6 +367,7 @@ namespace ByteLike
                         // if lit (again) draw chest sprites
                         else if (darkness[camera[0] + j, camera[1] + i] > 0)
                         {
+                            // CHESTS
                             foreach (Chest item in chests)
                             {
                                 if (item.position[0] == camera[0] + j && item.position[1] == camera[1] + i && level[item.position[0],item.position[1]] != 2 && level[item.position[0], item.position[1]] != 0 && level[item.position[0], item.position[1]] != 5 && level[item.position[0], item.position[1]] != 4)
@@ -372,7 +376,7 @@ namespace ByteLike
                                 }
                             }
 
-                            // Player draw code
+                            // PLAYER
                             if (player.position[0] == camera[0] + j && player.position[1] == camera[1] + i)
                             {
                                 // Draw quiver if slot is full and is a quiver
@@ -422,12 +426,49 @@ namespace ByteLike
                             // End player draw code
 
 
+                            // ENEMIES
                             foreach (Creature item in enemies)
                             {
                                 if (camera[0] + j == item.position[0] && camera[1] + i == item.position[1])
+                                {
+                                    if (item.Inventory[4, 0] != null && item.DrawEquipment)
+                                    {
+                                        if (item.Inventory[4, 0].Name.Contains("Quiver"))
+                                        {
+                                            dc.DrawImage(new BitmapImage(new Uri(item.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        }
+                                    }
+
                                     dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+
+                                    if (item.DrawEquipment)
+                                    {
+                                        // Draw legs
+                                        if (item.Inventory[2, 0] != null)
+                                            dc.DrawImage(new BitmapImage(new Uri(item.Inventory[2, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        // Draw chestplate
+                                        if (item.Inventory[1, 0] != null)
+                                            dc.DrawImage(new BitmapImage(new Uri(item.Inventory[1, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        // Draw hat
+                                        if (item.Inventory[0, 0] != null)
+                                            dc.DrawImage(new BitmapImage(new Uri(item.Inventory[0, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        // Draw weapon
+                                        if (item.Inventory[3, 0] != null)
+                                            dc.DrawImage(new BitmapImage(new Uri(item.Inventory[3, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+
+                                        // Draw offhand if not a quiver (drew quiver earlier)
+                                        if (item.Inventory[4, 0] != null)
+                                        {
+                                            if (!item.Inventory[4, 0].Name.Contains("Quiver"))
+                                            {
+                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                            }
+                                        }
+                                    }
+                                }
                             }
 
+                            // EFFECTS
                             foreach (Effect item in effects)
                             {
                                 if (camera[0] + j == item.position[0] && camera[1] + i == item.position[1])
@@ -464,7 +505,7 @@ namespace ByteLike
                                         {
                                             FormattedText dialogue3 = new FormattedText(player.Inventory[j - 4, i - 1].Quantity.ToString(), System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 8, System.Windows.Media.Brushes.White);
                                             dialogue3.MaxTextWidth = 56;
-                                            dc.DrawText(dialogue3, new System.Windows.Point(j * 16, 8 + i * 16));
+                                            dc.DrawText(dialogue3, new Point(j * 16, 8 + i * 16));
                                         }
                                     }
                                 }
@@ -510,7 +551,7 @@ namespace ByteLike
                                             {
                                                 FormattedText dialogue3 = new FormattedText(chests[currentChest].Inventory[j - 4, i - 2 - player.Inventory.GetLength(1)].Quantity.ToString(), System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 8, System.Windows.Media.Brushes.White);
                                                 dialogue3.MaxTextWidth = 56;
-                                                dc.DrawText(dialogue3, new System.Windows.Point(j * 16, 8 + i * 16));
+                                                dc.DrawText(dialogue3, new Point(j * 16, 8 + i * 16));
                                             }
                                         }
                                     }
@@ -808,29 +849,49 @@ namespace ByteLike
                             floorImage = player.GetArrows().ToString();
                             break;
                     }
-                    FormattedText dialogue2 = new FormattedText(floorImage, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 16, System.Windows.Media.Brushes.White);
-                    FormattedText dialogue3 = new FormattedText(floorImage2, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 8, System.Windows.Media.Brushes.White);
+                    FormattedText dialogue2 = new FormattedText(floorImage, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 16, Brushes.White);
+                    FormattedText dialogue3 = new FormattedText(floorImage2, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 8, Brushes.White);
                     dialogue2.MaxTextWidth = 320;
                     dialogue3.MaxTextWidth = 320;
                     if (i != 0 && i != 9)
                     {
-                        dc.DrawText(dialogue2, new System.Windows.Point(4, 14 + i * 32 - 16));
+                        dc.DrawText(dialogue2, new Point(4, 14 + i * 32 - 16));
                         if (floorImage2 != "")
-                            dc.DrawText(dialogue3, new System.Windows.Point(20, 4 + i * 32 - 16));
+                            dc.DrawText(dialogue3, new Point(20, 4 + i * 32 - 16));
                     }
                     else if (i != 9)
-                        dc.DrawText(dialogue2, new System.Windows.Point(20, 0));
+                    {
+                        dc.DrawText(dialogue2, new Point(20, 0));
+                        // Draw statuses
+                        int statsOffset = 0;
+                        while (statsOffset < dialogue2.Width + 20)
+                        {
+                            statsOffset += 16;
+                        }
+                        for (int j = 0; j < 4; j++)
+                        {
+                            if (player.Statuses[j] > 0)
+                            {
+                                dialogue3 = new FormattedText(player.Statuses[j].ToString(), System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 8, Brushes.White);
+                                dc.DrawImage(new BitmapImage(new Uri($"Graphics/ByteLikeGraphics/Hud/statuses{j}.png", UriKind.Relative)), new Rect(statsOffset, 0, 17, 17));
+                                dc.DrawText(dialogue3, new Point(statsOffset+4, 8));
+                                statsOffset += 16;
+                            }
+                        }
+                        // end draw statuses
+                    }
                     else
                     {
                         if (player.Inventory[3, 0] != null)
                         {
                             if (player.Inventory[3, 0].Name.ToLower().Contains("bow"))
-                                dc.DrawText(dialogue2, new System.Windows.Point(20, 0));
+                                dc.DrawText(dialogue2, new Point(4, 14 + i * 32 - 16));
                         }
                     }
                 }
                 // End stats hud
 
+                
 
                 // Spell names
                 if (player.OpenInventory && !player.OpenSpell)
@@ -840,7 +901,7 @@ namespace ByteLike
                     {
                         FormattedText dialogue3 = new FormattedText(item, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 10, System.Windows.Media.Brushes.White);
                         dialogue3.MaxTextWidth = 80;
-                        dc.DrawText(dialogue3, new System.Windows.Point((player.Inventory.GetLength(0)+4)*16 + 4, 18 + i * 16));
+                        dc.DrawText(dialogue3, new Point((player.Inventory.GetLength(0)+4)*16 + 4, 18 + i * 16));
                         i++;
                     }
                 }
@@ -848,7 +909,7 @@ namespace ByteLike
                 // Response text
                 if (response != "")
                 {
-                    dc.DrawText(dialogue, new System.Windows.Point(40, (cameraSize[1]*16)-dialogue.Height-8));
+                    dc.DrawText(dialogue, new Point(40, (cameraSize[1]*16)-dialogue.Height-8));
                 }
                 //
 
@@ -955,10 +1016,11 @@ namespace ByteLike
 
             if (!cameraManagment)
             {
-
+                bool doEnemies = false;
 
                 if (effects.Count > 0)
                 {
+                    doEnemies = true;
                     List<int> deleteus = new List<int>();
                     for (int i = 0; i < effects.Count; i++)
                     {
@@ -978,24 +1040,28 @@ namespace ByteLike
                 {
                     response = player.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness);
 
+                    if (!player.OpenInventory && !Keyboard.IsKeyDown(Key.Q))
+                    {
+                        doEnemies = true;
+                    }
+
                     if (enemies.Count < 10 + floor/2)
                     {
                         int[] newPos = new int[] { rand.Next(level.GetLength(0)), rand.Next(level.GetLength(1)) };
 
                         if (level[newPos[0], newPos[1]] == 1 && (darkness[newPos[0], newPos[1]] <= 0 || darkness[newPos[0], newPos[1]] == 2))
                         {
-                            enemies.Add(new Critter(floor, new int[] { newPos[0], newPos[1] }));
+                            enemies.Add(new Critter(floor+player.DangerLevel, new int[] { newPos[0], newPos[1] }));
                         }
                     }
                 }
 
                 if (effects.Count <= 0)
                 {
-                    List<int> deletusXL = new List<int>();
-                    int pos = 0;
-
-                    if (!player.OpenInventory && !Keyboard.IsKeyDown(Key.Q))
+                    if (doEnemies)
                     {
+                        List<int> deletusXL = new List<int>();
+                        int pos = 0;
 
                         foreach (Creature enemy in enemies)
                         {
@@ -1008,13 +1074,31 @@ namespace ByteLike
 
                         }
 
-                    }
 
-                    if (deletusXL.Count > 0)
-                    {
-                        for (int i = deletusXL.Count - 1; i >= 0; i--)
+                        if (deletusXL.Count > 0)
                         {
-                            enemies.RemoveAt(deletusXL[i]);
+                            for (int i = deletusXL.Count - 1; i >= 0; i--)
+                            {
+                                if (enemies[deletusXL[i]].DropEquipment)
+                                {
+                                    Chest temp = new Chest(new int[] { enemies[deletusXL[i]].position[0], enemies[deletusXL[i]].position[1] }, -(enemies[deletusXL[i]].Inventory.GetLength(1) + 1));
+                                    for (int f = 0; f < enemies[deletusXL[i]].Inventory.GetLength(1); f++)
+                                    {
+                                        for (int k = 0; k < enemies[deletusXL[i]].Inventory.GetLength(0); k++)
+                                        {
+                                            temp.Inventory[k, f] = enemies[deletusXL[i]].Inventory[k, f];
+                                        }
+                                    }
+                                    chests.Add(temp);
+                                }
+
+                                if (enemies[deletusXL[i]].GetType() == typeof(DoppleGanger))
+                                {
+                                    response += "The darkness around you glooms...\n";
+                                    player.DangerLevel+= 3;
+                                }
+                                enemies.RemoveAt(deletusXL[i]);
+                            }
                         }
                     }
 
@@ -1048,6 +1132,37 @@ namespace ByteLike
             {
                 NewLevel();
                 response = $"{player.Name} finds their way to floor #{floor}!\n";
+
+                if (Directory.Exists("Memories"))
+                {
+                    if (File.Exists($"Memories/floor{floor}.json"))
+                    {
+                        using (StreamReader sr = File.OpenText($"Memories/floor{floor}.json"))
+                        {
+                            Player temp = new JsonSerializer().Deserialize<Player>(new JsonTextReader(sr));
+                            if (temp != null)
+                            {
+                                int[] spawnpoint = new int[2] { 0, 0 };
+                                int counter = 0;
+                                while (level[spawnpoint[0], spawnpoint[1]] != 1 && level[spawnpoint[0], spawnpoint[1]] != 3 && level[spawnpoint[0], spawnpoint[1]] != 8 && counter < 50)
+                                {
+                                    spawnpoint[0] = rand.Next(level.GetLength(0));
+                                    spawnpoint[1] = rand.Next(level.GetLength(1));
+
+                                    counter++;
+                                    if (level[spawnpoint[0], spawnpoint[1]] == 1 || level[spawnpoint[0], spawnpoint[1]] == 3 || level[spawnpoint[0], spawnpoint[1]] == 8)
+                                    {
+                                        enemies.Add(new DoppleGanger(temp, new int[] { spawnpoint[0], spawnpoint[1] }));
+                                        counter = 50;
+                                        response += "An earie chill goes down your spine...\n";
+                                    }
+                                }
+                            }
+                            sr.Close();
+                        }
+                        File.Delete($"Memories/floor{floor}.json");
+                    }
+                }
                 if (cameraSize[0] >= level.GetLength(0))
                     cameraSize[0] = level.GetLength(0) - 1;
                 if (cameraSize[1] >= level.GetLength(1))
@@ -1056,6 +1171,17 @@ namespace ByteLike
 
             if (player.Stats["HP"] <= 0)
             {
+                if (!Directory.Exists("Memories"))
+                    Directory.CreateDirectory("Memories");
+                if (!File.Exists($"Memories/floor{floor}.json"))
+                {
+                    using (StreamWriter sw = File.CreateText($"Memories/floor{floor}.json"))
+                    {
+                        sw.WriteLine(JsonConvert.SerializeObject(player));
+                        sw.Close();
+                    }
+                }
+                
                 floor = 0;
                 player = new Player("Player");
                 NewLevel();
@@ -1433,7 +1559,7 @@ namespace ByteLike
                     stat = "HPRegen|ManaRegen";
                     File = "Graphics/ByteLikeGraphics/Effects/buff.png";
                     isDamaging = false;
-                    element = 1;
+                    element = -1;
                     strength *= 5;
                     break;
                 case "Melt Armor":
