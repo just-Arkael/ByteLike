@@ -115,7 +115,8 @@ namespace ByteLike
 
                     if (strength == 0)
                     {
-                        GearType = rand.Next(4) + 1;
+                        if (floor >= 0)
+                            GearType = rand.Next(4) + 1;
                         sideB = false;
                     }
 
@@ -1119,7 +1120,7 @@ namespace ByteLike
                 case 6:
 
                     File = "Graphics/ByteLikeGraphics/Items/torch";
-                    typeSwitch = rand.Next(6);
+                    typeSwitch = rand.Next(10);
                     if (floor < 0)
                         typeSwitch = 0;
                     File += typeSwitch;
@@ -1160,6 +1161,30 @@ namespace ByteLike
                             Stats["Torch"] += 2;
                             Stats["Strength"] += (int)(rand.Next(6) + 2 + floor / 23);
                             Description = "A torch with a small pouch of hellroot in it\n";
+                            break;
+                        case 6:
+                            Name = "Cloud Torch";
+                            Stats["Torch"] += 2;
+                            Stats["Agility"] += (int)(rand.Next(6) + 2 + floor / 23);
+                            Description = "A torch with a small pouch speedroot in it\n";
+                            break;
+                        case 7:
+                            Name = "Archana Torch";
+                            Stats["Torch"] += 2;
+                            Stats["Agility"] += (int)(rand.Next(6) + 2 + floor / 23);
+                            Description = "A torch with a small pouch moonglow in it\n";
+                            break;
+                        case 8:
+                            Name = "Tiny Shield Torch";
+                            Stats["Torch"] += 2;
+                            Stats["Defense"] += (int)(rand.Next(6) + 2 + floor / 23);
+                            Description = "A torch with a tiny shield strapped to it\n";
+                            break;
+                        case 9:
+                            Name = "Night Shield Torch";
+                            Stats["Torch"] += 2;
+                            Stats["MagicDefense"] += (int)(rand.Next(6) + 2 + floor / 23);
+                            Description = "A torch with an enchanted aura to it\n";
                             break;
                     }
 

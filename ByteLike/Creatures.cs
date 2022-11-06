@@ -11,7 +11,7 @@ namespace ByteLike
     public abstract class Creature
     {
         public bool DrawEquipment = false;
-
+        public bool DrawHealthbar = true;
         public bool DropEquipment = false;
 
         public string Name;
@@ -2505,8 +2505,7 @@ namespace ByteLike
             if (Stats["HP"] > GetStat("MaxHP")) { Stats["HP"] = GetStat("MaxHP"); }
             if (Stats["Mana"] > GetStat("MaxMana")) { Stats["Mana"] = GetStat("MaxMana"); }
 
-            if (Stats["HP"] < GetStat("MaxHP"))
-                response += $"{Name} has {Stats["HP"]} HP left!\n";
+
 
 
             if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= player.GetStat("Torch") || Aggressive)
@@ -2920,8 +2919,6 @@ namespace ByteLike
             if (Stats["HP"] > GetStat("MaxHP")) { Stats["HP"] = GetStat("MaxHP"); }
             if (Stats["Mana"] > GetStat("MaxMana")) { Stats["Mana"] = GetStat("MaxMana"); }
 
-            if (Stats["HP"] < GetStat("MaxHP"))
-                response += $"{Name} has {Stats["HP"]} HP left!\n";
 
             if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= player.GetStat("Torch") || Aggressive)
                 return response;
@@ -2934,6 +2931,8 @@ namespace ByteLike
         public Bomb(int[] pos, int strength)
             :base()
         {
+            DrawHealthbar = false;
+            Name = "Bomb";
             position[0] = pos[0];
             position[1] = pos[1];
             Stats["HP"] = 4;

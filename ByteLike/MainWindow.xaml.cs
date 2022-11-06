@@ -465,6 +465,44 @@ namespace ByteLike
                                             }
                                         }
                                     }
+
+                                    if (i > 0 )
+                                    {
+                                        //FormattedText dialogueen = new FormattedText($"{item.Stats["HP"]}/{item.GetStat("MaxHP")}", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 4, Brushes.Red);
+                                        //dc.DrawText(dialogueen, new Point(j*16 + (16 - dialogueen.Width)/2, i*16 - 2));
+
+                                        for (int f = 0; f < 14; f++)
+                                        {
+                                            string hpbar = "Graphics/ByteLikeGraphics/Hud/healthbar";
+                                            if (f == 0)
+                                            {
+                                                if (item.Stats["HP"] < (item.GetStat("MaxHP") / 16.0))
+                                                    hpbar += "0.png";
+                                                else
+                                                    hpbar += "3.png";
+
+                                                dc.DrawImage(new BitmapImage(new Uri(hpbar, UriKind.Relative)), new Rect(j * 16 + f, i * 16 - 4, 2.25, 4));
+                                            }
+                                            else if (f == 13)
+                                            {
+                                                if (item.Stats["HP"] < (item.GetStat("MaxHP") / 16.0) * 15.0)
+                                                    hpbar += "2.png";
+                                                else
+                                                    hpbar += "5.png";
+
+                                                dc.DrawImage(new BitmapImage(new Uri(hpbar, UriKind.Relative)), new Rect(j * 16 + f, i * 16 - 4, 2, 4));
+                                            }
+                                            else
+                                            {
+                                                if (item.Stats["HP"] < (item.GetStat("MaxHP") / 16.0) * (f+1.0))
+                                                    hpbar += "1.png";
+                                                else
+                                                    hpbar += "4.png";
+
+                                                dc.DrawImage(new BitmapImage(new Uri(hpbar, UriKind.Relative)), new Rect(j * 16 + f, i * 16 - 4, 3, 4));
+                                            }
+                                        }
+                                    }
                                 }
                             }
 
@@ -510,14 +548,14 @@ namespace ByteLike
                                     }
                                 }
                                 // If j-i is in spell slots
-                                else if (j - 4 >= player.Inventory.GetLength(0) && j - 4 < player.Inventory.GetLength(0) + 4 && i - 1 < player.Stats["SpellSlots"] && i > 0)
+                                else if (j - 4 >= player.Inventory.GetLength(0) && j - 4 < player.Inventory.GetLength(0) + 5 && i - 1 < player.Stats["SpellSlots"] && i > 0)
                                 {
                                     floorImage = "Graphics/ByteLikeGraphics/Hud/spellslot";
                                     if (j - 4 == player.Inventory.GetLength(0))
                                     {
                                         floorImage += "0.png";
                                     }
-                                    else if (j - 4 == player.Inventory.GetLength(0) + 3)
+                                    else if (j - 4 == player.Inventory.GetLength(0) + 4)
                                     {
                                         floorImage += "2.png";
                                     }
@@ -528,7 +566,7 @@ namespace ByteLike
                                     dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
                                 }
                                 // Delete spell slot
-                                else if (j - 4 == player.Inventory.GetLength(0) + 4 && i - 1 < player.Stats["SpellSlots"] && i > 0)
+                                else if (j - 4 == player.Inventory.GetLength(0) + 5 && i - 1 < player.Stats["SpellSlots"] && i > 0)
                                 {
                                     dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/spellslot6.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
                                 }
@@ -571,19 +609,19 @@ namespace ByteLike
 
 
                                 // Current slot is in inventory
-                                if ((j - 4 == player.CurrentSlot[0] && player.CurrentSlot[0] < player.Inventory.GetLength(0) || j-4 == player.CurrentSlot[0]+3 && player.CurrentSlot[0] == player.Inventory.GetLength(0)+1) && i - 1 == player.CurrentSlot[1] && (player.CurrentSlot[1] < player.Inventory.GetLength(1) || player.CurrentSlot[0] > player.Inventory.GetLength(0)) && player.CurrentSlot[0] != player.Inventory.GetLength(0))
+                                if ((j - 4 == player.CurrentSlot[0] && player.CurrentSlot[0] < player.Inventory.GetLength(0) || j-4 == player.CurrentSlot[0]+4 && player.CurrentSlot[0] == player.Inventory.GetLength(0)+1) && i - 1 == player.CurrentSlot[1] && (player.CurrentSlot[1] < player.Inventory.GetLength(1) || player.CurrentSlot[0] > player.Inventory.GetLength(0)) && player.CurrentSlot[0] != player.Inventory.GetLength(0))
                                 {
                                     dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/invslot12.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
                                 }
                                 // Current slot in spells
-                                else if (j - 4 >= player.Inventory.GetLength(0) && j - 4 < player.Inventory.GetLength(0) + 4 && i - 1 == player.CurrentSlot[1] && player.CurrentSlot[0] == player.Inventory.GetLength(0))
+                                else if (j - 4 >= player.Inventory.GetLength(0) && j - 4 < player.Inventory.GetLength(0) + 5 && i - 1 == player.CurrentSlot[1] && player.CurrentSlot[0] == player.Inventory.GetLength(0))
                                 {
                                     floorImage = "Graphics/ByteLikeGraphics/Hud/spellslot";
                                     if (j - 4 == player.Inventory.GetLength(0))
                                     {
                                         floorImage += "3.png";
                                     }
-                                    else if (j - 4 == player.Inventory.GetLength(0) + 3)
+                                    else if (j - 4 == player.Inventory.GetLength(0) + 4)
                                     {
                                         floorImage += "5.png";
                                     }
@@ -989,28 +1027,44 @@ namespace ByteLike
         {
             bool cameraManagment = false;
 
-            if (Keyboard.IsKeyToggled(Key.Up) && Keyboard.IsKeyDown(Key.Up))
+            if ( Keyboard.IsKeyDown(Key.Up))
             {
                 if (cameraSize[1] > 20)
                 cameraSize[1]--;
                 cameraManagment = true;
             }
-            if (Keyboard.IsKeyToggled(Key.Down) && Keyboard.IsKeyDown(Key.Down))
+            if ( Keyboard.IsKeyDown(Key.Down))
             {
                 if (cameraSize[1] < level.GetLength(1) - 1)
                 cameraSize[1]++;
                 cameraManagment = true;
             }
-            if (Keyboard.IsKeyToggled(Key.Left) && Keyboard.IsKeyDown(Key.Left))
+            if ( Keyboard.IsKeyDown(Key.Left))
             {
-                if (cameraSize[0] > 20)
+                if (cameraSize[0] > 21)
                 cameraSize[0]--;
                 cameraManagment = true;
             }
-            if (Keyboard.IsKeyToggled(Key.Right) && Keyboard.IsKeyDown(Key.Right))
+            if ( Keyboard.IsKeyDown(Key.Right))
             {
                 if (cameraSize[0] < level.GetLength(0) - 1)
                 cameraSize[0]++;
+                cameraManagment = true;
+            }
+
+            if ( Keyboard.IsKeyDown(Key.F12))
+            {
+                switch (ByteLikeWindow.WindowState)
+                {
+                    case WindowState.Normal:
+                        ByteLikeWindow.WindowState = WindowState.Maximized;
+                        ByteLikeWindow.WindowStyle = WindowStyle.None;
+                            break;
+                    case WindowState.Maximized:
+                        ByteLikeWindow.WindowState = WindowState.Normal;
+                        ByteLikeWindow.WindowStyle = WindowStyle.SingleBorderWindow;
+                        break;
+                }
                 cameraManagment = true;
             }
 
@@ -1154,7 +1208,7 @@ namespace ByteLike
                                     {
                                         enemies.Add(new DoppleGanger(temp, new int[] { spawnpoint[0], spawnpoint[1] }));
                                         counter = 50;
-                                        response += "An earie chill goes down your spine...\n";
+                                        response += "An eerie chill goes down your spine...\n";
                                     }
                                 }
                             }
