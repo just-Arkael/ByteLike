@@ -211,9 +211,9 @@ namespace ByteLike
                                     else { floorImage += "0"; }
                                     floorImage += ".png";
                                     break;
-                                // Center of the room, really only needed for debug
+                                // Cracked floors
                                 case 3:
-                                    floorImage = "Graphics/ByteLikeGraphics/Tiles/floor.png";
+                                    floorImage = "Graphics/ByteLikeGraphics/Tiles/floor1.png";
                                     break;
                                 // Door
                                 case 4:
@@ -1303,6 +1303,11 @@ namespace ByteLike
                         element = 3;
                     else if (spell.Contains("Lightning"))
                         element = 4;
+                    else
+                    {
+                        spawntile = 3;
+                        radius = 0;
+                    }
 
                     File = "Graphics/ByteLikeGraphics/Effects/explosion";
                     File += element.ToString();

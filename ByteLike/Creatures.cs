@@ -2007,6 +2007,19 @@ namespace ByteLike
                                                             response += $"{Name}: I need a bow to use that.\n";
                                                         }
                                                     }
+                                                    // Bombs
+                                                    else if (Inventory[SelectedSlot[0], SelectedSlot[1]].Name.Contains("Bomb"))
+                                                    {
+                                                        response += $"{Name} has planted a {Inventory[SelectedSlot[0], SelectedSlot[1]].Name.ToLower()}!\n";
+                                                        if (Inventory[SelectedSlot[0], SelectedSlot[1]].Name.Contains("Large"))
+                                                            enemies.Add(new Bomb(new int[] { position[0], position[1] }, 3));
+                                                        else
+                                                            enemies.Add(new Bomb(new int[] { position[0], position[1] }, 2));
+                                                        Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity--;
+                                                        if (Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity <= 0)
+                                                            Inventory[SelectedSlot[0], SelectedSlot[1]] = null;
+                                                        SelectedSlot[0] = -100;
+                                                    }
                                                     // Learning new spells
                                                     else if (Inventory[SelectedSlot[0], SelectedSlot[1]].Name.Contains("Book"))
                                                     {
@@ -2052,7 +2065,7 @@ namespace ByteLike
                                                                     BuffLevels["Strength"] = Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Strength"];
                                                                 if (BuffLevels["Strength"] >= 0)
                                                                     Buffs["Strength"] = BuffLevels["Strength"] * 10;
-                                                                else Buffs["Strength"] = -(BuffLevels["Strength"])*10;
+                                                                else Buffs["Strength"] = -(BuffLevels["Strength"]) * 10;
                                                             }
 
                                                             if (Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Agility"] > 0)
@@ -2063,7 +2076,7 @@ namespace ByteLike
                                                                     BuffLevels["Agility"] = Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Agility"];
                                                                 if (BuffLevels["Agility"] >= 0)
                                                                     Buffs["Agility"] = BuffLevels["Agility"] * 10;
-                                                                else Buffs["Agility"] = -(BuffLevels["Agility"])*10;
+                                                                else Buffs["Agility"] = -(BuffLevels["Agility"]) * 10;
                                                             }
 
                                                             if (Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Magic"] > 0)
@@ -2074,7 +2087,7 @@ namespace ByteLike
                                                                     BuffLevels["Magic"] = Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Magic"];
                                                                 if (BuffLevels["Magic"] >= 0)
                                                                     Buffs["Magic"] = BuffLevels["Magic"] * 10;
-                                                                else Buffs["Magic"] = -(BuffLevels["Magic"])*10;
+                                                                else Buffs["Magic"] = -(BuffLevels["Magic"]) * 10;
                                                             }
 
                                                             if (Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Defense"] > 0)
@@ -2085,7 +2098,7 @@ namespace ByteLike
                                                                     BuffLevels["Defense"] = Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["Defense"];
                                                                 if (BuffLevels["Defense"] >= 0)
                                                                     Buffs["Defense"] = BuffLevels["Defense"] * 10;
-                                                                else Buffs["Defense"] = -(BuffLevels["Defense"])*10;
+                                                                else Buffs["Defense"] = -(BuffLevels["Defense"]) * 10;
                                                             }
 
                                                             if (Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["MagicDefense"] > 0)
@@ -2096,7 +2109,7 @@ namespace ByteLike
                                                                     BuffLevels["MagicDefense"] = Inventory[SelectedSlot[0], SelectedSlot[1]].Stats["MagicDefense"];
                                                                 if (BuffLevels["MagicDefense"] >= 0)
                                                                     Buffs["MagicDefense"] = BuffLevels["MagicDefense"] * 10;
-                                                                else Buffs["MagicDefense"] = -(BuffLevels["MagicDefense"])*10;
+                                                                else Buffs["MagicDefense"] = -(BuffLevels["MagicDefense"]) * 10;
                                                             }
                                                         }
                                                         Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity--;
@@ -2174,7 +2187,9 @@ namespace ByteLike
                                     }
                                 }
                                 // Using nothing
-                                else { response += $"{Name}: I need to pick something to use first\n"; }
+                                else if (CurrentSlot[0] == 9) { response += $"{Name}: I need to pick something to use first\n"; }
+                                // Throwing out nothing
+                                else { response += $"{Name}: There's nothing here.\n"; }
                             }
 
 
@@ -2691,7 +2706,7 @@ namespace ByteLike
                 itemSlot[1] = rand.Next(Inventory.GetLength(1));
                 if (Inventory[itemSlot[0], itemSlot[1]] != null)
                 {
-                    if (Inventory[itemSlot[0], itemSlot[1]].GearType == 10 && !Inventory[itemSlot[0], itemSlot[1]].Name.Contains("Arrow") && !Inventory[itemSlot[0], itemSlot[1]].Name.Contains("Book"))
+                    if (Inventory[itemSlot[0], itemSlot[1]].GearType == 10 && !Inventory[itemSlot[0], itemSlot[1]].Name.Contains("Arrow") && !Inventory[itemSlot[0], itemSlot[1]].Name.Contains("Book") && !Inventory[itemSlot[0], itemSlot[1]].Name.Contains("Bomb"))
                     {
                         for (byte i = 0; i < 7; i++)
                             actions.Add(6);
@@ -2911,6 +2926,44 @@ namespace ByteLike
             if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= player.GetStat("Torch") || Aggressive)
                 return response;
             else return "";
+        }
+    }
+
+    public class Bomb : Creature
+    {
+        public Bomb(int[] pos, int strength)
+            :base()
+        {
+            position[0] = pos[0];
+            position[1] = pos[1];
+            Stats["HP"] = 4;
+            Stats["HPRegen"] = 999;
+            File = "Graphics/ByteLikeGraphics/Items/bomb4.png";
+            Stats["Strength"] = strength;
+        }
+
+        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness)
+        {
+            Stats["HP"]--;
+            if (Stats["HP"] > 4)
+                Stats["HP"] = 4;
+            if (Stats["HP"] <= 0)
+            {
+                Stats["HP"] = 0;
+                for (int i = -Stats["Strength"] - 1; i < Stats["Strength"] + 1; i++)
+                {
+                    for (int j = -Stats["Strength"] - 1; j < Stats["Strength"] + 1; j++)
+                    {
+                        if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { position[0]+j, position[1]+i }) <= Stats["Strength"])
+                            effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { j, i }, 20, "Explosion"));
+                    }
+                }
+            }
+            File = "Graphics/ByteLikeGraphics/Items/bomb";
+            File += Stats["HP"].ToString();
+            File += ".png";
+
+            return "";
         }
     }
 }

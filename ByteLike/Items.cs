@@ -1168,7 +1168,7 @@ namespace ByteLike
 
                     break;
                 case 10:
-                    int itemtype = rand.Next(27);
+                    int itemtype = rand.Next(28);
                     switch (itemtype)
                     {
                         case 0:
@@ -1292,6 +1292,21 @@ namespace ByteLike
                                 Description = $"Casts {Spell} with no Mana cost\n{Spell}: {Creature.GetSpellDescription(Spell)}";
                             }
                             Element = 0;
+                            break;
+                        case 21:
+                            File = "Graphics/ByteLikeGraphics/Items/bomb4.png";
+                            Name = "Bomb";
+                            Description = "Explodes after 3 turns, dealing massive damage to nearby enemies and destroying tiles\n";
+                            break;
+                        case 22:
+                            File = "Graphics/ByteLikeGraphics/Items/bomb4.png";
+                            Name = "Bomb";
+                            Description = "Explodes after 3 turns, dealing massive damage to nearby enemies and destroying tiles\n";
+                            if (rand.Next(3) != 0)
+                            {
+                                Name = "Large Bomb";
+                                Description += "Has a larger explosion radius than a regular bomb\n";
+                            }
                             break;
                         // Arrows
                         default:

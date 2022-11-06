@@ -948,6 +948,9 @@
     <None Update="Graphics\ByteLikeGraphics\Tiles\floor.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Graphics\ByteLikeGraphics\Tiles\floor1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Graphics\ByteLikeGraphics\Tiles\grass0000.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

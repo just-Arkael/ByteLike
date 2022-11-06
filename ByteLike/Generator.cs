@@ -78,7 +78,7 @@ namespace ByteLike
             {
                 for (int j = -(room[0] / 2); j < room[0] / 2; j++)
                 {
-                    if (j == chestPosition[0] && i == chestPosition[1])
+                    if ((j == chestPosition[0] && i == chestPosition[1]) || (rand.Next(10) == 0 && !remember))
                         chest = new Chest(new int[] { position[0] + j, position[1] + i }, currentFloor);
                     // If we're in boundaries
                     if (position[0] + j >= 0 && position[0] + j < level.GetLength(0) && position[1] + i >= 0 && position[1] + i < level.GetLength(1))
@@ -88,15 +88,12 @@ namespace ByteLike
                         {
                             level[position[0] + j, position[1] + i] = 2;
                         }
-                        // if we're in the center of the room, set tile to Room Center
-                        else if (j == 0 && i == 0)
-                        {
-                            level[position[0] + j, position[1] + i] = 3;
-                        }
                         // Else, set to floor
                         else
                         {
                             level[position[0] + j, position[1] + i] = 1;
+                            if (rand.Next(5) == 0)
+                                level[position[0] + j, position[1] + i] = 3;
                             if (rand.Next(5) == 0)
                             {
                                 level[position[0] + j, position[1] + i] = 8;
@@ -430,6 +427,8 @@ namespace ByteLike
                                         else
                                         {
                                             Generator.level[position[0], position[1] + i] = 1;
+                                            if (rand.Next(5) == 0)
+                                                Generator.level[position[0], position[1] + i] = 3;
                                             if (rand.Next(10) == 0) { Generator.level[position[0], position[1] + i] = 8; }
                                             else if (rand.Next(25) == 0) { Generator.level[position[0], position[1] + i] = 9; }
                                             else if (rand.Next(20) == 0) { Generator.level[position[0], position[1] + i] = 10; }
@@ -447,6 +446,8 @@ namespace ByteLike
                                         else
                                         {
                                             Generator.level[position[0] + i, position[1]] = 1;
+                                            if (rand.Next(5) == 0)
+                                                Generator.level[position[0] + i, position[1]] = 3;
                                             if (rand.Next(10) == 0) { Generator.level[position[0] + i, position[1]] = 8; }
                                             else if (rand.Next(25) == 0) { Generator.level[position[0] + i, position[1]] = 9; }
                                             else if (rand.Next(20) == 0) { Generator.level[position[0] + i, position[1]] = 10; }
