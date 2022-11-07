@@ -33,7 +33,7 @@ namespace ByteLike
         public string File = "Graphics/ByteLikeGraphics/placeholder.png";
         static protected Random rand = new Random();
 
-        public abstract string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness);
+        public abstract string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness, out string currentSound);
 
         public int TakeDamage(int damage, int type)
         {
@@ -50,8 +50,12 @@ namespace ByteLike
 
             Stats["HP"] -= damage;
 
-            if (type > 0)
-                Potentials[type - 1] += 5;
+            if (type > 0 && type < 5)
+                Potentials[type - 1] += 6;
+            else if (type > 0 && type < 9)
+                Potentials[type - 5] += 4;
+            else if (type > 0)
+                Potentials[type - 9] += 2;
 
             if (Stats["HP"] <= 0)
                 result = Stats["Level"] * rand.Next(2, 10) + 1;
@@ -695,10 +699,11 @@ namespace ByteLike
             return result;
         }
 
-        protected string WalkTo(int[] movement, ref int[,] level, string response, ref List<Creature> enemies, ref Player player, ref int[,] darkness)
+        protected string WalkTo(int[] movement, ref int[,] level, string response, ref List<Creature> enemies, ref Player player, ref int[,] darkness, out string sound)
         {
         WalkReset:
             bool InTheWay = false;
+            string currentSound = "";
 
             if (movement[0] != 0 || movement[1] != 0)
             {
@@ -737,6 +742,8 @@ namespace ByteLike
                                 response += $"{Name} hits {item.Name}!\n";
                                 break;
                         }
+
+                        currentSound = "Graphics/Sounds/attack.wav";
 
                         if (Stats.ContainsKey("XP") && xp > 0)
                         {
@@ -779,6 +786,7 @@ namespace ByteLike
                             response += $"{Name} hits {player.Name}!\n";
                             break;
                     }
+                    currentSound = "Graphics/Sounds/attack.wav";
 
                     if (Stats.ContainsKey("XP") && xp2 > 0)
                     {
@@ -818,6 +826,7 @@ namespace ByteLike
                             }
                             position[0] += movement[0];
                             position[1] += movement[1];
+                            currentSound = "Graphics/Sounds/footstep.wav";
                         }
                         break;
 
@@ -827,8 +836,9 @@ namespace ByteLike
                         {
                             position[0] += movement[0];
                             position[1] += movement[1];
+                            currentSound = "Graphics/Sounds/footstep.wav";
                         }
-                        else { level[position[0] + movement[0], position[1] + movement[1]] = 1; }
+                        else { level[position[0] + movement[0], position[1] + movement[1]] = 1; currentSound = "Graphics/Sounds/dooropen.wav"; }
                         break;
 
                     // Regular tile
@@ -836,6 +846,7 @@ namespace ByteLike
                     case 3:
                         position[0] += movement[0];
                         position[1] += movement[1];
+                        currentSound = "Graphics/Sounds/footstep.wav";
                         break;
 
                     // Water tile, Freeze for a turn time from time
@@ -850,6 +861,7 @@ namespace ByteLike
                                 response += $"{Name} is splashing in a pool of water\n";
                             }
                         }
+                        currentSound = "Graphics/Sounds/waterfootstep.wav";
                         break;
 
                     // Lava
@@ -862,6 +874,7 @@ namespace ByteLike
                         {
                             Potentials[0] += 2;
                         }
+                        currentSound = "Graphics/Sounds/firefootstep.wav";
                         break;
 
                     // Grass
@@ -892,6 +905,7 @@ namespace ByteLike
                                 }
                             }
                         }
+                        currentSound = "Graphics/Sounds/grassfootstep.wav";
                         break;
 
                     // Spike traps
@@ -902,7 +916,7 @@ namespace ByteLike
                         position[1] += movement[1];
                         if (FloorCheck(level[position[0], position[1]]))
                         {
-                            Stats["HP"] -= (int)(Stats["MaxHP"]*0.2);
+                            Stats["HP"] -= (int)(Stats["MaxHP"] * 0.2);
 
                             if (darkness[position[0], position[1]] > 0 && darkness[position[0], position[1]] != 2)
                             {
@@ -935,6 +949,7 @@ namespace ByteLike
                                 }
                             }
                         }
+                        currentSound = "Graphics/Sounds/footstep.wav";
                         break;
 
                     // Poison traps
@@ -977,6 +992,7 @@ namespace ByteLike
                                 }
                             }
                         }
+                        currentSound = "Graphics/Sounds/firefootstep.wav";
                         break;
                     // Poisonous vines
                     case 13:
@@ -988,6 +1004,7 @@ namespace ByteLike
                         {
                             Potentials[1] += 2;
                         }
+                        currentSound = "Graphics/Sounds/grassfootstep.wav";
                         break;
                     // Electro terrain
                     case 14:
@@ -1001,6 +1018,7 @@ namespace ByteLike
                                 response += $"{Name} is paralyzed by electric terrain!\n";
                             }
                         }
+                        currentSound = "Graphics/Sounds/footstep.wav";
                         break;
                     // Level exit
                     case 15:
@@ -1011,6 +1029,7 @@ namespace ByteLike
                             response += $"{Name} has found the exit to the next floor!\n";
                             response += $"Press [E] to move to the next floor\n";
                         }
+                        currentSound = "Graphics/Sounds/footstep.wav";
                         break;
                     // Secret exit
                     case 16:
@@ -1022,10 +1041,11 @@ namespace ByteLike
                             response += $"{Name} has found a secret exit to the next floor!\n";
                             response += $"Press [E] to move to the next floor\n";
                         }
+                        currentSound = "Graphics/Sounds/footstep.wav";
                         break;
-
                 }
             }
+            sound = currentSound;
             return response;
         }
 
@@ -1548,8 +1568,9 @@ namespace ByteLike
         }
 
         // Main Logics
-        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness)
+        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness, out string currentSound)
         {
+            string sound = "";
             bool wasAlive = true;
             if (Stats["HP"] <= 0) { wasAlive = false; }
             string response = "";
@@ -1564,6 +1585,7 @@ namespace ByteLike
                 OpenInventory = true;
                 DrawSpellLine = false;
                 invCheck = true;
+                sound = "Graphics/Sounds/openinventory.wav";
             }
             // Move only if not frozen/paralysed
             if (Statuses[2] == 0 && Statuses[3] % 2 == 0 || OpenInventory)
@@ -1638,7 +1660,7 @@ namespace ByteLike
                         
                 }
 
-                response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness);
+                response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
             }
             // if in inventory
             else
@@ -1647,6 +1669,8 @@ namespace ByteLike
                 {
                     CurrentSlot[0] += movement[0];
                     CurrentSlot[1] += movement[1];
+                    if (movement[0] != 0 || movement[1] != 0)
+                        sound = "Graphics/Sounds/menuclick.wav";
                 }
                 // Actual inventory, not a spell usage
                 if (!OpenSpell)
@@ -1717,6 +1741,7 @@ namespace ByteLike
 
                     if (Keyboard.IsKeyDown(Key.E))
                     {
+                        sound = "Graphics/Sounds/paw_squeak.wav";
                         // if we're in normal inventory
                         if (CurrentSlot[0] < Inventory.GetLength(0))
                         {
@@ -1789,6 +1814,7 @@ namespace ByteLike
                                         // Gathering all items with double clicks
                                         else if (Inventory[CurrentSlot[0], CurrentSlot[1]] != null)
                                         {
+                                            sound = "Graphics/Sounds/equipment.wav";
                                             if (Inventory[CurrentSlot[0], CurrentSlot[1]].GearType > 9 || Inventory[CurrentSlot[0], CurrentSlot[1]].GearType == 0)
                                             {
                                                 for (int i = 0; i < Inventory.GetLength(1); i++)
@@ -1856,6 +1882,7 @@ namespace ByteLike
                                 // if selected something from equipment
                                 else if (SelectedSlot[1] == 0)
                                 {
+                                    sound = "Graphics/Sounds/equipment.wav";
                                     // if inside our inventory, otherwise do nothing
                                     if (CurrentSlot[1] < Inventory.GetLength(1))
                                     {
@@ -1939,6 +1966,7 @@ namespace ByteLike
                                 // if we're currently on something from equipment, not selecting something from equipment
                                 else if (CurrentSlot[1] == 0)
                                 {
+                                    sound = "Graphics/Sounds/equipment.wav";
                                     // if selected something from our inventory, not equipment
                                     if (SelectedSlot[1] < Inventory.GetLength(1))
                                     {
@@ -1988,7 +2016,10 @@ namespace ByteLike
                                                         if (Inventory[3, 0] != null)
                                                         {
                                                             if (Inventory[3, 0].Name.ToLower().Contains("bow"))
+                                                            {
                                                                 bowcheck = true;
+                                                                sound = "Graphics/Sounds/bow.wav";
+                                                            }
                                                         }
 
                                                         if (!Inventory[SelectedSlot[0], SelectedSlot[1]].Name.Contains("Arrow") || bowcheck)
@@ -2025,6 +2056,7 @@ namespace ByteLike
                                                     {
                                                         if (Stats["SpellSlots"] > Spells.Count)
                                                         {
+                                                            sound = "Graphics/Sounds/holychoir.wav";
                                                             Spells.Add(Inventory[SelectedSlot[0], SelectedSlot[1]].Spell);
                                                             response += $"{Name} has learnt how to use {Inventory[SelectedSlot[0], SelectedSlot[1]].Spell}!\n";
                                                             Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity--;
@@ -2040,6 +2072,7 @@ namespace ByteLike
                                                     // Healing items
                                                     else
                                                     {
+                                                        sound = "Graphics/Sounds/item.wav";
                                                         if (Inventory[SelectedSlot[0], SelectedSlot[1]].Name == "Improvement Potion")
                                                         {
                                                             Statuses[0] = 0;
@@ -2123,6 +2156,7 @@ namespace ByteLike
                                         // If throwing non-equipment out
                                         else if (CurrentSlot[0] == 10)
                                         {
+                                            sound = "Graphics/Sounds/equipment.wav";
                                             // if there's a chest, put in the chest
                                             if (GetChest(ref chests) >= 0)
                                             {
@@ -2152,6 +2186,7 @@ namespace ByteLike
                                     {
                                         if (chests[GetChest(ref chests)].Inventory[SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1)] == null || (chests[GetChest(ref chests)].Inventory[SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1)].GearType == CurrentSlot[0] + 1 || chests[GetChest(ref chests)].Inventory[SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1)].GearType == CurrentSlot[0] && chests[GetChest(ref chests)].Inventory[SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1)].GearType == 8))
                                         {
+                                            sound = "Graphics/Sounds/equipment.wav";
                                             Inventory[CurrentSlot[0], CurrentSlot[1]] = chests[GetChest(ref chests)].TakeOut(Inventory[CurrentSlot[0], CurrentSlot[1]], new int[] { SelectedSlot[0], SelectedSlot[1] - Inventory.GetLength(1) });
                                             SelectedSlot[0] = -100;
                                         }
@@ -2272,6 +2307,7 @@ namespace ByteLike
                             }
                             OpenInventory = false;
                             OpenSpell = false;
+                            sound = "Graphics/Sounds/holychoir.wav";
                         }
                         else
                         {
@@ -2300,6 +2336,7 @@ namespace ByteLike
             // closing inventory
             if (Keyboard.IsKeyDown(Key.Q) && OpenInventory && !invCheck)
             {
+                sound = "Graphics/Sounds/closeinventory.wav";
                 DrawSpellLine = false;
                 OpenInventory = false;
                 OpenSpell = false;
@@ -2323,7 +2360,7 @@ namespace ByteLike
                 response += LevelUp();
 
 
-
+            currentSound = sound;
 
             return response;
 
@@ -2453,9 +2490,10 @@ namespace ByteLike
 
         }
 
-        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness)
+        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness, out string currentSound)
         {
             string response = "";
+            string sound = "";
 
             if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= GetStat("Torch") && !Aggressive)
             {
@@ -2496,7 +2534,7 @@ namespace ByteLike
                 movement[0] = 0;
                 movement[1] = 0;
             }
-            response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness);
+            response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
 
 
             // Default logics ending
@@ -2507,7 +2545,7 @@ namespace ByteLike
 
 
 
-
+            currentSound = sound;
             if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= player.GetStat("Torch") || Aggressive)
                 return response;
             else return "";
@@ -2579,9 +2617,10 @@ namespace ByteLike
                 }
             }
         }
-        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness)
+        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness, out string currentSound)
         {
             string response = "";
+            string sound = "";
 
             // Aggressive check
             if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= GetStat("Torch") && !Aggressive)
@@ -2713,7 +2752,7 @@ namespace ByteLike
                 }
 
                 // ACTUAL ACTION
-                switch (rand.Next(actions.Count))
+                switch (actions[rand.Next(actions.Count)])
                 {
                     case 0:
                         response += $"{Name} is watching carefully...\n";
@@ -2740,10 +2779,11 @@ namespace ByteLike
                                 movement[1] = -1;
                                 break;
                         }
-                        response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness);
+                        response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
                         break;
                     case 2:
                         Stats["Mana"] -= GetSpellCost(Spells[chosenSpell]);
+                        sound = "Graphics/Sounds/holychoir.wav";
                         arrowSlot[0] = 0;
                         arrowSlot[1] = 0;
                         if (IsAggresiveSpell(Spells[chosenSpell]))
@@ -2757,6 +2797,7 @@ namespace ByteLike
                     case 3:
                         healSlot[0] = player.position[0] - position[0];
                         healSlot[1] = player.position[1] - position[1];
+                        sound = "Graphics/Sounds/bow.wav";
 
                         effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { healSlot[0], healSlot[1] }, GetStat("Agility"), $"Shoot {Inventory[arrowSlot[0], arrowSlot[1]].Name}"));
 
@@ -2767,6 +2808,8 @@ namespace ByteLike
                     case 4:
                         Stats["HP"] += Inventory[healSlot[0], healSlot[1]].Stats["MaxHP"];
 
+                        sound = "Graphics/Sounds/closeinventory.wav";
+
                         response += $"{Name} used a {Inventory[healSlot[0], healSlot[1]].Name}!\n";
                         Inventory[healSlot[0], healSlot[1]].Quantity--;
                         if (Inventory[healSlot[0], healSlot[1]].Quantity <= 0)
@@ -2775,13 +2818,15 @@ namespace ByteLike
                     case 5:
                         Stats["Mana"] += Inventory[manaSlot[0], manaSlot[1]].Stats["MaxMana"];
 
+                        sound = "Graphics/Sounds/closeinventory.wav";
+
                         response += $"{Name} used a {Inventory[manaSlot[0], manaSlot[1]].Name}!\n";
                         Inventory[manaSlot[0], manaSlot[1]].Quantity--;
                         if (Inventory[manaSlot[0], manaSlot[1]].Quantity <= 0)
                             Inventory[manaSlot[0], manaSlot[1]] = null;
                         break;
-                        break;
                     case 6:
+                        sound = "Graphics/Sounds/closeinventory.wav";
                         // Arrows/Scrolls, aka using spells inside items
                         if (Inventory[itemSlot[0], itemSlot[1]].Name.Contains("Scroll"))
                         {
@@ -2908,7 +2953,7 @@ namespace ByteLike
                     movement[0] = 0;
                     movement[1] = 0;
                 }
-                response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness);
+                response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
 
             }
 
@@ -2919,6 +2964,7 @@ namespace ByteLike
             if (Stats["HP"] > GetStat("MaxHP")) { Stats["HP"] = GetStat("MaxHP"); }
             if (Stats["Mana"] > GetStat("MaxMana")) { Stats["Mana"] = GetStat("MaxMana"); }
 
+            currentSound = sound;
 
             if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= player.GetStat("Torch") || Aggressive)
                 return response;
@@ -2941,8 +2987,9 @@ namespace ByteLike
             Stats["Strength"] = strength;
         }
 
-        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness)
+        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness, out string currentSound)
         {
+            string sound = "";
             Stats["HP"]--;
             if (Stats["HP"] > 4)
                 Stats["HP"] = 4;
@@ -2957,10 +3004,12 @@ namespace ByteLike
                             effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { j, i }, 20, "Explosion"));
                     }
                 }
+                sound = "Graphics/Sounds/explosion.wav";
             }
             File = "Graphics/ByteLikeGraphics/Items/bomb";
             File += Stats["HP"].ToString();
             File += ".png";
+            currentSound = sound;
 
             return "";
         }

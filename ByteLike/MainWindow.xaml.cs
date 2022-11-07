@@ -24,6 +24,7 @@ namespace ByteLike
 
     public partial class MainWindow : Window
     {
+        static MediaPlayer music = new MediaPlayer();
         static int[,] level = new int[40, 40];
         static int[,] darkness = new int[40, 40];
 
@@ -37,6 +38,8 @@ namespace ByteLike
 
         static int[] sizes = new int[2];
         static string response = "";
+        static string currentSound = "";
+        static string tempSound = "";
 
         static Random rand = new Random();
 
@@ -46,7 +49,7 @@ namespace ByteLike
             int[] position = new int[2];
             bool doNext = true;
 
-
+            // clear light around the player, replacing it with faded light
             for (int i = -player.GetStat("Torch") - 5; i <= player.GetStat("Torch") + 5; i++)
             {
                 for (int j = -player.GetStat("Torch") - 5; j <= player.GetStat("Torch") + 5; j++)
@@ -60,55 +63,113 @@ namespace ByteLike
                     }
                 }
             }
+            // set a light source at the player position
+            // extra light sources are in case the player is inside a wall
             darkness[player.position[0], player.position[1]] = 3;
 
             while (doNext)
             {
                 doNext = false;
+                // once again, cheking only inside a small area around the player
                 for (int i = -player.GetStat("Torch") - 5; i <= player.GetStat("Torch") + 5; i++)
                 {
                     for (int j = -player.GetStat("Torch") - 5; j <= player.GetStat("Torch") + 5; j++)
                     {
-                        if (player.position[0] + j > 0 && player.position[0] + j < level.GetLength(0) && player.position[1] + i > 0 && player.position[1] + i < level.GetLength(1))
+                        // check inbounds
+                        if (player.position[0] + j >= 0 && player.position[0] + j < level.GetLength(0) && player.position[1] + i >= 0 && player.position[1] + i < level.GetLength(1))
                         {
+                            // If we're trying to light this spot up
                             if (darkness[player.position[0] + j, player.position[1] + i] >= 3)
                             {
+                                // set currently checked position
                                 position[0] = player.position[0];
                                 position[1] = player.position[1];
                                 position[0] += j;
                                 position[1] += i;
-                                if (level[position[0], position[1]] != 2 && level[position[0], position[1]] != 0 && level[position[0], position[1]] != 5 && level[position[0], position[1]] != 4)
+                                // if we have a light source (a tile of 3 or above inside the darkness array),
+                                // and we're not on a wall -> spread the light and repeat the cycle so we spread it again later
+                                if (level[position[0], position[1]] != 2 && level[position[0], position[1]] != 0 && level[position[0], position[1]] != 5 && level[position[0], position[1]] != 4 || j == 0 && i == 0)
                                 {
-                                    if (position[0] + 1 > 0 && position[0] + 1 < level.GetLength(0) && position[1] > 0 && position[1] < level.GetLength(1) && darkness[position[0],position[1]]-3 < player.GetStat("Torch"))
+                                    // Right
+                                    if (position[0] + 1 >= 0 && position[0] + 1 < level.GetLength(0) && position[1] >= 0 && position[1] < level.GetLength(1) && darkness[position[0], position[1]] - 3 < player.GetStat("Torch"))
                                     {
+                                        // since we set future lit tiles to 1, check if we should relight it again
                                         if (darkness[position[0] + 1, position[1]] != 1)
-                                            darkness[position[0] + 1, position[1]] = darkness[position[0],position[1]]+1;
+                                            darkness[position[0] + 1, position[1]] = darkness[position[0], position[1]] + 1;
                                         doNext = true;
                                     }
 
-                                    if (position[0] - 1 > 0 && position[0] - 1 < level.GetLength(0) && position[1] > 0 && position[1] < level.GetLength(1) && darkness[position[0], position[1]] - 3 < player.GetStat("Torch"))
+                                    // Left
+                                    if (position[0] - 1 >= 0 && position[0] - 1 < level.GetLength(0) && position[1] >= 0 && position[1] < level.GetLength(1) && darkness[position[0], position[1]] - 3 < player.GetStat("Torch"))
                                     {
                                         if (darkness[position[0] - 1, position[1]] != 1)
                                             darkness[position[0] - 1, position[1]] = darkness[position[0], position[1]] + 1;
                                         doNext = true;
                                     }
 
-                                    if (position[0] > 0 && position[0] < level.GetLength(0) && position[1] + 1 > 0 && position[1] + 1 < level.GetLength(1) && darkness[position[0], position[1]] - 3 < player.GetStat("Torch"))
+                                    // Down
+                                    if (position[0] >= 0 && position[0] < level.GetLength(0) && position[1] + 1 >= 0 && position[1] + 1 < level.GetLength(1) && darkness[position[0], position[1]] - 3 < player.GetStat("Torch"))
                                     {
                                         if (darkness[position[0], position[1] + 1] != 1)
                                             darkness[position[0], position[1] + 1] = darkness[position[0], position[1]] + 1;
                                         doNext = true;
                                     }
 
-                                    if (position[0] > 0 && position[0] < level.GetLength(0) && position[1] - 1 > 0 && position[1] - 1 < level.GetLength(1) && darkness[position[0], position[1]] - 3 < player.GetStat("Torch"))
+                                    // Up
+                                    if (position[0] >= 0 && position[0] < level.GetLength(0) && position[1] - 1 >= 0 && position[1] - 1 < level.GetLength(1) && darkness[position[0], position[1]] - 3 < player.GetStat("Torch"))
                                     {
                                         if (darkness[position[0], position[1] - 1] != 1)
                                             darkness[position[0], position[1] - 1] = darkness[position[0], position[1]] + 1;
                                         doNext = true;
                                     }
                                 }
+                                // Here we're inside a wall, so we'll spread light only to nearby wall tiles
+                                // This makes sure we can't see behind thin walls, but can see two tiles inside the wall
+                                // The player's light level is also decreased here
+                                else
+                                {
+                                    // Right
+                                    if (position[0] + 1 >= 0 && position[0] + 1 < level.GetLength(0) && position[1] >= 0 && position[1] < level.GetLength(1) && darkness[position[0], position[1]] - 3 < player.GetStat("Torch")/1.5)
+                                    {
+                                        if (level[position[0] + 1, position[1]] == 0 || level[position[0] + 1, position[1]] == 2 || level[position[0] + 1, position[1]] == 4 || level[position[0] + 1, position[1]] == 5)
+                                        {
+                                            if (darkness[position[0] + 1, position[1]] != 1)
+                                                darkness[position[0] + 1, position[1]] = darkness[position[0], position[1]] + 2;
+                                        }
+                                    }
 
-                                
+                                    // Left
+                                    if (position[0] - 1 >= 0 && position[0] - 1 < level.GetLength(0) && position[1] >= 0 && position[1] < level.GetLength(1) && darkness[position[0], position[1]] - 3 < player.GetStat("Torch")/1.5)
+                                    {
+                                        if (level[position[0] - 1, position[1]] == 0 || level[position[0] - 1, position[1]] == 2 || level[position[0] - 1, position[1]] == 4 || level[position[0] - 1, position[1]] == 5)
+                                        {
+                                            if (darkness[position[0] - 1, position[1]] != 1)
+                                                darkness[position[0] - 1, position[1]] = darkness[position[0], position[1]] + 2;
+                                        }
+                                    }
+
+                                    // Down
+                                    if (position[0] >= 0 && position[0] < level.GetLength(0) && position[1] + 1 >= 0 && position[1] + 1 < level.GetLength(1) && darkness[position[0], position[1]] - 3 < player.GetStat("Torch")/1.5)
+                                    {
+                                        if (level[position[0], position[1] + 1] == 0 || level[position[0], position[1] + 1] == 2 || level[position[0], position[1] + 1] == 4 || level[position[0], position[1] + 1] == 5)
+                                        {
+                                            if (darkness[position[0], position[1] + 1] != 1)
+                                                darkness[position[0], position[1] + 1] = darkness[position[0], position[1]] + 2;
+                                        }
+                                    }
+
+                                    // Up
+                                    if (position[0] >= 0 && position[0] < level.GetLength(0) && position[1] - 1 >= 0 && position[1] - 1 < level.GetLength(1) && darkness[position[0], position[1]] - 3 < player.GetStat("Torch")/1.5)
+                                    {
+                                        if (level[position[0], position[1] - 1] == 0 || level[position[0], position[1] - 1] == 2 || level[position[0], position[1] - 1] == 4 || level[position[0], position[1] - 1] == 5)
+                                        {
+                                            if (darkness[position[0], position[1] - 1] != 1)
+                                                darkness[position[0], position[1] - 1] = darkness[position[0], position[1]] + 2;
+                                        }
+                                    }
+                                }
+
+                                // set the current tile to lit
                                 darkness[position[0], position[1]] = 1;
                             }
                         }
@@ -466,7 +527,7 @@ namespace ByteLike
                                         }
                                     }
 
-                                    if (i > 0 )
+                                    if (i > 0 && (!player.OpenInventory || player.OpenSpell))
                                     {
                                         //FormattedText dialogueen = new FormattedText($"{item.Stats["HP"]}/{item.GetStat("MaxHP")}", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 4, Brushes.Red);
                                         //dc.DrawText(dialogueen, new Point(j*16 + (16 - dialogueen.Width)/2, i*16 - 2));
@@ -1013,6 +1074,9 @@ namespace ByteLike
             this.Background = System.Windows.Media.Brushes.White;
             this.Margin = new Thickness(0);
             this.Content = imageBorder;
+
+            music.Open(new Uri(@"Graphics/Sounds/firstpart.wav", UriKind.Relative));
+            music.Play();
         }
 
         private void Grid_KeyDown(object sender, KeyEventArgs e)
@@ -1026,6 +1090,8 @@ namespace ByteLike
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             bool cameraManagment = false;
+            currentSound = "";
+            tempSound = "";
 
             if ( Keyboard.IsKeyDown(Key.Up))
             {
@@ -1078,8 +1144,11 @@ namespace ByteLike
                     List<int> deleteus = new List<int>();
                     for (int i = 0; i < effects.Count; i++)
                     {
-                        if (!effects[i].Logics(ref level, ref enemies, ref effects, ref player, out response, response))
+                        if (!effects[i].Logics(ref level, ref enemies, ref effects, ref player, out response, response, out tempSound))
                             deleteus.Add(i);
+
+                        if (tempSound != "")
+                            currentSound = tempSound;
                     }
                     if (deleteus.Count > 0)
                     {
@@ -1092,20 +1161,21 @@ namespace ByteLike
                 }
                 else
                 {
-                    response = player.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness);
+                    response = player.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness, out tempSound);
+                    currentSound = tempSound;
 
                     if (!player.OpenInventory && !Keyboard.IsKeyDown(Key.Q))
                     {
                         doEnemies = true;
                     }
 
-                    if (enemies.Count < 10 + floor/2)
+                    if (enemies.Count < 10 + floor / 2)
                     {
                         int[] newPos = new int[] { rand.Next(level.GetLength(0)), rand.Next(level.GetLength(1)) };
 
-                        if (level[newPos[0], newPos[1]] == 1 && (darkness[newPos[0], newPos[1]] <= 0 || darkness[newPos[0], newPos[1]] == 2))
+                        if (level[newPos[0], newPos[1]] == 1 && (darkness[newPos[0], newPos[1]] <= 0 || darkness[newPos[0], newPos[1]] == 2) && DistanceBetween(new int[] { newPos[0], newPos[1] }, new int[] { player.position[0], player.position[1] }) > player.GetStat("Torch")+2)
                         {
-                            enemies.Add(new Critter(floor+player.DangerLevel, new int[] { newPos[0], newPos[1] }));
+                            enemies.Add(new Critter(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
                         }
                     }
                 }
@@ -1119,7 +1189,10 @@ namespace ByteLike
 
                         foreach (Creature enemy in enemies)
                         {
-                            response += enemy.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness);
+                            response += enemy.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness, out string tempSound);
+
+                            if (tempSound != "" && currentSound == "")
+                                tempSound = currentSound;
 
                             if (enemy.Stats["HP"] <= 0)
                                 deletusXL.Add(pos);
@@ -1149,7 +1222,7 @@ namespace ByteLike
                                 if (enemies[deletusXL[i]].GetType() == typeof(DoppleGanger))
                                 {
                                     response += "The darkness around you glooms...\n";
-                                    player.DangerLevel+= 3;
+                                    player.DangerLevel += 3;
                                 }
                                 enemies.RemoveAt(deletusXL[i]);
                             }
@@ -1161,8 +1234,11 @@ namespace ByteLike
                         List<int> deleteus = new List<int>();
                         for (int i = 0; i < effects.Count; i++)
                         {
-                            if (!effects[i].Logics(ref level, ref enemies, ref effects, ref player, out response, response))
+                            if (!effects[i].Logics(ref level, ref enemies, ref effects, ref player, out response, response, out tempSound))
                                 deleteus.Add(i);
+
+                            if (currentSound == "" && tempSound != "")
+                                currentSound = tempSound;
                         }
 
                         if (deleteus.Count > 0)
@@ -1174,8 +1250,10 @@ namespace ByteLike
                         }
                     }
                 }
-
-
+            }
+            else
+            {
+                response = $"Camera size: {cameraSize[0]} by {cameraSize[1]}\n";
             }
             // Set camera to player's position
             camera[0] = player.position[0];
@@ -1184,8 +1262,27 @@ namespace ByteLike
 
             if (level[player.position[0], player.position[1]] == 15 && Keyboard.IsKeyDown(Key.E) && !player.OpenInventory && !Keyboard.IsKeyDown(Key.W) && !Keyboard.IsKeyDown(Key.S) && !Keyboard.IsKeyDown(Key.A) && !Keyboard.IsKeyDown(Key.D) && effects.Count <= 0)
             {
+                currentSound = "Graphics/Sounds/newfloor.wav";
                 NewLevel();
                 response = $"{player.Name} finds their way to floor #{floor}!\n";
+                if (floor <= 16)
+                {
+                    music.Stop();
+                    music.Open(new Uri(@"Graphics/Sounds/firstpart.wav", UriKind.Relative));
+                    music.Play();
+                }
+                else if (floor > 16 && floor < 32)
+                {
+                    music.Stop();
+                    music.Open(new Uri(@"Graphics/Sounds/secondpart.wav", UriKind.Relative));
+                    music.Play();
+                }
+                else if (floor >= 32)
+                {
+                    music.Stop();
+                    music.Open(new Uri(@"Graphics/Sounds/thirdpart.wav", UriKind.Relative));
+                    music.Play();
+                }
 
                 if (Directory.Exists("Memories"))
                 {
@@ -1209,6 +1306,9 @@ namespace ByteLike
                                         enemies.Add(new DoppleGanger(temp, new int[] { spawnpoint[0], spawnpoint[1] }));
                                         counter = 50;
                                         response += "An eerie chill goes down your spine...\n";
+                                        music.Stop();
+                                        music.Open(new Uri(@"Graphics/Sounds/doppleganger.wav", UriKind.Relative));
+                                        music.Play();
                                     }
                                 }
                             }
@@ -1225,6 +1325,9 @@ namespace ByteLike
 
             if (player.Stats["HP"] <= 0)
             {
+                music.Stop();
+                music.Open(new Uri(@"Graphics/Sounds/firstpart.wav", UriKind.Relative));
+                music.Play();
                 if (!Directory.Exists("Memories"))
                     Directory.CreateDirectory("Memories");
                 if (!File.Exists($"Memories/floor{floor}.json"))
@@ -1235,7 +1338,7 @@ namespace ByteLike
                         sw.Close();
                     }
                 }
-                
+                currentSound = "Graphics/Sounds/scream.wav";
                 floor = 0;
                 player = new Player("Player");
                 NewLevel();
@@ -1247,6 +1350,11 @@ namespace ByteLike
                     cameraSize[1] = level.GetLength(1) - 1;
             }
 
+            if (File.Exists(currentSound))
+            {
+                System.Media.SoundPlayer sound = new System.Media.SoundPlayer(currentSound);
+                sound.Play();
+            }
 
             Border imageBorder = new Border();
             imageBorder.BorderBrush = System.Windows.Media.Brushes.Gray;
@@ -1259,7 +1367,6 @@ namespace ByteLike
             this.Background = System.Windows.Media.Brushes.White;
             this.Margin = new Thickness(0);
             this.Content = imageBorder;
-
             
 
         }
@@ -1366,6 +1473,8 @@ namespace ByteLike
                     File = "Graphics/ByteLikeGraphics/Effects/explosion";
                     File += element.ToString();
                     File += ".png";
+                    if (element > 0)
+                        element += 4;
                     break;
                 // Arrows
                 case "Shoot Arrow":
@@ -1387,6 +1496,8 @@ namespace ByteLike
                     File += element;
                     File += direction;
                     File += ".png";
+                    if (element > 0)
+                        element += 4;
                     break;
                 // Projectiles
                 case "Focus":
@@ -1408,34 +1519,34 @@ namespace ByteLike
                     switch (spell)
                     {
                         case "Ember":
-                            element = 1;
+                            element = 9;
                             break;
                         case "Ice Shard":
-                            element = 3;
+                            element = 11;
                             break;
                         case "Zap":
-                            element = 4;
+                            element = 12;
                             break;
                         case "Poison Sting":
-                            element = 2;
+                            element = 10;
                             break;
                         case "Fireball":
-                            element = 1;
+                            element = 5;
                             isExplosion = true;
                             radius = 1;
                             break;
                         case "Ice Storm":
-                            element = 3;
+                            element = 7;
                             isWide = true;
                             radius = 1;
                             break;
                         case "Electro Bolt":
-                            element = 4;
+                            element = 8;
                             isWide = true;
                             radius = 1;
                             break;
                         case "Sludge Bomb":
-                            element = 2;
+                            element = 6;
                             isExplosion = true;
                             radius = 1;
                             break;
@@ -1465,12 +1576,17 @@ namespace ByteLike
 
 
                     File = "Graphics/ByteLikeGraphics/Effects/blast";
-                    File += element;
+                    if (element < 5)
+                        File += element;
+                    else if (element < 9)
+                        File += (element - 4);
+                    else
+                        File += (element - 8);
                     File += direction;
                     File += ".png";
 
                     if (spell == "Focus")
-                        element = rand.Next(5);
+                        element = rand.Next(5)+8;
                     break;
                 // Tile Spawners
                 case "Liquify":
@@ -1759,14 +1875,18 @@ namespace ByteLike
             else { Move(); }
         }
 
-        public bool Logics(ref int[,] level, ref List<Creature> enemies, ref List<Effect> effects, ref Player player, out string response, string currentresponse)
+        public bool Logics(ref int[,] level, ref List<Creature> enemies, ref List<Effect> effects, ref Player player, out string response, string currentresponse, out string currentSound)
         {
             bool result = true;
 
             response = currentresponse;
+            string sound = "";
 
             if (strength == 0)
+            {
+                sound = "Graphics/Sounds/attack.wav";
                 result = false;
+            }
 
             int xp = 0;
             bool check = false;
@@ -1778,6 +1898,7 @@ namespace ByteLike
                 {
                     if (position[0] == enemy.position[0] && position[1] == enemy.position[1])
                     {
+                        sound = "Graphics/Sounds/attack.wav";
                         if (isDamaging)
                             xp += enemy.TakeDamage(strength, element);
                         else if (stat != "Mana" && stat != "HP" && stat != "")
@@ -1889,15 +2010,23 @@ namespace ByteLike
                         switch (element)
                         {
                             case 1:
+                            case 5:
+                            case 9:
                                 spell = "Fire ";
                                 break;
                             case 2:
+                            case 6:
+                            case 10:
                                 spell = "Poison ";
                                 break;
                             case 3:
+                            case 7:
+                            case 11:
                                 spell = "Ice ";
                                 break;
                             case 4:
+                            case 8:
+                            case 12:
                                 spell = "Lightning ";
                                 break;
                         }
@@ -1934,15 +2063,23 @@ namespace ByteLike
                                     switch (element)
                                     {
                                         case 1:
+                                        case 5:
+                                        case 9:
                                             spell = "Fire ";
                                             break;
                                         case 2:
+                                        case 6:
+                                        case 10:
                                             spell = "Poison ";
                                             break;
                                         case 3:
+                                        case 7:
+                                        case 11:
                                             spell = "Ice ";
                                             break;
                                         case 4:
+                                        case 8:
+                                        case 12:
                                             spell = "Lightning ";
                                             break;
                                     }
@@ -2024,6 +2161,7 @@ namespace ByteLike
 
                 // Move, check for collison
                 Move();
+                sound = "Graphics/Sounds/projectilesound.wav";
                 if (level[position[0], position[1]] == 0 || level[position[0], position[1]] == 5 || level[position[0], position[1]] == 4 || level[position[0], position[1]] == 2)
                 {
                     result = false;
@@ -2173,6 +2311,7 @@ namespace ByteLike
                     // Explosions
                     if (isExplosion)
                     {
+                        sound = "Graphics/Sounds/explosion.wav";
                         for (int i = -radius - 1; i <= radius + 1; i++)
                         {
                             for (int j = -radius - 1; j <= radius + 1; j++)
@@ -2209,7 +2348,9 @@ namespace ByteLike
 
             }
             // end On Collison
-            
+
+            currentSound = sound;
+
             return result;
         }
 
