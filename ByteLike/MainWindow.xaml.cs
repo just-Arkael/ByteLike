@@ -24,7 +24,8 @@ namespace ByteLike
 
     public partial class MainWindow : Window
     {
-
+        static bool Paused = false;
+        static int pausePointer = 0;
 
         static MediaPlayer music = new MediaPlayer();
         static int[,] level = new int[40, 40];
@@ -38,7 +39,6 @@ namespace ByteLike
         static List<Creature> enemies = new List<Creature>();
         static List<Effect> effects = new List<Effect>();
 
-        static int[] sizes = new int[2];
         static string response = "";
         static string currentSound = "";
         static string tempSound = "";
@@ -53,46 +53,46 @@ namespace ByteLike
             switch (type)
             {
                 case "Star Stone Amulet":
-                    File += 0;
+                    File += "0.png";
                     break;
                 case "Seashell Amulet":
-                    File += 1;
+                    File += "1.png";
                     break;
                 case "Lightning Stone Amulet":
-                    File += 2;
+                    File += "2.png";
                     break;
                 case "Cyclops Tooth Amulet":
-                    File += 3;
+                    File += "3.png";
                     break;
                 case "Bloody Crescent Moon Amulet":
-                    File += 4;
+                    File += "4.png";
                     break;
                 case "Cursed Pyramid Amulet":
-                    File += 5;
+                    File += "5.png";
                     break;
                 case "Half-Hearted Amulet":
-                    File += 6;
+                    File += "6.png";
                     break;
                 case "Half-Enchanted Amulet":
-                    File += 7;
+                    File += "7.png";
                     break;
                 case "Restoration Amulet":
-                    File += 8;
+                    File += "8.png";
                     break;
                 case "Empty Restoration Amulet":
-                    File += 9;
+                    File += "9.png";
                     break;
                 case "Survival Amulet":
-                    File += 10;
+                    File += "10.png";
                     break;
                 case "Empty Survival Amulet":
-                    File += 11;
+                    File += "11.png";
                     break;
                 case "Moon Amulet":
-                    File += 12;
+                    File += "12.png";
                     break;
                 case "Empty Moon Amulet":
-                    File += 13;
+                    File += "13.png";
                     break;
                 default:
                     File = "";
@@ -779,7 +779,7 @@ namespace ByteLike
 
 
                         // Draw the response dialogue box
-                        if (response != "" && j>1)
+                        if (response != "" && j>1 && !Paused)
                         {
                             if (i * 16 >= (cameraSize[1] * 16) - dialogue.Height - 16)
                             {
@@ -1077,12 +1077,82 @@ namespace ByteLike
                     }
                 }
 
+
+
                 // Response text
-                if (response != "")
+                if (response != "" && !Paused)
                 {
-                    dc.DrawText(dialogue, new Point(40, (cameraSize[1]*16)-dialogue.Height-8));
+                    dc.DrawText(dialogue, new Point(40, (cameraSize[1] * 16) - dialogue.Height - 8));
                 }
                 //
+
+                // Pause screen
+                if (Paused)
+                {
+                    // Draw pause overlay
+                    for (int i = 0; i < cameraSize[1]; i++)
+                    {
+                        for (int j = 0; j < cameraSize[0]; j++)
+                        {
+                            string hudFile = "Graphics/ByteLikeGraphics/Hud/pause";
+                            if (i == 0 || j == 0 || i == cameraSize[1] - 1 || j == cameraSize[0] - 1)
+                            {
+                                hudFile += "0.png";
+                            }
+                            else if (i == 1)
+                            {
+                                if (j == 1)
+                                    hudFile += "2.png";
+                                else if (j == cameraSize[0] - 2)
+                                    hudFile += "4.png";
+                                else
+                                    hudFile += "3.png";
+                            }
+                            else if (i == cameraSize[1] - 2)
+                            {
+                                if (j == 1)
+                                    hudFile += "7.png";
+                                else if (j == cameraSize[0] - 2)
+                                    hudFile += "9.png";
+                                else
+                                    hudFile += "8.png";
+                            }
+                            else 
+                            {
+                                if (j == 1)
+                                    hudFile += "5.png";
+                                else if (j == cameraSize[0] - 2)
+                                    hudFile += "6.png";
+                                else
+                                    hudFile += "1.png";
+                            }
+
+                            dc.DrawImage(new BitmapImage(new Uri(hudFile, UriKind.Relative)), new Rect(j*16, i*16, 16, 16));
+                        }
+                    }
+
+
+
+                    FormattedText dialogue4 = new FormattedText("PAUSED", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 32, Brushes.White);
+                    dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 48));
+                    
+                    dialogue4 = new FormattedText("CONTINUE", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                    dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 98));
+                    if (pausePointer == 0)
+                        dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 92, 32, 32));
+
+                    dialogue4 = new FormattedText("LOAD FROM LAST FLOOR", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                    dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 128));
+                    if (pausePointer == 1)
+                        dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 122, 32, 32));
+
+                    dialogue4 = new FormattedText("QUIT", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                    dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 158));
+                    if (pausePointer == 2)
+                        dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 152, 32, 32));
+                }
+
+
 
 
             } // end of using dc.open
@@ -1090,7 +1160,7 @@ namespace ByteLike
 
             DrawingImage drawingImageSource = new DrawingImage(drawingGroup);
 
-            System.Windows.Controls.Image imageControl = new System.Windows.Controls.Image();
+            Image imageControl = new Image();
             imageControl.Stretch = Stretch.Fill;
             imageControl.Source = drawingImageSource;
 
@@ -1169,7 +1239,79 @@ namespace ByteLike
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            bool cameraManagment = false;
+            bool cameraManagment = Paused;
+
+            // Pause
+            if (Keyboard.IsKeyDown(Key.Escape))
+            {
+                switch (Paused)
+                {
+                    case true:
+                        Paused = false;
+                        break;
+                    case false:
+                        Paused = true;
+                        break;
+                }
+                cameraManagment = true;
+            }
+
+            if (Paused)
+            {
+                if (Keyboard.IsKeyDown(Key.W))
+                {
+                    pausePointer--;
+                    if (pausePointer < 0)
+                        pausePointer = 2;
+                    currentSound = "Graphics/Sounds/menuclick.wav";
+                }
+                if (Keyboard.IsKeyDown(Key.S))
+                {
+                    pausePointer++;
+                    if (pausePointer > 2)
+                        pausePointer = 0;
+                    currentSound = "Graphics/Sounds/menuclick.wav";
+                }
+
+                if (Keyboard.IsKeyDown(Key.E))
+                {
+                    currentSound = "Graphics/Sounds/menuclick.wav";
+                    switch (pausePointer)
+                    {
+                        case 0:
+                            Paused = false;
+                            break;
+                        case 1:
+                            if (File.Exists("save.json"))
+                            {
+                                using (StreamReader sr = File.OpenText($"save.json"))
+                                {
+                                    try
+                                    {
+                                        GameData gm = new JsonSerializer().Deserialize<GameData>(new JsonTextReader(sr));
+                                        if (gm != null)
+                                        {
+                                            enemies = new List<Creature>();
+                                            effects = new List<Effect>();
+                                            player = gm.player;
+                                            level = gm.level;
+                                            darkness = gm.darkness;
+                                            floor = gm.floor;
+                                            chests = gm.chests;
+                                        }
+                                    }
+                                    catch { }
+                                    sr.Close();
+                                }
+                                player.DangerLevel++;
+                            }
+                            break;
+                        case 2:
+                            this.Close();
+                            break;
+                    }
+                }
+            }
 
             if (Keyboard.IsKeyDown(Key.Up))
             {
@@ -1436,6 +1578,15 @@ namespace ByteLike
                         cameraSize[0] = level.GetLength(0) - 1;
                     if (cameraSize[1] >= level.GetLength(1))
                         cameraSize[1] = level.GetLength(1) - 1;
+
+                    // Saving the game
+                    if (File.Exists("save.json"))
+                        File.Delete("save.json");
+                    using (StreamWriter sw = File.CreateText("save.json"))
+                    {
+                        sw.WriteLine(JsonConvert.SerializeObject(new GameData(chests, level, darkness, floor, player)));
+                        sw.Close();
+                    }
                 }
 
                 if (player.Stats["HP"] <= 0 && player.Inventory[6, 0] != null)
@@ -1477,6 +1628,15 @@ namespace ByteLike
                         cameraSize[0] = level.GetLength(0) - 1;
                     if (cameraSize[1] >= level.GetLength(1))
                         cameraSize[1] = level.GetLength(1) - 1;
+
+                    // Saving the game
+                    if (File.Exists("save.json"))
+                        File.Delete("save.json");
+                    using (StreamWriter sw = File.CreateText("save.json"))
+                    {
+                        sw.WriteLine(JsonConvert.SerializeObject(new GameData(chests, level, darkness, floor, player)));
+                        sw.Close();
+                    }
                 }
 
                 if (File.Exists(currentSound))
@@ -2256,15 +2416,23 @@ namespace ByteLike
                     switch (element)
                     {
                         case 1:
+                        case 5:
+                        case 9:
                             spell = "Fire ";
                             break;
                         case 2:
+                        case 6:
+                        case 10:
                             spell = "Poison ";
                             break;
                         case 3:
+                        case 7:
+                        case 11:
                             spell = "Ice ";
                             break;
                         case 4:
+                        case 8:
+                        case 12:
                             spell = "Lightning ";
                             break;
                     }
@@ -2404,15 +2572,23 @@ namespace ByteLike
                         switch (element)
                         {
                             case 1:
+                            case 5:
+                            case 9:
                                 spell = "Fire ";
                                 break;
                             case 2:
+                            case 6:
+                            case 10:
                                 spell = "Poison ";
                                 break;
                             case 3:
+                            case 7:
+                            case 11:
                                 spell = "Ice ";
                                 break;
                             case 4:
+                            case 8:
+                            case 12:
                                 spell = "Lightning ";
                                 break;
                         }
@@ -2451,15 +2627,23 @@ namespace ByteLike
                                     switch (element)
                                     {
                                         case 1:
+                                        case 5:
+                                        case 9:
                                             spell = "Fire ";
                                             break;
                                         case 2:
+                                        case 6:
+                                        case 10:
                                             spell = "Poison ";
                                             break;
                                         case 3:
+                                        case 7:
+                                        case 11:
                                             spell = "Ice ";
                                             break;
                                         case 4:
+                                        case 8:
+                                        case 12:
                                             spell = "Lightning ";
                                             break;
                                     }
@@ -2589,5 +2773,22 @@ namespace ByteLike
         }
     }
 
-   
+
+    public class GameData
+    {
+        public List<Chest> chests;
+        public int[,] level;
+        public int[,] darkness;
+        public int floor;
+        public Player player;
+
+        public GameData(List<Chest> chests, int[,] level, int[,] darkness, int floor, Player player)
+        {
+            this.darkness = darkness;
+            this.level = level;
+            this.chests = chests;
+            this.player = player;
+            this.floor = floor;
+        }
+    }
 }

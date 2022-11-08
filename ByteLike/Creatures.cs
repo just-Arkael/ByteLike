@@ -2361,6 +2361,8 @@ namespace ByteLike
                                     effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { CurrentSlot[0], CurrentSlot[1] }, GetStat("Magic"), RemSpell));
                                 else
                                     response += "... Nothing happened.\n";
+
+                                sound = "Graphics/Sounds/holychoir.wav";
                             }
                             else
                             {
@@ -2368,7 +2370,6 @@ namespace ByteLike
                             }
                             OpenInventory = false;
                             OpenSpell = false;
-                            sound = "Graphics/Sounds/holychoir.wav";
                         }
                         else
                         {

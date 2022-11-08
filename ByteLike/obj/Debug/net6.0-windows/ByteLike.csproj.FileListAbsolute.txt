@@ -478,3 +478,15 @@ C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windo
 C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Armor\armor7-7.png
 C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Armor\armor7-8.png
 C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Armor\armor7-9.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Armor\armor0-4c.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\pause0.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\pause1.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\pause2.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\pause3.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\pause4.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\pause5.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\pause6.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\pause7.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\pause8.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\pause9.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\pointer.png

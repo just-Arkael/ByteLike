@@ -127,6 +127,11 @@ namespace ByteLike
                         File += "b";
                         typeSwitch += 5;
                     }
+                    else if (GearType == 4 && rand.Next(2) == 0 && strength == 0)
+                    {
+                        File += "c";
+                        typeSwitch += 7;
+                    }
                     if (strength > 0)
                     {
                         switch (rand.Next(0,3))
@@ -193,6 +198,12 @@ namespace ByteLike
                             Name = "Makeshift Hatchet";
                             Stats["Strength"] += 3;
                             Description = "Somewhat dull hatchet. Could probably still chop a log or two\n";
+                            break;
+                        case 47:
+                            Name = "Makeshift Bow";
+                            Stats["Agility"] += 2;
+                            Stats["Strength"] += 1;
+                            Description = "A long stick with a tight rope attached to it. You can probably fire some arrows with this\n";
                             break;
                         case 10110:
                             Name = "Iron Cap";
@@ -1265,12 +1276,12 @@ namespace ByteLike
                         case 6:
                             Name = "Half-Hearted Amulet";
                             Description = "An amulet made from a glass heart with some health potion in it. You can't buy them, but they're gifted to suffering wanderers\n";
-                            Stats["HPRegen"] += 2;
+                            Stats["HPRegen"] -= 2;
                             break;
                         case 7:
                             Name = "Half-Enchanted Amulet";
                             Description = "An amulet made from a glass mada drop with some mana potion in it. Apprentice mages are gifted these to help them with channeling mana\n";
-                            Stats["ManaRegen"] += 2;
+                            Stats["ManaRegen"] -= 2;
                             break;
                         case 8:
                             Name = "Restoration Amulet";
@@ -1576,6 +1587,11 @@ namespace ByteLike
                 }
             }
             return check;
+        }
+
+        public Chest()
+        {
+
         }
 
         public Chest(int[] coordinates, int floor)
