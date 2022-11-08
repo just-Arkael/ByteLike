@@ -77,7 +77,7 @@ namespace ByteLike
             if (type == 0)
             {
                 GearType = 10;
-                if (rand.Next(5) == 0) { GearType = rand.Next(6) + 1; }
+                if (rand.Next(5) == 0) { GearType = rand.Next(7) + 1; }
             }
             else { GearType = type; }
 
@@ -1142,13 +1142,13 @@ namespace ByteLike
                         case 2:
                             Name = "Mana Torch";
                             Stats["Torch"] += 2;
-                            Stats["MaxMana"] += (int)(rand.Next(8)+4 + floor/23);
+                            Stats["MaxMana"] += (int)(rand.Next(8)+4 + floor / 12);
                             Description = "A torch infused with some mana powder\n";
                             break;
                         case 3:
                             Name = "Heart Torch";
                             Stats["Torch"] += 2;
-                            Stats["MaxHP"] += (int)(rand.Next(8) + 4 + floor / 23);
+                            Stats["MaxHP"] += (int)(rand.Next(8) + 4 + floor / 12);
                             Description = "A crystal heart with a burning aura to it\n";
                             break;
                         case 4:
@@ -1159,38 +1159,168 @@ namespace ByteLike
                         case 5:
                             Name = "Rage Torch";
                             Stats["Torch"] += 2;
-                            Stats["Strength"] += (int)(rand.Next(6) + 2 + floor / 23);
+                            Stats["Strength"] += (int)(rand.Next(6) + 2 + floor / 12);
                             Description = "A torch with a small pouch of hellroot in it\n";
                             break;
                         case 6:
                             Name = "Cloud Torch";
                             Stats["Torch"] += 2;
-                            Stats["Agility"] += (int)(rand.Next(6) + 2 + floor / 23);
+                            Stats["Agility"] += (int)(rand.Next(6) + 2 + floor / 12);
                             Description = "A torch with a small pouch speedroot in it\n";
                             break;
                         case 7:
                             Name = "Archana Torch";
                             Stats["Torch"] += 2;
-                            Stats["Agility"] += (int)(rand.Next(6) + 2 + floor / 23);
+                            Stats["Agility"] += (int)(rand.Next(6) + 2 + floor / 12);
                             Description = "A torch with a small pouch moonglow in it\n";
                             break;
                         case 8:
                             Name = "Tiny Shield Torch";
                             Stats["Torch"] += 2;
-                            Stats["Defense"] += (int)(rand.Next(6) + 2 + floor / 23);
+                            Stats["Defense"] += (int)(rand.Next(6) + 2 + floor / 12);
                             Description = "A torch with a tiny shield strapped to it\n";
                             break;
                         case 9:
                             Name = "Night Shield Torch";
                             Stats["Torch"] += 2;
-                            Stats["MagicDefense"] += (int)(rand.Next(6) + 2 + floor / 23);
+                            Stats["MagicDefense"] += (int)(rand.Next(6) + 2 + floor / 12);
                             Description = "A torch with an enchanted aura to it\n";
                             break;
                     }
 
-                    while (rand.Next(15) <= (floor/23)+1)
+                    if (rand.Next(8) == 0)
+                        Stats["MaxHP"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
+                    if (rand.Next(8) == 0)
+                        Stats["MaxMana"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
+                    if (rand.Next(8) == 0)
+                        Stats["Strength"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
+                    if (rand.Next(8) == 0)
+                        Stats["Magic"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
+                    if (rand.Next(8) == 0)
+                        Stats["Agility"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
+                    if (rand.Next(8) == 0)
+                        Stats["Defense"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
+                    if (rand.Next(8) == 0)
+                        Stats["MagicDefense"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
+
+                    while (rand.Next(15) <= (floor / 12)+1)
                         Stats["Torch"] += 1;
 
+                    break;
+                case 7:
+                    File = "Graphics/ByteLikeGraphics/Items/amulet";
+                    typeSwitch = rand.Next(14);
+                    File += typeSwitch;
+                    File += ".png";
+                    switch (typeSwitch)
+                    {
+                        case 0:
+                            Name = "Star Stone Amulet";
+                            Description = "An amulet made from a fallen star. Fallen stars are believed to be warriors aiding their allies after death\n";
+                            Stats["Strength"] += (int)(rand.Next(6) + 2 + floor / 12);
+                            Stats["Defense"] += (int)(rand.Next(6) + 2 + floor / 12);
+                            Stats["MaxHP"] += (int)(rand.Next(6) + 2 + floor / 12);
+                            break;
+                        case 1:
+                            Name = "Seashell Amulet";
+                            Description = "An amulet made from a perfectly shaped seashell. The sea floor is believed to have giant undiscovered mana pools\n";
+                            Stats["Magic"] += (int)(rand.Next(6) + 2 + floor / 12);
+                            Stats["MagicDefense"] += (int)(rand.Next(6) + 2 + floor / 12);
+                            Stats["MaxMana"] += (int)(rand.Next(6) + 2 + floor / 12);
+                            break;
+                        case 2:
+                            Name = "Lightning Stone Amulet";
+                            Description = "An amulet made from a crystal struck by lightning. Surviving a lightning strike is said to be one's rebirth\n";
+                            Stats["Agility"] += (int)(rand.Next(6) + 2 + floor / 12);
+                            Stats["Defense"] += (int)(rand.Next(3) + 1 + floor / 23);
+                            Stats["MagicDefense"] += (int)(rand.Next(3) + 1 + floor / 23);
+                            Stats["MaxMana"] += (int)(rand.Next(3) + 1 + floor / 23);
+                            break;
+                        case 3:
+                            Name = "Cyclops Tooth Amulet";
+                            Description = "An amulet made from a giant cyclops tooth. Shepherds trade their sheep for teeth with cyclops to gather their strength\n";
+                            Stats["Strength"] += (int)(rand.Next(8) + 4 + floor / 10);
+                            Stats["Defense"] += (int)(rand.Next(8) + 4 + floor / 10);
+                            Stats["Magic"] -= (int)(rand.Next(4) + 1 + floor / 16);
+                            Stats["MaxMana"] -= (int)(rand.Next(2) + floor / 20);
+                            break;
+                        case 4:
+                            Name = "Bloody Crescent Moon Amulet";
+                            Description = "An amulet made from a sacrifice table shard. Wise mages can always tell if someone is wearing one of these due to its aura\n";
+                            Stats["Magic"] += (int)(rand.Next(8) + 4 + floor / 10);
+                            Stats["MaxMana"] += (int)(rand.Next(8) + 4 + floor / 10);
+                            Stats["Strength"] -= (int)(rand.Next(4) + 1 + floor / 16);
+                            Stats["Defense"] -= (int)(rand.Next(2) + floor / 20);
+                            break;
+                        case 5:
+                            Name = "Cursed Pyramid Amulet";
+                            Description = "An amulet made from sandstone shaped like a pyramid. Desert dwellers will trade these for 5 nightswipes. 3 if they're desperate\n";
+                            Stats["Agility"] += (int)(rand.Next(8) + 4 + floor / 10);
+                            Stats["MaxMana"] += (int)(rand.Next(4) + 2 + floor / 12);
+                            Stats["MaxHP"] += (int)(rand.Next(4) + 2 + floor / 12);
+                            Stats["Magic"] -= (int)(rand.Next(4) + floor / 16);
+                            Stats["Defense"] -= (int)(rand.Next(4) + floor / 16);
+                            Stats["Strength"] -= (int)(rand.Next(4) + floor / 16);
+                            break;
+                        case 6:
+                            Name = "Half-Hearted Amulet";
+                            Description = "An amulet made from a glass heart with some health potion in it. You can't buy them, but they're gifted to suffering wanderers\n";
+                            Stats["HPRegen"] += 2;
+                            break;
+                        case 7:
+                            Name = "Half-Enchanted Amulet";
+                            Description = "An amulet made from a glass mada drop with some mana potion in it. Apprentice mages are gifted these to help them with channeling mana\n";
+                            Stats["ManaRegen"] += 2;
+                            break;
+                        case 8:
+                            Name = "Restoration Amulet";
+                            Description = "It will fully heal and grant you some XP once you enter a new floor once. It will need to recharge afterwards to work again\n";
+                            ClassType = 100;
+                            break;
+                        case 9:
+                            Name = "Empty Restoration Amulet";
+                            Description = "A used Restoration Amulet. It requires 100 more steps to work again\n";
+                            ClassType = 100;
+                            Quantity = 100;
+                            break;
+                        case 10:
+                            Name = "Survival Amulet";
+                            Description = "It will leave you at 1 HP instead of dying once. It will need to recharge afterwards to work again\n";
+                            ClassType = 100;
+                            break;
+                        case 11:
+                            Name = "Empty Survival Amulet";
+                            Description = "A used Survival Amulet. It requires 100 more steps to work again\n";
+                            ClassType = 100;
+                            Quantity = 100;
+                            break;
+                        case 12:
+                            Name = "Moon Amulet";
+                            Description = "It will fully restore your mana and let you cast a spell if you run out of mana once. It will need to recharge afterwards to work again\n";
+                            ClassType = 100;
+                            break;
+                        case 13:
+                            Name = "Empty Moon Amulet";
+                            Description = "A used Moon Amulet. It requires 100 more steps to work again\n";
+                            ClassType = 100;
+                            Quantity = 100;
+                            break;
+                    }
+
+                    if (rand.Next(8) == 0)
+                        Stats["MaxHP"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
+                    if (rand.Next(8) == 0)
+                        Stats["MaxMana"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
+                    if (rand.Next(8) == 0)
+                        Stats["Strength"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
+                    if (rand.Next(8) == 0)
+                        Stats["Magic"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
+                    if (rand.Next(8) == 0)
+                        Stats["Agility"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
+                    if (rand.Next(8) == 0)
+                        Stats["Defense"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
+                    if (rand.Next(8) == 0)
+                        Stats["MagicDefense"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
                     break;
                 case 10:
                     int itemtype = rand.Next(28);
@@ -1427,7 +1557,7 @@ namespace ByteLike
     {
         public Item[,] Inventory = new Item[11, 7];
 
-        public string File = "Graphics/ByteLikeGraphics/chest0.png";
+        public string File = "Graphics/ByteLikeGraphics/Items/chest0.png";
 
         public int[] position = new int[2];
 
@@ -1471,19 +1601,19 @@ namespace ByteLike
             {
                 Inventory = new Item[11, 4];
                 floor += 3;
-                File = "Graphics/ByteLikeGraphics/chest1.png";
+                File = "Graphics/ByteLikeGraphics/Items/chest1.png";
             }
             else if (quality < 50)
             {
                 Inventory = new Item[11, 6];
                 floor += 7;
-                File = "Graphics/ByteLikeGraphics/chest2.png";
+                File = "Graphics/ByteLikeGraphics/Items/chest2.png";
             }
             else
             {
                 Inventory = new Item[11, 7];
                 floor += 15;
-                File = "Graphics/ByteLikeGraphics/chest3.png";
+                File = "Graphics/ByteLikeGraphics/Items/chest3.png";
             }
 
             int counter = rand.Next(150);

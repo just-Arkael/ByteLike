@@ -24,6 +24,8 @@ namespace ByteLike
 
     public partial class MainWindow : Window
     {
+
+
         static MediaPlayer music = new MediaPlayer();
         static int[,] level = new int[40, 40];
         static int[,] darkness = new int[40, 40];
@@ -42,6 +44,63 @@ namespace ByteLike
         static string tempSound = "";
 
         static Random rand = new Random();
+
+        // Amulet sprites
+        static string GetAmulet(string type)
+        {
+            string File = "Graphics/ByteLikeGraphics/Armor/armor7-";
+
+            switch (type)
+            {
+                case "Star Stone Amulet":
+                    File += 0;
+                    break;
+                case "Seashell Amulet":
+                    File += 1;
+                    break;
+                case "Lightning Stone Amulet":
+                    File += 2;
+                    break;
+                case "Cyclops Tooth Amulet":
+                    File += 3;
+                    break;
+                case "Bloody Crescent Moon Amulet":
+                    File += 4;
+                    break;
+                case "Cursed Pyramid Amulet":
+                    File += 5;
+                    break;
+                case "Half-Hearted Amulet":
+                    File += 6;
+                    break;
+                case "Half-Enchanted Amulet":
+                    File += 7;
+                    break;
+                case "Restoration Amulet":
+                    File += 8;
+                    break;
+                case "Empty Restoration Amulet":
+                    File += 9;
+                    break;
+                case "Survival Amulet":
+                    File += 10;
+                    break;
+                case "Empty Survival Amulet":
+                    File += 11;
+                    break;
+                case "Moon Amulet":
+                    File += 12;
+                    break;
+                case "Empty Moon Amulet":
+                    File += 13;
+                    break;
+                default:
+                    File = "";
+                    break;
+            }
+            return File;
+        }
+
 
         // Torch and darkness
         static void ClearLight()
@@ -470,9 +529,16 @@ namespace ByteLike
                                 // Draw hat
                                 if (player.Inventory[0, 0] != null)
                                     dc.DrawImage(new BitmapImage(new Uri(player.Inventory[0, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                // Draw Amulet
+                                if (player.Inventory[6, 0] != null)
+                                {
+                                    if (GetAmulet(player.Inventory[6,0].Name) != "")
+                                        dc.DrawImage(new BitmapImage(new Uri(GetAmulet(player.Inventory[6,0].Name), UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                }
                                 // Draw weapon
                                 if (player.Inventory[3, 0] != null)
                                     dc.DrawImage(new BitmapImage(new Uri(player.Inventory[3, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+
 
                                 // Draw offhand if not a quiver (drew quiver earlier)
                                 if (player.Inventory[4, 0] != null)
@@ -513,6 +579,12 @@ namespace ByteLike
                                         // Draw hat
                                         if (item.Inventory[0, 0] != null)
                                             dc.DrawImage(new BitmapImage(new Uri(item.Inventory[0, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        // Draw Amulet
+                                        if (item.Inventory[6, 0] != null)
+                                        {
+                                            if (GetAmulet(item.Inventory[6, 0].Name) != "")
+                                                dc.DrawImage(new BitmapImage(new Uri(GetAmulet(item.Inventory[6, 0].Name), UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        }
                                         // Draw weapon
                                         if (item.Inventory[3, 0] != null)
                                             dc.DrawImage(new BitmapImage(new Uri(item.Inventory[3, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
@@ -527,7 +599,7 @@ namespace ByteLike
                                         }
                                     }
 
-                                    if (i > 0 && (!player.OpenInventory || player.OpenSpell))
+                                    if (i > 0 && (!player.OpenInventory || player.OpenSpell) && !item.File.Contains("Items"))
                                     {
                                         //FormattedText dialogueen = new FormattedText($"{item.Stats["HP"]}/{item.GetStat("MaxHP")}", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 4, Brushes.Red);
                                         //dc.DrawText(dialogueen, new Point(j*16 + (16 - dialogueen.Width)/2, i*16 - 2));
@@ -1077,6 +1149,14 @@ namespace ByteLike
 
             music.Open(new Uri(@"Graphics/Sounds/firstpart.wav", UriKind.Relative));
             music.Play();
+
+            music.MediaEnded += Music_MediaEnded;
+        }
+
+        private void Music_MediaEnded(object? sender, EventArgs e)
+        {
+            music.Position = TimeSpan.Zero;
+            music.Play();
         }
 
         private void Grid_KeyDown(object sender, KeyEventArgs e)
@@ -1090,42 +1170,40 @@ namespace ByteLike
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             bool cameraManagment = false;
-            currentSound = "";
-            tempSound = "";
 
-            if ( Keyboard.IsKeyDown(Key.Up))
+            if (Keyboard.IsKeyDown(Key.Up))
             {
                 if (cameraSize[1] > 20)
-                cameraSize[1]--;
+                    cameraSize[1]--;
                 cameraManagment = true;
             }
-            if ( Keyboard.IsKeyDown(Key.Down))
+            if (Keyboard.IsKeyDown(Key.Down))
             {
                 if (cameraSize[1] < level.GetLength(1) - 1)
-                cameraSize[1]++;
+                    cameraSize[1]++;
                 cameraManagment = true;
             }
-            if ( Keyboard.IsKeyDown(Key.Left))
+            if (Keyboard.IsKeyDown(Key.Left))
             {
                 if (cameraSize[0] > 21)
-                cameraSize[0]--;
+                    cameraSize[0]--;
                 cameraManagment = true;
             }
-            if ( Keyboard.IsKeyDown(Key.Right))
+            if (Keyboard.IsKeyDown(Key.Right))
             {
                 if (cameraSize[0] < level.GetLength(0) - 1)
-                cameraSize[0]++;
+                    cameraSize[0]++;
                 cameraManagment = true;
             }
 
-            if ( Keyboard.IsKeyDown(Key.F12))
+            if (Keyboard.IsKeyDown(Key.F12))
             {
                 switch (ByteLikeWindow.WindowState)
                 {
                     case WindowState.Normal:
                         ByteLikeWindow.WindowState = WindowState.Maximized;
                         ByteLikeWindow.WindowStyle = WindowStyle.None;
-                            break;
+                        break;
                     case WindowState.Maximized:
                         ByteLikeWindow.WindowState = WindowState.Normal;
                         ByteLikeWindow.WindowStyle = WindowStyle.SingleBorderWindow;
@@ -1134,113 +1212,28 @@ namespace ByteLike
                 cameraManagment = true;
             }
 
-            if (!cameraManagment)
+            if (cameraManagment || Keyboard.IsKeyDown(Key.E) || Keyboard.IsKeyDown(Key.Q) || Keyboard.IsKeyDown(Key.W) || Keyboard.IsKeyDown(Key.S) || Keyboard.IsKeyDown(Key.A) || Keyboard.IsKeyDown(Key.D) || Keyboard.IsKeyDown(Key.R))
             {
-                bool doEnemies = false;
+                currentSound = "";
+                tempSound = "";
 
-                if (effects.Count > 0)
+
+                if (!cameraManagment)
                 {
-                    doEnemies = true;
-                    List<int> deleteus = new List<int>();
-                    for (int i = 0; i < effects.Count; i++)
-                    {
-                        if (!effects[i].Logics(ref level, ref enemies, ref effects, ref player, out response, response, out tempSound))
-                            deleteus.Add(i);
-
-                        if (tempSound != "")
-                            currentSound = tempSound;
-                    }
-                    if (deleteus.Count > 0)
-                    {
-                        for (int i = deleteus.Count - 1; i >= 0; i--)
-                        {
-                            effects.RemoveAt(deleteus[i]);
-                        }
-                    }
-
-                }
-                else
-                {
-                    response = player.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness, out tempSound);
-                    currentSound = tempSound;
-
-                    if (!player.OpenInventory && !Keyboard.IsKeyDown(Key.Q))
-                    {
-                        doEnemies = true;
-                    }
-
-                    if (enemies.Count < 10 + floor / 2)
-                    {
-                        int[] newPos = new int[] { rand.Next(level.GetLength(0)), rand.Next(level.GetLength(1)) };
-
-                        if (level[newPos[0], newPos[1]] == 1 && (darkness[newPos[0], newPos[1]] <= 0 || darkness[newPos[0], newPos[1]] == 2) && DistanceBetween(new int[] { newPos[0], newPos[1] }, new int[] { player.position[0], player.position[1] }) > player.GetStat("Torch")+2)
-                        {
-                            enemies.Add(new Critter(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
-                        }
-                    }
-                }
-
-                if (effects.Count <= 0)
-                {
-                    if (doEnemies)
-                    {
-                        List<int> deletusXL = new List<int>();
-                        int pos = 0;
-
-                        foreach (Creature enemy in enemies)
-                        {
-                            response += enemy.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness, out string tempSound);
-
-                            if (tempSound != "" && currentSound == "")
-                                tempSound = currentSound;
-
-                            if (enemy.Stats["HP"] <= 0)
-                                deletusXL.Add(pos);
-
-                            pos++;
-
-                        }
-
-
-                        if (deletusXL.Count > 0)
-                        {
-                            for (int i = deletusXL.Count - 1; i >= 0; i--)
-                            {
-                                if (enemies[deletusXL[i]].DropEquipment)
-                                {
-                                    Chest temp = new Chest(new int[] { enemies[deletusXL[i]].position[0], enemies[deletusXL[i]].position[1] }, -(enemies[deletusXL[i]].Inventory.GetLength(1) + 1));
-                                    for (int f = 0; f < enemies[deletusXL[i]].Inventory.GetLength(1); f++)
-                                    {
-                                        for (int k = 0; k < enemies[deletusXL[i]].Inventory.GetLength(0); k++)
-                                        {
-                                            temp.Inventory[k, f] = enemies[deletusXL[i]].Inventory[k, f];
-                                        }
-                                    }
-                                    chests.Add(temp);
-                                }
-
-                                if (enemies[deletusXL[i]].GetType() == typeof(DoppleGanger))
-                                {
-                                    response += "The darkness around you glooms...\n";
-                                    player.DangerLevel += 3;
-                                }
-                                enemies.RemoveAt(deletusXL[i]);
-                            }
-                        }
-                    }
+                    bool doEnemies = false;
 
                     if (effects.Count > 0)
                     {
+                        doEnemies = true;
                         List<int> deleteus = new List<int>();
                         for (int i = 0; i < effects.Count; i++)
                         {
                             if (!effects[i].Logics(ref level, ref enemies, ref effects, ref player, out response, response, out tempSound))
                                 deleteus.Add(i);
 
-                            if (currentSound == "" && tempSound != "")
+                            if (tempSound != "")
                                 currentSound = tempSound;
                         }
-
                         if (deleteus.Count > 0)
                         {
                             for (int i = deleteus.Count - 1; i >= 0; i--)
@@ -1248,127 +1241,263 @@ namespace ByteLike
                                 effects.RemoveAt(deleteus[i]);
                             }
                         }
+
+                    }
+                    else
+                    {
+                        response = player.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness, out tempSound);
+                        currentSound = tempSound;
+
+                        if (!player.OpenInventory && !Keyboard.IsKeyDown(Key.Q))
+                        {
+                            doEnemies = true;
+                        }
+
+                        if (enemies.Count < 10 + floor / 2)
+                        {
+                            int[] newPos = new int[] { rand.Next(level.GetLength(0)), rand.Next(level.GetLength(1)) };
+
+                            if (level[newPos[0], newPos[1]] == 1 && (darkness[newPos[0], newPos[1]] <= 0 || darkness[newPos[0], newPos[1]] == 2) && DistanceBetween(new int[] { newPos[0], newPos[1] }, new int[] { player.position[0], player.position[1] }) > player.GetStat("Torch") + 2)
+                            {
+                                enemies.Add(new Critter(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
+                            }
+                        }
+                    }
+
+                    if (effects.Count <= 0)
+                    {
+                        if (doEnemies)
+                        {
+                            List<int> deletusXL = new List<int>();
+                            int pos = 0;
+
+                            foreach (Creature enemy in enemies)
+                            {
+                                response += enemy.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness, out string tempSound);
+
+                                if (tempSound != "" && currentSound == "" || tempSound == "Graphics/Sounds/explosion.wav")
+                                    tempSound = currentSound;
+
+                                if (enemy.Stats["HP"] <= 0 && enemy.Inventory[6, 0] != null)
+                                {
+                                    if (enemy.Inventory[6, 0].Name == "Survival Amulet")
+                                    {
+                                        enemy.Stats["HP"] = 1;
+                                        enemy.Inventory[6, 0].Name = "Empty Survival Amulet";
+                                        enemy.Inventory[6, 0].Quantity = enemy.Inventory[6, 0].ClassType;
+                                        enemy.Inventory[6, 0].ClassType += 10;
+                                        enemy.Inventory[6, 0].Description = $"A used Survival Amulet. It requires {enemy.Inventory[6, 0].Quantity} more steps to work again\n";
+                                        enemy.Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet11.png";
+                                        response += $"{enemy.Name}'s Survival Amulet glows brightly!\n";
+                                    }
+                                }
+
+                                if (enemy.Stats["HP"] <= 0)
+                                    deletusXL.Add(pos);
+
+                                pos++;
+
+                            }
+
+
+                            if (deletusXL.Count > 0)
+                            {
+                                for (int i = deletusXL.Count - 1; i >= 0; i--)
+                                {
+                                    if (enemies[deletusXL[i]].DropEquipment)
+                                    {
+                                        Chest temp = new Chest(new int[] { enemies[deletusXL[i]].position[0], enemies[deletusXL[i]].position[1] }, -(enemies[deletusXL[i]].Inventory.GetLength(1) + 1));
+                                        for (int f = 0; f < enemies[deletusXL[i]].Inventory.GetLength(1); f++)
+                                        {
+                                            for (int k = 0; k < enemies[deletusXL[i]].Inventory.GetLength(0); k++)
+                                            {
+                                                temp.Inventory[k, f] = enemies[deletusXL[i]].Inventory[k, f];
+                                            }
+                                        }
+                                        chests.Add(temp);
+                                    }
+
+                                    if (enemies[deletusXL[i]].GetType() == typeof(DoppleGanger))
+                                    {
+                                        response += "The darkness around you glooms...\n";
+                                        player.DangerLevel += 3;
+                                    }
+                                    enemies.RemoveAt(deletusXL[i]);
+                                }
+                            }
+                        }
+
+                        if (effects.Count > 0)
+                        {
+                            List<int> deleteus = new List<int>();
+                            for (int i = 0; i < effects.Count; i++)
+                            {
+                                if (!effects[i].Logics(ref level, ref enemies, ref effects, ref player, out response, response, out tempSound))
+                                    deleteus.Add(i);
+
+                                if (currentSound == "" && tempSound != "")
+                                    currentSound = tempSound;
+                            }
+
+                            if (deleteus.Count > 0)
+                            {
+                                for (int i = deleteus.Count - 1; i >= 0; i--)
+                                {
+                                    effects.RemoveAt(deleteus[i]);
+                                }
+                            }
+                        }
                     }
                 }
-            }
-            else
-            {
-                response = $"Camera size: {cameraSize[0]} by {cameraSize[1]}\n";
-            }
-            // Set camera to player's position
-            camera[0] = player.position[0];
-            camera[1] = player.position[1];
+                else
+                {
+                    response = $"Camera size: {cameraSize[0]} by {cameraSize[1]}\n";
+                }
+                // Set camera to player's position
+                camera[0] = player.position[0];
+                camera[1] = player.position[1];
 
 
-            if (level[player.position[0], player.position[1]] == 15 && Keyboard.IsKeyDown(Key.E) && !player.OpenInventory && !Keyboard.IsKeyDown(Key.W) && !Keyboard.IsKeyDown(Key.S) && !Keyboard.IsKeyDown(Key.A) && !Keyboard.IsKeyDown(Key.D) && effects.Count <= 0)
-            {
-                currentSound = "Graphics/Sounds/newfloor.wav";
-                NewLevel();
-                response = $"{player.Name} finds their way to floor #{floor}!\n";
-                if (floor <= 16)
+                if (level[player.position[0], player.position[1]] == 15 && Keyboard.IsKeyDown(Key.E) && !player.OpenInventory && !Keyboard.IsKeyDown(Key.W) && !Keyboard.IsKeyDown(Key.S) && !Keyboard.IsKeyDown(Key.A) && !Keyboard.IsKeyDown(Key.D) && effects.Count <= 0)
+                {
+                    currentSound = "Graphics/Sounds/newfloor.wav";
+                    NewLevel();
+                    response = $"{player.Name} finds their way to floor #{floor}!\n";
+
+                    if (player.Inventory[6, 0] != null)
+                    {
+                        if (player.Inventory[6, 0].Name == "Restoration Amulet")
+                        {
+                            player.Stats["HP"] = player.GetStat("MaxHP");
+                            player.Stats["Mana"] = player.GetStat("MaxMana");
+                            player.Stats["XP"] += (int)((90 + Math.Pow(player.Stats["Level"], 2) * 10)/5);
+                            player.Inventory[6, 0].Name = "Empty Restoration Amulet";
+                            player.Inventory[6, 0].Quantity = player.Inventory[6, 0].ClassType;
+                            player.Inventory[6, 0].ClassType += 10;
+                            player.Inventory[6, 0].Description = $"A used Restoration Amulet. It requires {player.Inventory[6, 0].Quantity} more steps to work again\n";
+                            player.Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet9.png";
+                            response += $"{player.Name}'s Restoration Amulet glows brightly!\n";
+                        }
+                    }
+
+                    if (floor <= 16)
+                    {
+                        music.Stop();
+                        music.Open(new Uri(@"Graphics/Sounds/firstpart.wav", UriKind.Relative));
+                        music.Play();
+                    }
+                    else if (floor > 16 && floor < 32)
+                    {
+                        music.Stop();
+                        music.Open(new Uri(@"Graphics/Sounds/secondpart.wav", UriKind.Relative));
+                        music.Play();
+                    }
+                    else if (floor >= 32)
+                    {
+                        music.Stop();
+                        music.Open(new Uri(@"Graphics/Sounds/thirdpart.wav", UriKind.Relative));
+                        music.Play();
+                    }
+
+                    if (Directory.Exists("Memories"))
+                    {
+                        if (File.Exists($"Memories/floor{floor}.json"))
+                        {
+                            using (StreamReader sr = File.OpenText($"Memories/floor{floor}.json"))
+                            {
+                                Player temp = new JsonSerializer().Deserialize<Player>(new JsonTextReader(sr));
+                                if (temp != null)
+                                {
+                                    int[] spawnpoint = new int[2] { 0, 0 };
+                                    int counter = 0;
+                                    while (level[spawnpoint[0], spawnpoint[1]] != 1 && level[spawnpoint[0], spawnpoint[1]] != 3 && level[spawnpoint[0], spawnpoint[1]] != 8 && counter < 50)
+                                    {
+                                        spawnpoint[0] = rand.Next(level.GetLength(0));
+                                        spawnpoint[1] = rand.Next(level.GetLength(1));
+
+                                        counter++;
+                                        if (level[spawnpoint[0], spawnpoint[1]] == 1 || level[spawnpoint[0], spawnpoint[1]] == 3 || level[spawnpoint[0], spawnpoint[1]] == 8)
+                                        {
+                                            enemies.Add(new DoppleGanger(temp, new int[] { spawnpoint[0], spawnpoint[1] }));
+                                            counter = 50;
+                                            response += "An eerie chill goes down your spine...\n";
+                                            music.Stop();
+                                            music.Open(new Uri(@"Graphics/Sounds/doppleganger.wav", UriKind.Relative));
+                                            music.Play();
+                                        }
+                                    }
+                                }
+                                sr.Close();
+                            }
+                            File.Delete($"Memories/floor{floor}.json");
+                        }
+                    }
+                    if (cameraSize[0] >= level.GetLength(0))
+                        cameraSize[0] = level.GetLength(0) - 1;
+                    if (cameraSize[1] >= level.GetLength(1))
+                        cameraSize[1] = level.GetLength(1) - 1;
+                }
+
+                if (player.Stats["HP"] <= 0 && player.Inventory[6, 0] != null)
+                {
+                    if (player.Inventory[6, 0].Name == "Survival Amulet")
+                    {
+                        player.Stats["HP"] = 1;
+                        player.Inventory[6, 0].Name = "Empty Survival Amulet";
+                        player.Inventory[6, 0].Quantity = player.Inventory[6, 0].ClassType;
+                        player.Inventory[6, 0].ClassType += 10;
+                        player.Inventory[6, 0].Description = $"A used Survival Amulet. It requires {player.Inventory[6, 0].Quantity} more steps to work again\n";
+                        player.Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet11.png";
+                        response += $"{player.Name}'s Survival Amulet glows brightly!\n";
+                    }
+                }
+
+                if (player.Stats["HP"] <= 0)
                 {
                     music.Stop();
                     music.Open(new Uri(@"Graphics/Sounds/firstpart.wav", UriKind.Relative));
                     music.Play();
-                }
-                else if (floor > 16 && floor < 32)
-                {
-                    music.Stop();
-                    music.Open(new Uri(@"Graphics/Sounds/secondpart.wav", UriKind.Relative));
-                    music.Play();
-                }
-                else if (floor >= 32)
-                {
-                    music.Stop();
-                    music.Open(new Uri(@"Graphics/Sounds/thirdpart.wav", UriKind.Relative));
-                    music.Play();
-                }
-
-                if (Directory.Exists("Memories"))
-                {
-                    if (File.Exists($"Memories/floor{floor}.json"))
+                    if (!Directory.Exists("Memories"))
+                        Directory.CreateDirectory("Memories");
+                    if (!File.Exists($"Memories/floor{floor}.json"))
                     {
-                        using (StreamReader sr = File.OpenText($"Memories/floor{floor}.json"))
+                        using (StreamWriter sw = File.CreateText($"Memories/floor{floor}.json"))
                         {
-                            Player temp = new JsonSerializer().Deserialize<Player>(new JsonTextReader(sr));
-                            if (temp != null)
-                            {
-                                int[] spawnpoint = new int[2] { 0, 0 };
-                                int counter = 0;
-                                while (level[spawnpoint[0], spawnpoint[1]] != 1 && level[spawnpoint[0], spawnpoint[1]] != 3 && level[spawnpoint[0], spawnpoint[1]] != 8 && counter < 50)
-                                {
-                                    spawnpoint[0] = rand.Next(level.GetLength(0));
-                                    spawnpoint[1] = rand.Next(level.GetLength(1));
-
-                                    counter++;
-                                    if (level[spawnpoint[0], spawnpoint[1]] == 1 || level[spawnpoint[0], spawnpoint[1]] == 3 || level[spawnpoint[0], spawnpoint[1]] == 8)
-                                    {
-                                        enemies.Add(new DoppleGanger(temp, new int[] { spawnpoint[0], spawnpoint[1] }));
-                                        counter = 50;
-                                        response += "An eerie chill goes down your spine...\n";
-                                        music.Stop();
-                                        music.Open(new Uri(@"Graphics/Sounds/doppleganger.wav", UriKind.Relative));
-                                        music.Play();
-                                    }
-                                }
-                            }
-                            sr.Close();
+                            sw.WriteLine(JsonConvert.SerializeObject(player));
+                            sw.Close();
                         }
-                        File.Delete($"Memories/floor{floor}.json");
                     }
-                }
-                if (cameraSize[0] >= level.GetLength(0))
-                    cameraSize[0] = level.GetLength(0) - 1;
-                if (cameraSize[1] >= level.GetLength(1))
-                    cameraSize[1] = level.GetLength(1) - 1;
-            }
+                    currentSound = "Graphics/Sounds/scream.wav";
+                    floor = 0;
+                    player = new Player("Player");
+                    NewLevel();
+                    response = $"{player.Name} enters the dungeon.\nScreams of an unfortunate adventurer echo somewhere in the depths...\n";
 
-            if (player.Stats["HP"] <= 0)
-            {
-                music.Stop();
-                music.Open(new Uri(@"Graphics/Sounds/firstpart.wav", UriKind.Relative));
-                music.Play();
-                if (!Directory.Exists("Memories"))
-                    Directory.CreateDirectory("Memories");
-                if (!File.Exists($"Memories/floor{floor}.json"))
+                    if (cameraSize[0] >= level.GetLength(0))
+                        cameraSize[0] = level.GetLength(0) - 1;
+                    if (cameraSize[1] >= level.GetLength(1))
+                        cameraSize[1] = level.GetLength(1) - 1;
+                }
+
+                if (File.Exists(currentSound))
                 {
-                    using (StreamWriter sw = File.CreateText($"Memories/floor{floor}.json"))
-                    {
-                        sw.WriteLine(JsonConvert.SerializeObject(player));
-                        sw.Close();
-                    }
+                    System.Media.SoundPlayer sound = new System.Media.SoundPlayer(currentSound);
+                    sound.Play();
                 }
-                currentSound = "Graphics/Sounds/scream.wav";
-                floor = 0;
-                player = new Player("Player");
-                NewLevel();
-                response = $"{player.Name} enters the dungeon.\nScreams of an unfortunate adventurer echo somewhere in the depths...\n";
 
-                if (cameraSize[0] >= level.GetLength(0))
-                    cameraSize[0] = level.GetLength(0) - 1;
-                if (cameraSize[1] >= level.GetLength(1))
-                    cameraSize[1] = level.GetLength(1) - 1;
+                Border imageBorder = new Border();
+                imageBorder.BorderBrush = System.Windows.Media.Brushes.Gray;
+                imageBorder.BorderThickness = new Thickness(0);
+                imageBorder.HorizontalAlignment = HorizontalAlignment.Left;
+                imageBorder.VerticalAlignment = VerticalAlignment.Top;
+                imageBorder.Margin = new Thickness(0);
+                imageBorder.Child = DrawMap(response);
+
+                this.Background = System.Windows.Media.Brushes.White;
+                this.Margin = new Thickness(0);
+                this.Content = imageBorder;
+
             }
-
-            if (File.Exists(currentSound))
-            {
-                System.Media.SoundPlayer sound = new System.Media.SoundPlayer(currentSound);
-                sound.Play();
-            }
-
-            Border imageBorder = new Border();
-            imageBorder.BorderBrush = System.Windows.Media.Brushes.Gray;
-            imageBorder.BorderThickness = new Thickness(0);
-            imageBorder.HorizontalAlignment = HorizontalAlignment.Left;
-            imageBorder.VerticalAlignment = VerticalAlignment.Top;
-            imageBorder.Margin = new Thickness(0);
-            imageBorder.Child = DrawMap(response);
-
-            this.Background = System.Windows.Media.Brushes.White;
-            this.Margin = new Thickness(0);
-            this.Content = imageBorder;
-            
-
         }
     }
 

@@ -883,7 +883,7 @@ namespace ByteLike
                         position[1] += movement[1];
                         if (FloorCheck(level[position[0], position[1]]))
                         {
-                            if (darkness[position[0], position[1]] > 0 && darkness[position[0], position[1]] != 2)
+                            if (darkness[position[0], position[1]] == 1 && darkness[position[0], position[1]] != 2)
                             {
                                 level[position[0], position[1]] = 1;
                                 if (position[0] + 1 < level.GetLength(0))
@@ -918,7 +918,7 @@ namespace ByteLike
                         {
                             Stats["HP"] -= (int)(Stats["MaxHP"] * 0.2);
 
-                            if (darkness[position[0], position[1]] > 0 && darkness[position[0], position[1]] != 2)
+                            if (darkness[position[0], position[1]] == 1 && darkness[position[0], position[1]] != 2)
                             {
                                 level[position[0], position[1]] = 11;
 
@@ -961,7 +961,7 @@ namespace ByteLike
                         if (FloorCheck(level[position[0], position[1]]))
                         {
                             Statuses[1] = 10;
-                            if (darkness[position[0], position[1]] > 0 && darkness[position[0], position[1]] != 2)
+                            if (darkness[position[0], position[1]] == 1 && darkness[position[0], position[1]] != 2)
                             {
                                 level[position[0], position[1]] = 12;
 
@@ -1579,7 +1579,8 @@ namespace ByteLike
 
             // Movement code
 
-            // Keys
+
+            // Opening inventory
             if (Keyboard.IsKeyDown(Key.Q) && !OpenInventory)
             {
                 OpenInventory = true;
@@ -1587,7 +1588,7 @@ namespace ByteLike
                 invCheck = true;
                 sound = "Graphics/Sounds/openinventory.wav";
             }
-            // Move only if not frozen/paralysed
+            // Move only if not frozen/paralysed (Movement direction)
             if (Statuses[2] == 0 && Statuses[3] % 2 == 0 || OpenInventory)
             {
                 if (Keyboard.IsKeyDown(Key.W)) { movement[1] = -1; }
@@ -1603,6 +1604,7 @@ namespace ByteLike
                 bool movecheck = true;
 
 
+                // Shooting with a bow
                 if (Keyboard.IsKeyDown(Key.E) && Inventory[3, 0] != null && level[position[0],position[1]] != 15)
                 {
                     if (Inventory[3, 0].Name.ToLower().Contains("bow"))
@@ -1657,10 +1659,55 @@ namespace ByteLike
                             CurrentSlot[1] = 0;
                         }
                     }
-                        
                 }
 
                 response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
+                // Empty amulets
+                if (Inventory[6, 0] != null)
+                {
+                    switch (Inventory[6, 0].Name)
+                    {
+                        case "Empty Restoration Amulet":
+                            Inventory[6, 0].Quantity--;
+                            Inventory[6,0].Description = $"A used Restoration Amulet. It requires {Inventory[6, 0].Quantity} more steps to work again\n";
+                            if (Inventory[6, 0].Quantity <= 0)
+                            {
+                                response += $"{Name}'s Restoration Amulet glows brightly!\n";
+                                Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet8.png";
+                                Inventory[6, 0].Quantity = 1;
+                                Inventory[6, 0].ClassType += 10;
+                                Inventory[6, 0].Name = "Restoration Amulet";
+                                Inventory[6, 0].Description = "It will fully heal and grant you some XP once you enter a new floor once. It will need to recharge afterwards to work again\n";
+                            }
+                            break;
+                        case "Empty Survival Amulet":
+                            Inventory[6, 0].Quantity--;
+                            Inventory[6, 0].Description = $"A used Survival Amulet. It requires {Inventory[6, 0].Quantity} more steps to work again\n";
+                            if (Inventory[6, 0].Quantity <= 0)
+                            {
+                                response += $"{Name}'s Survival Amulet glows brightly!\n";
+                                Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet10.png";
+                                Inventory[6, 0].Quantity = 1;
+                                Inventory[6, 0].ClassType += 10;
+                                Inventory[6, 0].Name = "Survival Amulet";
+                                Inventory[6, 0].Description = "It will leave you at 1 HP instead of dying once. It will need to recharge afterwards to work again\n";
+                            }
+                            break;
+                        case "Empty Moon Amulet":
+                            Inventory[6, 0].Quantity--;
+                            Inventory[6, 0].Description = $"A used Moon Amulet. It requires {Inventory[6, 0].Quantity} more steps to work again\n";
+                            if (Inventory[6, 0].Quantity <= 0)
+                            {
+                                response += $"{Name}'s Moon Amulet glows brightly!\n";
+                                Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet12.png";
+                                Inventory[6, 0].Quantity = 1;
+                                Inventory[6, 0].ClassType += 10;
+                                Inventory[6, 0].Name = "Moon Amulet";
+                                Inventory[6, 0].Description = "It will fully restore your mana and let you cast a spell if you run out of mana once. It will need to recharge afterwards to work again\n";
+                            }
+                            break;
+                    }
+                }
             }
             // if in inventory
             else
@@ -2279,6 +2326,20 @@ namespace ByteLike
                             }
                         }
 
+                        if (UseMana && Stats["Mana"] < GetSpellCost(RemSpell) && Inventory[6,0] != null)
+                        {
+                            if (Inventory[6, 0].Name == "Moon Amulet")
+                            {
+                                Stats["Mana"] = GetStat("MaxMana") + GetSpellCost(RemSpell);
+                                Inventory[6,0].Name = "Empty Moon Amulet";
+                                Inventory[6, 0].Quantity = Inventory[6, 0].ClassType;
+                                Inventory[6, 0].ClassType += 10;
+                                Inventory[6, 0].Description = $"A used Moon Amulet. It requires {Inventory[6,0].Quantity} more steps to work again\n";
+                                Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet13.png";
+                                response += $"{Name}'s Moon Amulet glows brightly!\n";
+                            }
+                        }
+
                         if (Stats["Mana"] >= GetSpellCost(RemSpell) || !UseMana)
                         {
                             if (ArrowSlot[0] != 0 || ArrowSlot[1] != 0)
@@ -2321,13 +2382,13 @@ namespace ByteLike
 
             //
 
+            // Conditions
             if (!OpenInventory)
             {
                 response = Conditions(response);
                 if (Stats["HP"] > GetStat("MaxHP")) { Stats["HP"] = GetStat("MaxHP"); }
                 if (Stats["Mana"] > GetStat("MaxMana")) { Stats["Mana"] = GetStat("MaxMana"); }
             }
-
 
 
             // Death
@@ -2359,6 +2420,13 @@ namespace ByteLike
             if (Stats["XP"] >= (int)(90 + Math.Pow(Stats["Level"], 2) * 10))
                 response += LevelUp();
 
+
+            // Skipping turns
+            if (Keyboard.IsKeyDown(Key.R) && !OpenInventory)
+            {
+                response += $"{Name} is watching carefully...\n";
+                sound = "";
+            }
 
             currentSound = sound;
 
@@ -2457,7 +2525,7 @@ namespace ByteLike
             if (Stats["Level"] <= 0)
                 Stats["Level"] = 1;
 
-            if ((floor / 23) >= 4)
+            if ((floor / 12) >= 4)
             {
                 File += "3.png";
                 Stats["HPRegen"] += 1;
@@ -2465,7 +2533,7 @@ namespace ByteLike
                 statModifier = 1.25;
                 Name = "Giant Rat";
             }
-            else if ((floor / 23) >= 2)
+            else if ((floor / 12) >= 2)
             {
                 File += "2.png";
                 Stats["HPRegen"] += 1;
@@ -2662,6 +2730,14 @@ namespace ByteLike
                         for (byte i = 0; i < 10; i++)
                             actions.Add(2);
                     }
+                    else if (Stats["Mana"] < GetSpellCost(Spells[chosenSpell]) && Inventory[6, 0] != null)
+                    {
+                        if (Inventory[6, 0].Name == "Moon Amulet")
+                        {
+                            for (byte i = 0; i < 12; i++)
+                                actions.Add(2);
+                        }
+                    }
                 }
 
                 // deciding to - Shooting an arrow
@@ -2782,6 +2858,16 @@ namespace ByteLike
                         response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
                         break;
                     case 2:
+                        if (Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
+                        {
+                            Stats["Mana"] = GetStat("MaxMana") + GetSpellCost(Spells[chosenSpell]);
+                            Inventory[6, 0].Name = "Empty Moon Amulet";
+                            Inventory[6, 0].Quantity = Inventory[6, 0].ClassType;
+                            Inventory[6, 0].ClassType += 10;
+                            Inventory[6, 0].Description = $"A used Moon Amulet. It requires {Inventory[6, 0].Quantity} more steps to work again\n";
+                            Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet13.png";
+                            response += $"{Name}'s Moon Amulet glows brightly!\n";
+                        }
                         Stats["Mana"] -= GetSpellCost(Spells[chosenSpell]);
                         sound = "Graphics/Sounds/holychoir.wav";
                         arrowSlot[0] = 0;
