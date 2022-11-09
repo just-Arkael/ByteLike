@@ -45,6 +45,8 @@ namespace ByteLike
 
         static Random rand = new Random();
 
+        static bool MainMenu = true;
+
         // Amulet sprites
         static string GetAmulet(string type)
         {
@@ -461,191 +463,192 @@ namespace ByteLike
                                     break;
 
                             }
+                            // draw tile
+                            dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
 
+
+                            // if partly in darkness, draw partial darkness
+                            if (darkness[camera[0] + j, camera[1] + i] == 2)
+                            {
+                                // EFFECTS IN PARTIAL DARKNESS
+                                foreach (Effect item in effects)
+                                {
+                                    if (camera[0] + j == item.position[0] && camera[1] + i == item.position[1])
+                                        dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                }
+
+                                dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Tiles/partialdarkness.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                            }
+                            // draw other sprites
+                            else
+                            {
+                                // CHESTS
+                                foreach (Chest item in chests)
+                                {
+                                    if (item.position[0] == camera[0] + j && item.position[1] == camera[1] + i && level[item.position[0], item.position[1]] != 2 && level[item.position[0], item.position[1]] != 0 && level[item.position[0], item.position[1]] != 5 && level[item.position[0], item.position[1]] != 4)
+                                    {
+                                        dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                    }
+                                }
+
+                                // PLAYER
+                                if (player.position[0] == camera[0] + j && player.position[1] == camera[1] + i)
+                                {
+                                    // Draw quiver if slot is full and is a quiver
+                                    if (player.Inventory[4, 0] != null)
+                                    {
+                                        if (player.Inventory[4, 0].Name.Contains("Quiver"))
+                                        {
+                                            dc.DrawImage(new BitmapImage(new Uri(player.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        }
+                                    }
+
+                                    // If not a ghost, draw regular sprite
+                                    if (!player.IsGhost)
+                                    {
+                                        dc.DrawImage(new BitmapImage(new Uri(player.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                    }
+                                    // Otherwise, draw the ghosty appearance
+                                    else
+                                    {
+                                        dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Creatures/player4.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                    }
+
+
+                                    // Draw legs
+                                    if (player.Inventory[2, 0] != null)
+                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[2, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                    // Draw chestplate
+                                    if (player.Inventory[1, 0] != null)
+                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[1, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                    // Draw hat
+                                    if (player.Inventory[0, 0] != null)
+                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[0, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                    // Draw Amulet
+                                    if (player.Inventory[6, 0] != null)
+                                    {
+                                        if (GetAmulet(player.Inventory[6, 0].Name) != "")
+                                            dc.DrawImage(new BitmapImage(new Uri(GetAmulet(player.Inventory[6, 0].Name), UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                    }
+                                    // Draw weapon
+                                    if (player.Inventory[3, 0] != null)
+                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[3, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+
+
+                                    // Draw offhand if not a quiver (drew quiver earlier)
+                                    if (player.Inventory[4, 0] != null)
+                                    {
+                                        if (!player.Inventory[4, 0].Name.Contains("Quiver"))
+                                        {
+                                            dc.DrawImage(new BitmapImage(new Uri(player.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        }
+                                    }
+
+                                }
+                                // End player draw code
+
+                                // ENEMIES
+                                foreach (Creature item in enemies)
+                                {
+                                    if (camera[0] + j == item.position[0] && camera[1] + i == item.position[1])
+                                    {
+                                        if (item.Inventory[4, 0] != null && item.DrawEquipment)
+                                        {
+                                            if (item.Inventory[4, 0].Name.Contains("Quiver"))
+                                            {
+                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                            }
+                                        }
+
+                                        dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+
+                                        if (item.DrawEquipment)
+                                        {
+                                            // Draw legs
+                                            if (item.Inventory[2, 0] != null)
+                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[2, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                            // Draw chestplate
+                                            if (item.Inventory[1, 0] != null)
+                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[1, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                            // Draw hat
+                                            if (item.Inventory[0, 0] != null)
+                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[0, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                            // Draw Amulet
+                                            if (item.Inventory[6, 0] != null)
+                                            {
+                                                if (GetAmulet(item.Inventory[6, 0].Name) != "")
+                                                    dc.DrawImage(new BitmapImage(new Uri(GetAmulet(item.Inventory[6, 0].Name), UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                            }
+                                            // Draw weapon
+                                            if (item.Inventory[3, 0] != null)
+                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[3, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+
+                                            // Draw offhand if not a quiver (drew quiver earlier)
+                                            if (item.Inventory[4, 0] != null)
+                                            {
+                                                if (!item.Inventory[4, 0].Name.Contains("Quiver"))
+                                                {
+                                                    dc.DrawImage(new BitmapImage(new Uri(item.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                                }
+                                            }
+                                        }
+
+                                        if (i > 0 && (!player.OpenInventory || player.OpenSpell) && !item.File.Contains("Items"))
+                                        {
+                                            //FormattedText dialogueen = new FormattedText($"{item.Stats["HP"]}/{item.GetStat("MaxHP")}", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 4, Brushes.Red);
+                                            //dc.DrawText(dialogueen, new Point(j*16 + (16 - dialogueen.Width)/2, i*16 - 2));
+
+                                            for (int f = 0; f < 14; f++)
+                                            {
+                                                string hpbar = "Graphics/ByteLikeGraphics/Hud/healthbar";
+                                                if (f == 0)
+                                                {
+                                                    if (item.Stats["HP"] < (item.GetStat("MaxHP") / 16.0))
+                                                        hpbar += "0.png";
+                                                    else
+                                                        hpbar += "3.png";
+
+                                                    dc.DrawImage(new BitmapImage(new Uri(hpbar, UriKind.Relative)), new Rect(j * 16 + f, i * 16 - 4, 2.25, 4));
+                                                }
+                                                else if (f == 13)
+                                                {
+                                                    if (item.Stats["HP"] < (item.GetStat("MaxHP") / 16.0) * 15.0)
+                                                        hpbar += "2.png";
+                                                    else
+                                                        hpbar += "5.png";
+
+                                                    dc.DrawImage(new BitmapImage(new Uri(hpbar, UriKind.Relative)), new Rect(j * 16 + f, i * 16 - 4, 2, 4));
+                                                }
+                                                else
+                                                {
+                                                    if (item.Stats["HP"] < (item.GetStat("MaxHP") / 16.0) * (f + 1.0))
+                                                        hpbar += "1.png";
+                                                    else
+                                                        hpbar += "4.png";
+
+                                                    dc.DrawImage(new BitmapImage(new Uri(hpbar, UriKind.Relative)), new Rect(j * 16 + f, i * 16 - 4, 3, 4));
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // EFFECTS
+                                foreach (Effect item in effects)
+                                {
+                                    if (camera[0] + j == item.position[0] && camera[1] + i == item.position[1])
+                                        dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                }
+                            }
                         }
                         // if covered in darkness
                         else
                         {
                             floorImage = "Graphics/ByteLikeGraphics/Tiles/darkness.png";
+                            // draw tile
+                            dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
                         }
 
-                        // draw tile
-                        dc.DrawImage(new BitmapImage(new Uri(floorImage, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-
-                        // if partly in darkness, draw partial darkness
-                        if (darkness[camera[0] + j, camera[1] + i] == 2)
-                        {
-                            // EFFECTS IN PARTIAL DARKNESS
-                            foreach (Effect item in effects)
-                            {
-                                if (camera[0] + j == item.position[0] && camera[1] + i == item.position[1])
-                                    dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                            }
-
-                            dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Tiles/partialdarkness.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                        }
-                        // if lit (again) draw chest sprites
-                        else if (darkness[camera[0] + j, camera[1] + i] > 0)
-                        {
-                            // CHESTS
-                            foreach (Chest item in chests)
-                            {
-                                if (item.position[0] == camera[0] + j && item.position[1] == camera[1] + i && level[item.position[0],item.position[1]] != 2 && level[item.position[0], item.position[1]] != 0 && level[item.position[0], item.position[1]] != 5 && level[item.position[0], item.position[1]] != 4)
-                                {
-                                    dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                }
-                            }
-
-                            // PLAYER
-                            if (player.position[0] == camera[0] + j && player.position[1] == camera[1] + i)
-                            {
-                                // Draw quiver if slot is full and is a quiver
-                                if (player.Inventory[4, 0] != null)
-                                {
-                                    if (player.Inventory[4, 0].Name.Contains("Quiver"))
-                                    {
-                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                    }
-                                }
-
-                                // If not a ghost, draw regular sprite
-                                if (!player.IsGhost)
-                                {
-                                    dc.DrawImage(new BitmapImage(new Uri(player.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                }
-                                // Otherwise, draw the ghosty appearance
-                                else
-                                {
-                                    dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Creatures/player4.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                }
-
-
-                                // Draw legs
-                                if (player.Inventory[2, 0] != null)
-                                    dc.DrawImage(new BitmapImage(new Uri(player.Inventory[2, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                // Draw chestplate
-                                if (player.Inventory[1, 0] != null)
-                                    dc.DrawImage(new BitmapImage(new Uri(player.Inventory[1, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                // Draw hat
-                                if (player.Inventory[0, 0] != null)
-                                    dc.DrawImage(new BitmapImage(new Uri(player.Inventory[0, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                // Draw Amulet
-                                if (player.Inventory[6, 0] != null)
-                                {
-                                    if (GetAmulet(player.Inventory[6,0].Name) != "")
-                                        dc.DrawImage(new BitmapImage(new Uri(GetAmulet(player.Inventory[6,0].Name), UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                }
-                                // Draw weapon
-                                if (player.Inventory[3, 0] != null)
-                                    dc.DrawImage(new BitmapImage(new Uri(player.Inventory[3, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-
-
-                                // Draw offhand if not a quiver (drew quiver earlier)
-                                if (player.Inventory[4, 0] != null)
-                                {
-                                    if (!player.Inventory[4, 0].Name.Contains("Quiver"))
-                                    {
-                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                    }
-                                }
-
-                            }
-                            // End player draw code
-
-
-                            // ENEMIES
-                            foreach (Creature item in enemies)
-                            {
-                                if (camera[0] + j == item.position[0] && camera[1] + i == item.position[1])
-                                {
-                                    if (item.Inventory[4, 0] != null && item.DrawEquipment)
-                                    {
-                                        if (item.Inventory[4, 0].Name.Contains("Quiver"))
-                                        {
-                                            dc.DrawImage(new BitmapImage(new Uri(item.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                        }
-                                    }
-
-                                    dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-
-                                    if (item.DrawEquipment)
-                                    {
-                                        // Draw legs
-                                        if (item.Inventory[2, 0] != null)
-                                            dc.DrawImage(new BitmapImage(new Uri(item.Inventory[2, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                        // Draw chestplate
-                                        if (item.Inventory[1, 0] != null)
-                                            dc.DrawImage(new BitmapImage(new Uri(item.Inventory[1, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                        // Draw hat
-                                        if (item.Inventory[0, 0] != null)
-                                            dc.DrawImage(new BitmapImage(new Uri(item.Inventory[0, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                        // Draw Amulet
-                                        if (item.Inventory[6, 0] != null)
-                                        {
-                                            if (GetAmulet(item.Inventory[6, 0].Name) != "")
-                                                dc.DrawImage(new BitmapImage(new Uri(GetAmulet(item.Inventory[6, 0].Name), UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                        }
-                                        // Draw weapon
-                                        if (item.Inventory[3, 0] != null)
-                                            dc.DrawImage(new BitmapImage(new Uri(item.Inventory[3, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-
-                                        // Draw offhand if not a quiver (drew quiver earlier)
-                                        if (item.Inventory[4, 0] != null)
-                                        {
-                                            if (!item.Inventory[4, 0].Name.Contains("Quiver"))
-                                            {
-                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                                            }
-                                        }
-                                    }
-
-                                    if (i > 0 && (!player.OpenInventory || player.OpenSpell) && !item.File.Contains("Items"))
-                                    {
-                                        //FormattedText dialogueen = new FormattedText($"{item.Stats["HP"]}/{item.GetStat("MaxHP")}", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 4, Brushes.Red);
-                                        //dc.DrawText(dialogueen, new Point(j*16 + (16 - dialogueen.Width)/2, i*16 - 2));
-
-                                        for (int f = 0; f < 14; f++)
-                                        {
-                                            string hpbar = "Graphics/ByteLikeGraphics/Hud/healthbar";
-                                            if (f == 0)
-                                            {
-                                                if (item.Stats["HP"] < (item.GetStat("MaxHP") / 16.0))
-                                                    hpbar += "0.png";
-                                                else
-                                                    hpbar += "3.png";
-
-                                                dc.DrawImage(new BitmapImage(new Uri(hpbar, UriKind.Relative)), new Rect(j * 16 + f, i * 16 - 4, 2.25, 4));
-                                            }
-                                            else if (f == 13)
-                                            {
-                                                if (item.Stats["HP"] < (item.GetStat("MaxHP") / 16.0) * 15.0)
-                                                    hpbar += "2.png";
-                                                else
-                                                    hpbar += "5.png";
-
-                                                dc.DrawImage(new BitmapImage(new Uri(hpbar, UriKind.Relative)), new Rect(j * 16 + f, i * 16 - 4, 2, 4));
-                                            }
-                                            else
-                                            {
-                                                if (item.Stats["HP"] < (item.GetStat("MaxHP") / 16.0) * (f+1.0))
-                                                    hpbar += "1.png";
-                                                else
-                                                    hpbar += "4.png";
-
-                                                dc.DrawImage(new BitmapImage(new Uri(hpbar, UriKind.Relative)), new Rect(j * 16 + f, i * 16 - 4, 3, 4));
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // EFFECTS
-                            foreach (Effect item in effects)
-                            {
-                                if (camera[0] + j == item.position[0] && camera[1] + i == item.position[1])
-                                    dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
-                            }
-                        }
 
 
                         // Inventory draw code, still in j-i switch
@@ -1169,6 +1172,99 @@ namespace ByteLike
             return imageControl;
         }
 
+        static Image DrawMenu(bool drawCamera)
+        {
+            
+            DrawingGroup drawingGroup = new DrawingGroup();
+
+
+            using (DrawingContext dc = drawingGroup.Open())
+            {
+                // Draw pause overlay
+                for (int i = 0; i < cameraSize[1]; i++)
+                {
+                    for (int j = 0; j < cameraSize[0]; j++)
+                    {
+                        string hudFile = "Graphics/ByteLikeGraphics/Hud/mainmenu";
+                        if (i == 0 || j == 0 || i == cameraSize[1] - 1 || j == cameraSize[0] - 1)
+                        {
+                            hudFile += "0.png";
+                        }
+                        else if (i == 1)
+                        {
+                            if (j == 1)
+                                hudFile += "2.png";
+                            else if (j == cameraSize[0] - 2)
+                                hudFile += "4.png";
+                            else
+                                hudFile += "3.png";
+                        }
+                        else if (i == cameraSize[1] - 2)
+                        {
+                            if (j == 1)
+                                hudFile += "7.png";
+                            else if (j == cameraSize[0] - 2)
+                                hudFile += "9.png";
+                            else
+                                hudFile += "8.png";
+                        }
+                        else
+                        {
+                            if (j == 1)
+                                hudFile += "5.png";
+                            else if (j == cameraSize[0] - 2)
+                                hudFile += "6.png";
+                            else
+                                hudFile += "1.png";
+                        }
+
+                        dc.DrawImage(new BitmapImage(new Uri(hudFile, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                    }
+                }
+
+                dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/logo.png", UriKind.Relative)), new Rect(cameraSize[0]*8 - 82, 46, 164, 48));
+
+                //FormattedText dialogue4 = new FormattedText("ByteLike", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 32, Brushes.White);
+                //dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 48));
+
+                FormattedText dialogue4 = new FormattedText("New Game", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 110));
+                if (pausePointer == 0)
+                    dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 104, 32, 32));
+
+                dialogue4 = new FormattedText("Load Game", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 140));
+                if (pausePointer == 1)
+                    dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 134, 32, 32));
+
+                dialogue4 = new FormattedText("Exit", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 170));
+                if (pausePointer == 2)
+                    dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 164, 32, 32));
+
+                if (drawCamera)
+                {
+                    dialogue4 = new FormattedText($"cam: {cameraSize[0]}/{cameraSize[1]}", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 8, Brushes.White);
+                    dc.DrawText(dialogue4, new Point(cameraSize[0] * 16 - dialogue4.Width - 4, cameraSize[1]*16 - 12));
+
+                }
+
+
+
+
+            } // end of using dc.open
+
+
+            DrawingImage drawingImageSource = new DrawingImage(drawingGroup);
+
+            Image imageControl = new Image();
+            imageControl.Stretch = Stretch.Fill;
+            imageControl.Source = drawingImageSource;
+
+
+
+            return imageControl;
+        }
 
         static void NewLevel()
         {
@@ -1203,21 +1299,14 @@ namespace ByteLike
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {
-            NewLevel();
-            response = $"{player.Name} enters the dungeon.\n";
             Border imageBorder = new Border();
-            imageBorder.BorderBrush = System.Windows.Media.Brushes.Gray;
-            imageBorder.BorderThickness = new Thickness(0);
-            imageBorder.HorizontalAlignment = HorizontalAlignment.Left;
-            imageBorder.VerticalAlignment = VerticalAlignment.Top;
-            imageBorder.Margin = new Thickness(0);
-            imageBorder.Child = DrawMap(response);
+            imageBorder.Child = DrawMenu(false);
 
-            this.Background = System.Windows.Media.Brushes.White;
+            this.Background = Brushes.Black;
             this.Margin = new Thickness(0);
             this.Content = imageBorder;
 
-            music.Open(new Uri(@"Graphics/Sounds/firstpart.wav", UriKind.Relative));
+            music.Open(new Uri(@"Graphics/Sounds/menu.wav", UriKind.Relative));
             music.Play();
 
             music.MediaEnded += Music_MediaEnded;
@@ -1242,7 +1331,7 @@ namespace ByteLike
             bool cameraManagment = Paused;
 
             // Pause
-            if (Keyboard.IsKeyDown(Key.Escape))
+            if (Keyboard.IsKeyDown(Key.Escape) && !MainMenu)
             {
                 switch (Paused)
                 {
@@ -1256,7 +1345,8 @@ namespace ByteLike
                 cameraManagment = true;
             }
 
-            if (Paused)
+            // Pause/Menu controls
+            if (Paused || MainMenu)
             {
                 if (Keyboard.IsKeyDown(Key.W))
                 {
@@ -1273,7 +1363,7 @@ namespace ByteLike
                     currentSound = "Graphics/Sounds/menuclick.wav";
                 }
 
-                if (Keyboard.IsKeyDown(Key.E))
+                if (Keyboard.IsKeyDown(Key.E) && !MainMenu)
                 {
                     currentSound = "Graphics/Sounds/menuclick.wav";
                     switch (pausePointer)
@@ -1304,6 +1394,124 @@ namespace ByteLike
                                     sr.Close();
                                 }
                                 player.DangerLevel++;
+
+                                if (floor <= 16)
+                                {
+                                    music.Stop();
+                                    music.Open(new Uri(@"Graphics/Sounds/firstpart.wav", UriKind.Relative));
+                                    music.Play();
+                                }
+                                else if (floor > 16 && floor < 32)
+                                {
+                                    music.Stop();
+                                    music.Open(new Uri(@"Graphics/Sounds/secondpart.wav", UriKind.Relative));
+                                    music.Play();
+                                }
+                                else if (floor >= 32)
+                                {
+                                    music.Stop();
+                                    music.Open(new Uri(@"Graphics/Sounds/thirdpart.wav", UriKind.Relative));
+                                    music.Play();
+                                }
+
+                                foreach (Creature item in enemies)
+                                {
+                                    if (item.GetType() == typeof(DoppleGanger))
+                                    {
+                                        music.Stop();
+                                        music.Open(new Uri(@"Graphics/Sounds/doppleganger.wav", UriKind.Relative));
+                                        music.Play();
+                                    }
+                                }
+                            }
+                            break;
+                        case 2:
+                            MainMenu = true;
+                            Paused = false;
+                            music.Stop();
+                            music.Open(new Uri(@"Graphics/Sounds/menu.wav", UriKind.Relative));
+                            music.Play();
+                            break;
+                    }
+                }
+                else if (Keyboard.IsKeyDown(Key.E))
+                {
+                    currentSound = "Graphics/Sounds/menuclick.wav";
+                    switch (pausePointer)
+                    {
+                        case 0:
+                            floor = 0;
+                            player = new Player("Player");
+                            NewLevel();
+                            response = $"{player.Name} enters the dungeon\n";
+                            MainMenu = false;
+
+                            // Saving the game
+                            if (File.Exists("save.json"))
+                                File.Delete("save.json");
+                            using (StreamWriter sw = File.CreateText("save.json"))
+                            {
+                                sw.WriteLine(JsonConvert.SerializeObject(new GameData(chests, level, darkness, floor, player)));
+                                sw.Close();
+                            }
+
+                            music.Stop();
+                            music.Open(new Uri(@"Graphics/Sounds/firstpart.wav", UriKind.Relative));
+                            music.Play();
+                            break;
+                        case 1:
+                            if (File.Exists("save.json"))
+                            {
+                                using (StreamReader sr = File.OpenText($"save.json"))
+                                {
+                                    try
+                                    {
+                                        GameData gm = new JsonSerializer().Deserialize<GameData>(new JsonTextReader(sr));
+                                        if (gm != null)
+                                        {
+                                            enemies = new List<Creature>();
+                                            effects = new List<Effect>();
+                                            player = gm.player;
+                                            level = gm.level;
+                                            darkness = gm.darkness;
+                                            floor = gm.floor;
+                                            chests = gm.chests;
+                                        }
+                                    }
+                                    catch { }
+                                    sr.Close();
+                                }
+                                player.DangerLevel++;
+                                MainMenu = false;
+
+                                if (floor <= 16)
+                                {
+                                    music.Stop();
+                                    music.Open(new Uri(@"Graphics/Sounds/firstpart.wav", UriKind.Relative));
+                                    music.Play();
+                                }
+                                else if (floor > 16 && floor < 32)
+                                {
+                                    music.Stop();
+                                    music.Open(new Uri(@"Graphics/Sounds/secondpart.wav", UriKind.Relative));
+                                    music.Play();
+                                }
+                                else if (floor >= 32)
+                                {
+                                    music.Stop();
+                                    music.Open(new Uri(@"Graphics/Sounds/thirdpart.wav", UriKind.Relative));
+                                    music.Play();
+                                }
+
+                                foreach (Creature item in enemies)
+                                {
+                                    if (item.GetType() == typeof(DoppleGanger))
+                                    {
+                                        music.Stop();
+                                        music.Open(new Uri(@"Graphics/Sounds/doppleganger.wav", UriKind.Relative));
+                                        music.Play();
+                                    }
+                                }
                             }
                             break;
                         case 2:
@@ -1313,6 +1521,7 @@ namespace ByteLike
                 }
             }
 
+            // Camera sizes
             if (Keyboard.IsKeyDown(Key.Up))
             {
                 if (cameraSize[1] > 20)
@@ -1338,6 +1547,7 @@ namespace ByteLike
                 cameraManagment = true;
             }
 
+            // Fullscreen
             if (Keyboard.IsKeyDown(Key.F12))
             {
                 switch (ByteLikeWindow.WindowState)
@@ -1354,7 +1564,8 @@ namespace ByteLike
                 cameraManagment = true;
             }
 
-            if (cameraManagment || Keyboard.IsKeyDown(Key.E) || Keyboard.IsKeyDown(Key.Q) || Keyboard.IsKeyDown(Key.W) || Keyboard.IsKeyDown(Key.S) || Keyboard.IsKeyDown(Key.A) || Keyboard.IsKeyDown(Key.D) || Keyboard.IsKeyDown(Key.R))
+            // Main Game
+            if (!MainMenu && (cameraManagment || Keyboard.IsKeyDown(Key.E) || Keyboard.IsKeyDown(Key.Q) || Keyboard.IsKeyDown(Key.W) || Keyboard.IsKeyDown(Key.S) || Keyboard.IsKeyDown(Key.A) || Keyboard.IsKeyDown(Key.D) || Keyboard.IsKeyDown(Key.R)))
             {
                 currentSound = "";
                 tempSound = "";
@@ -1499,7 +1710,7 @@ namespace ByteLike
                 camera[0] = player.position[0];
                 camera[1] = player.position[1];
 
-
+                // New Floor
                 if (level[player.position[0], player.position[1]] == 15 && Keyboard.IsKeyDown(Key.E) && !player.OpenInventory && !Keyboard.IsKeyDown(Key.W) && !Keyboard.IsKeyDown(Key.S) && !Keyboard.IsKeyDown(Key.A) && !Keyboard.IsKeyDown(Key.D) && effects.Count <= 0)
                 {
                     currentSound = "Graphics/Sounds/newfloor.wav";
@@ -1512,7 +1723,7 @@ namespace ByteLike
                         {
                             player.Stats["HP"] = player.GetStat("MaxHP");
                             player.Stats["Mana"] = player.GetStat("MaxMana");
-                            player.Stats["XP"] += (int)((90 + Math.Pow(player.Stats["Level"], 2) * 10)/5);
+                            player.Stats["XP"] += (int)((90 + Math.Pow(player.Stats["Level"], 2) * 10) / 5);
                             player.Inventory[6, 0].Name = "Empty Restoration Amulet";
                             player.Inventory[6, 0].Quantity = player.Inventory[6, 0].ClassType;
                             player.Inventory[6, 0].ClassType += 10;
@@ -1589,6 +1800,7 @@ namespace ByteLike
                     }
                 }
 
+                // Revivals
                 if (player.Stats["HP"] <= 0 && player.Inventory[6, 0] != null)
                 {
                     if (player.Inventory[6, 0].Name == "Survival Amulet")
@@ -1603,6 +1815,7 @@ namespace ByteLike
                     }
                 }
 
+                // Death
                 if (player.Stats["HP"] <= 0)
                 {
                     music.Stop();
@@ -1646,17 +1859,27 @@ namespace ByteLike
                 }
 
                 Border imageBorder = new Border();
-                imageBorder.BorderBrush = System.Windows.Media.Brushes.Gray;
-                imageBorder.BorderThickness = new Thickness(0);
-                imageBorder.HorizontalAlignment = HorizontalAlignment.Left;
-                imageBorder.VerticalAlignment = VerticalAlignment.Top;
-                imageBorder.Margin = new Thickness(0);
                 imageBorder.Child = DrawMap(response);
 
-                this.Background = System.Windows.Media.Brushes.White;
+                this.Background = Brushes.Black;
                 this.Margin = new Thickness(0);
                 this.Content = imageBorder;
 
+            }
+            else if (MainMenu)
+            {
+                if (File.Exists(currentSound))
+                {
+                    System.Media.SoundPlayer sound = new System.Media.SoundPlayer(currentSound);
+                    sound.Play();
+                }
+
+                Border imageBorder = new Border();
+                imageBorder.Child = DrawMenu(cameraManagment);
+
+                this.Background = Brushes.Black;
+                this.Margin = new Thickness(0);
+                this.Content = imageBorder;
             }
         }
     }

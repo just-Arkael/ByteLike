@@ -459,6 +459,75 @@
     <None Update="Graphics\ByteLikeGraphics\Armor\armor7-9.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Graphics\ByteLikeGraphics\Creatures\enemymimic1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Creatures\enemymimic2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Creatures\enemymimic3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Creatures\enemyslug1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Creatures\enemyslug2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Creatures\enemyslug3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Creatures\enemysnake1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Creatures\enemysnake2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Creatures\enemysnake3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Creatures\enemyundead1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Creatures\enemyundead2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Creatures\enemyundead3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Hud\logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Hud\mainmenu0.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Hud\mainmenu1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Hud\mainmenu2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Hud\mainmenu3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Hud\mainmenu4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Hud\mainmenu5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Hud\mainmenu6.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Hud\mainmenu7.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Hud\mainmenu8.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Hud\mainmenu9.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Graphics\ByteLikeGraphics\Hud\pause0.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -2533,18 +2533,27 @@ namespace ByteLike
                 Stats["ManaRegen"] += 1;
                 statModifier = 1.25;
                 Name = "Giant Rat";
+                Spells.Add("Ice Shard");
+                Spells.Add("Rage");
+                Spells.Add("Weaken");
+                Spells.Add("Slow Down");
+                Spells.Add("Terrify");
             }
             else if ((floor / 12) >= 2)
             {
                 File += "2.png";
                 Stats["HPRegen"] += 1;
                 Name = "Smart Rat";
+                Spells.Add("Focus");
+                Spells.Add("Corrode Armor");
+                Spells.Add("Sharpen");
             }
             else
             {
                 File += "1.png";
                 statModifier = 0.75;
                 Name = "Rat";
+                Spells.Add("Sharpen");
             }
 
             Stats["MaxHP"] = (int)(((floor / 1.25) + 10)*statModifier);
@@ -2571,13 +2580,26 @@ namespace ByteLike
             }
 
             int movementdirection = rand.Next(4) * 90;
+            int chosenSpell = -1;
 
             if (Aggressive)
             {
                 movementdirection = FindDirection(new int[] { player.position[0], player.position[1] }, ref level, ref enemies);
+
+                if (rand.Next(10) == 0)
+                {
+                    chosenSpell = rand.Next(Spells.Count);
+
+                    if (Stats["Mana"] < chosenSpell)
+                        chosenSpell = -1;
+                    else
+                    {
+                        movementdirection = 5;
+                    }
+                }
             }
 
-            int[] movement = new int[2];
+            int[] movement = new int[2] {0, 0 };
             switch (movementdirection)
             {
                 case 0:
@@ -2604,6 +2626,22 @@ namespace ByteLike
                 movement[1] = 0;
             }
             response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
+
+
+            if (chosenSpell >= 0)
+            {
+                Stats["Mana"] -= GetSpellCost(Spells[chosenSpell]);
+                sound = "Graphics/Sounds/holychoir.wav";
+                movement[0] = 0;
+                movement[1] = 0;
+                if (IsAggresiveSpell(Spells[chosenSpell]))
+                {
+                    movement[0] = player.position[0] - position[0];
+                    movement[1] = player.position[1] - position[1];
+                }
+                effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { movement[0], movement[1] }, GetStat("Magic"), Spells[chosenSpell]));
+                response += $"{Name} casts {Spells[chosenSpell]}!\n";
+            }
 
 
             // Default logics ending
