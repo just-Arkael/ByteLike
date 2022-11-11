@@ -79,7 +79,7 @@ namespace ByteLike
                 for (int j = -(room[0] / 2); j < room[0] / 2; j++)
                 {
                     if ((j == chestPosition[0] && i == chestPosition[1]) || (rand.Next(10) == 0 && !remember))
-                        chest = new Chest(new int[] { position[0] + j, position[1] + i }, currentFloor);
+                        chest = new Chest(new int[] { position[0] + j, position[1] + i }, currentFloor, null);
                     // If we're in boundaries
                     if (position[0] + j >= 0 && position[0] + j < level.GetLength(0) && position[1] + i >= 0 && position[1] + i < level.GetLength(1))
                     {

@@ -1600,7 +1600,7 @@ namespace ByteLike
 
         }
 
-        public Chest(int[] coordinates, int floor)
+        public Chest(int[] coordinates, int floor, int? modifier)
         {
             position[0] = coordinates[0];
             position[1] = coordinates[1];
@@ -1612,6 +1612,9 @@ namespace ByteLike
 
             if (floor >= 100)
                 quality = 50;
+
+            if (modifier != null)
+                quality = (int)modifier;
 
             if (floor < -1)
                 Inventory = new Item[11, -(floor + 1)];

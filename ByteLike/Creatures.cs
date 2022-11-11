@@ -58,7 +58,7 @@ namespace ByteLike
                 Potentials[type - 9] += 2;
 
             if (Stats["HP"] <= 0)
-                result = Stats["Level"] * rand.Next(4, 10) + 1;
+                result = Stats["Level"] * rand.Next(4, 10) + rand.Next(15);
 
             return result;
         }
@@ -83,7 +83,10 @@ namespace ByteLike
             {
 
                 case 0:
-                    switch (rand.Next(17))
+                    quality = rand.Next(17);
+                    if (quality < 16 && modifier != null)
+                        quality++;
+                    switch (quality)
                     {
                         case 0:
                             response = "Nothing";
@@ -1564,6 +1567,8 @@ namespace ByteLike
             Stats["Mana"] = 10;
             Stats["MaxHP"] = 20;
             Stats["MaxMana"] = 10;
+            Stats["Defense"] = 2;
+            Stats["MagicDefense"] = 2;
 
             Stats.Add("XP", 0);
             Stats["Torch"] = 1;
@@ -2003,7 +2008,7 @@ namespace ByteLike
                                                 // no chest - create one
                                                 else
                                                 {
-                                                    Chest temp = new Chest(new int[] { position[0], position[1] }, -1);
+                                                    Chest temp = new Chest(new int[] { position[0], position[1] }, -1, null);
                                                     temp.AddTo(Inventory[SelectedSlot[0], SelectedSlot[1]]);
                                                     chests.Add(temp);
                                                     Inventory[SelectedSlot[0], SelectedSlot[1]] = null;
@@ -2250,7 +2255,7 @@ namespace ByteLike
                                             // No chest - create one
                                             else
                                             {
-                                                Chest temp = new Chest(new int[] { position[0], position[1] }, -1);
+                                                Chest temp = new Chest(new int[] { position[0], position[1] }, -1, null);
                                                 temp.AddTo(Inventory[SelectedSlot[0], SelectedSlot[1]]);
                                                 chests.Add(temp);
                                                 Inventory[SelectedSlot[0], SelectedSlot[1]] = null;
@@ -2611,7 +2616,7 @@ namespace ByteLike
             {
                 movementdirection = FindDirection(new int[] { player.position[0], player.position[1] }, ref level, ref enemies);
 
-                if (rand.Next(10) == 0 && Stats["HP"] >= GetStat("MaxHP") / 10)
+                if (rand.Next(10) == 0 && Stats["HP"] >= GetStat("MaxHP") / 10 && Stats["HP"] > 0)
                 {
                     chosenSpell = rand.Next(Spells.Count);
 
@@ -2789,7 +2794,7 @@ namespace ByteLike
             {
                 movementdirection = FindDirection(new int[] { player.position[0], player.position[1] }, ref level, ref enemies);
 
-                if (rand.Next(3) == 0)
+                if (rand.Next(3) == 0 && Stats["HP"] > 0)
                 {
                     chosenSpell = rand.Next(Spells.Count);
 
@@ -2965,7 +2970,7 @@ namespace ByteLike
             {
                 movementdirection = FindDirection(new int[] { player.position[0], player.position[1] }, ref level, ref enemies);
 
-                if (rand.Next(2) == 0)
+                if (rand.Next(2) == 0 && Stats["HP"] > 0)
                 {
                     chosenSpell = rand.Next(Spells.Count);
 
@@ -3046,10 +3051,201 @@ namespace ByteLike
 
     }
 
+    public class Slug : Creature
+    {
+        bool Aggressive = false;
+        public Slug(int floor, int[] pos)
+            : base()
+        {
+            position[0] = pos[0];
+            position[1] = pos[1];
+            File = "Graphics/ByteLikeGraphics/Creatures/enemyslug";
+
+            double statModifier = 1;
+
+            floor += rand.Next(-5, 5);
+
+
+            Stats["Level"] = floor;
+            if (Stats["Level"] <= 0)
+                Stats["Level"] = 1;
+
+            if ((floor / 12) >= 3.75)
+            {
+                File += "3.png";
+                Stats["HPRegen"] += 2;
+                Stats["ManaRegen"] += 4;
+                statModifier = 1.4;
+                Name = "Giant Slug";
+                Spells.Add("Thunder");
+                Spells.Add("Restore");
+                Spells.Add("Destroy Armor");
+                Spells.Add("Regenerate");
+                Spells.Add("Electrify");
+                Spells.Add("Chain Up");
+                Spells.Add("Weaken");
+                Spells.Add("Scare");
+
+                for (int i = 0; i < 7; i++)
+                {
+                    if (rand.Next(10) < 3)
+                    {
+                        Inventory[i, 0] = new Item(floor, i + 1);
+                    }
+                }
+
+                if (rand.Next(10) == 0)
+                    DropEquipment = true;
+            }
+            else if ((floor / 12) >= 2)
+            {
+                File += "2.png";
+                Stats["ManaRegen"] += 3;
+                Stats["HPRegen"] += 1;
+                statModifier = 1;
+                Name = "Slug";
+                Spells.Add("Electro Bolt");
+                Spells.Add("Heal Wounds");
+                Spells.Add("Melt Armor");
+                Spells.Add("Regenerate");
+                Spells.Add("Charge");
+                Spells.Add("Slow Down");
+                Spells.Add("Energy Drain");
+            }
+            else
+            {
+                Stats["ManaRegen"] += 2;
+                File += "1.png";
+                statModifier = 0.8;
+                Name = "Tiny Slug";
+                Spells.Add("Zap");
+                Spells.Add("Recover");
+                Spells.Add("Corrode Armor");
+            }
+
+            Stats["MaxHP"] = (int)(((floor / 1.15) + 12) * statModifier);
+            Stats["HP"] = Stats["MaxHP"];
+            Stats["MaxMana"] = (int)(((floor / 1.25) + 15) * statModifier);
+            Stats["Mana"] = Stats["MaxMana"];
+            Stats["Strength"] = (int)(((floor / 3) + 3) * statModifier);
+            Stats["Agility"] = (int)(((floor / 10) + 2) * statModifier);
+            Stats["Magic"] = (int)(((floor / 2.9) + 6) * statModifier);
+            Stats["Defense"] = (int)(((floor / 3) + 7) * statModifier);
+            Stats["MagicDefense"] = (int)(((floor / 6) + 5) * statModifier);
+
+
+        }
+
+        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness, out string currentSound)
+        {
+            string response = "";
+            string sound = "";
+
+            int movementdirection = rand.Next(4) * 90;
+            int chosenSpell = -1;
+
+            if (Aggressive)
+            {
+                if (rand.Next(3) != 0)
+                    movementdirection = FindDirection(new int[] { player.position[0], player.position[1] }, ref level, ref enemies);
+
+
+                if (rand.Next(2) == 0 && Stats["HP"] > 0)
+                {
+                    chosenSpell = rand.Next(Spells.Count);
+
+                    if (rand.Next(3) == 0)
+                        chosenSpell = 0;
+                    else if (rand.Next(3) == 0 && (player.Buffs["MagicDefense"] <= 0 || (player.BuffLevels["MagicDefense"] > 0 && player.Buffs["MagicDefense"] > 0)))
+                        chosenSpell = 2;
+                    else if (Stats["HP"] <= GetStat("MaxHP") / 2 && rand.Next(3) == 0)
+                        chosenSpell = 1;
+                    else if (Spells.Count > 3 && rand.Next(3) == 0 && level[player.position[0], player.position[1]] != 14)
+                        chosenSpell = 4;
+                    else if (rand.Next(3) == 0)
+                        chosenSpell = rand.Next(5, Spells.Count);
+
+
+                    if (Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
+                        chosenSpell = -1;
+                    else
+                        movementdirection = 5;
+                }
+            }
+
+            if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= GetStat("Torch") && !Aggressive)
+            {
+                Aggressive = true;
+                response = $"{Name} notices {player.Name}!\n";
+            }
+
+            int[] movement = new int[2] { 0, 0 };
+            switch (movementdirection)
+            {
+                case 0:
+                    movement[0] = 1;
+                    movement[1] = 0;
+                    break;
+                case 180:
+                    movement[0] = -1;
+                    movement[1] = 0;
+                    break;
+                case 270:
+                    movement[0] = 0;
+                    movement[1] = 1;
+                    break;
+                case 90:
+                    movement[0] = 0;
+                    movement[1] = -1;
+                    break;
+            }
+
+            if (Statuses[2] != 0 || Statuses[3] % 2 != 0 || Stats["HP"] <= 0)
+            {
+                movement[0] = 0;
+                movement[1] = 0;
+            }
+            response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
+
+
+            if (chosenSpell >= 0)
+            {
+                Stats["Mana"] -= GetSpellCost(Spells[chosenSpell]);
+                sound = "Graphics/Sounds/holychoir.wav";
+                movement[0] = 0;
+                movement[1] = 0;
+                if (IsAggresiveSpell(Spells[chosenSpell]))
+                {
+                    movement[0] = player.position[0] - position[0];
+                    movement[1] = player.position[1] - position[1];
+                }
+                effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { movement[0], movement[1] }, GetStat("Magic"), Spells[chosenSpell]));
+                response += $"{Name} casts {Spells[chosenSpell]}!\n";
+            }
+
+
+            // Default logics ending
+            response = Conditions(response);
+
+            if (Stats["HP"] > GetStat("MaxHP")) { Stats["HP"] = GetStat("MaxHP"); Stats["MaxHPRegen"] = 0; }
+            if (Stats["Mana"] > GetStat("MaxMana")) { Stats["Mana"] = GetStat("MaxMana"); Stats["MaxManaRegen"] = 0; }
+
+
+
+            currentSound = sound;
+            if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= player.GetStat("Torch") || Aggressive)
+                return response;
+            else return "";
+        }
+
+
+    }
+
+
     public class Mimic : Creature
     {
         bool Aggressive = false;
-        public Mimic(int floor, int[] pos)
+        public Mimic(int floor, int[] pos, int? modifier)
             : base()
         {
             position[0] = pos[0];
@@ -3316,197 +3512,199 @@ namespace ByteLike
 
                 // ACTUAL ACTION
                 int actioncheck = actions[rand.Next(actions.Count)];
-                switch (actioncheck)
+                if (Stats["HP"] > 0)
                 {
-                    case 0:
-                        response += $"{Name} is watching carefully...\n";
-                        break;
-                    case 1:
-                    case 7:
-                        int movementdirection = FindDirection(new int[] { player.position[0], player.position[1] }, ref level, ref enemies);
-                        int[] movement = new int[2];
-                        switch (movementdirection)
-                        {
-                            case 0:
-                                movement[0] = 1;
-                                movement[1] = 0;
-                                break;
-                            case 180:
-                                movement[0] = -1;
-                                movement[1] = 0;
-                                break;
-                            case 270:
-                                movement[0] = 0;
-                                movement[1] = 1;
-                                break;
-                            case 90:
-                                movement[0] = 0;
-                                movement[1] = -1;
-                                break;
-                        }
-                        response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
-                        if (actioncheck == 7)
-                        {
-                            response += $"{Name} leaps forward!";
-                            Stats["Mana"] -= 10;
-                            for (int i = 0; i < 4; i++)
+                    switch (actioncheck)
+                    {
+                        case 0:
+                            response += $"{Name} is watching carefully...\n";
+                            break;
+                        case 1:
+                        case 7:
+                            int movementdirection = FindDirection(new int[] { player.position[0], player.position[1] }, ref level, ref enemies);
+                            int[] movement = new int[2];
+                            switch (movementdirection)
                             {
-                                response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
+                                case 0:
+                                    movement[0] = 1;
+                                    movement[1] = 0;
+                                    break;
+                                case 180:
+                                    movement[0] = -1;
+                                    movement[1] = 0;
+                                    break;
+                                case 270:
+                                    movement[0] = 0;
+                                    movement[1] = 1;
+                                    break;
+                                case 90:
+                                    movement[0] = 0;
+                                    movement[1] = -1;
+                                    break;
                             }
-                        }
-                        break;
-                    case 2:
-                        if (Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
-                        {
-                            Stats["Mana"] = GetStat("MaxMana") + GetSpellCost(Spells[chosenSpell]);
-                            Inventory[6, 0].Name = "Empty Moon Amulet";
-                            Inventory[6, 0].Quantity = Inventory[6, 0].ClassType;
-                            Inventory[6, 0].ClassType += 10;
-                            Inventory[6, 0].Description = $"A used Moon Amulet. It requires {Inventory[6, 0].Quantity} more steps to work again\n";
-                            Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet13.png";
-                            response += $"{Name}'s Moon Amulet glows brightly!\n";
-                        }
-                        Stats["Mana"] -= GetSpellCost(Spells[chosenSpell]);
-                        sound = "Graphics/Sounds/holychoir.wav";
-                        arrowSlot[0] = 0;
-                        arrowSlot[1] = 0;
-                        if (IsAggresiveSpell(Spells[chosenSpell]))
-                        {
-                            arrowSlot[0] = player.position[0] - position[0];
-                            arrowSlot[1] = player.position[1] - position[1];
-                        }
-                        effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { arrowSlot[0], arrowSlot[1] }, GetStat("Magic"), Spells[chosenSpell]));
-                        response += $"{Name} casts {Spells[chosenSpell]}!\n";
-                        break;
-                    case 3:
-                        healSlot[0] = player.position[0] - position[0];
-                        healSlot[1] = player.position[1] - position[1];
-                        sound = "Graphics/Sounds/bow.wav";
-
-                        effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { healSlot[0], healSlot[1] }, GetStat("Agility"), $"Shoot {Inventory[arrowSlot[0], arrowSlot[1]].Name}"));
-
-                        Inventory[arrowSlot[0], arrowSlot[1]].Quantity--;
-                        if (Inventory[arrowSlot[0], arrowSlot[1]].Quantity <= 0)
-                            Inventory[arrowSlot[0], arrowSlot[1]] = null;
-                        break;
-                    case 4:
-                        Stats["HP"] += Inventory[healSlot[0], healSlot[1]].Stats["MaxHP"];
-
-                        sound = "Graphics/Sounds/closeinventory.wav";
-
-                        response += $"{Name} used a {Inventory[healSlot[0], healSlot[1]].Name}!\n";
-                        Inventory[healSlot[0], healSlot[1]].Quantity--;
-                        if (Inventory[healSlot[0], healSlot[1]].Quantity <= 0)
-                            Inventory[healSlot[0], healSlot[1]] = null;
-                        break;
-                    case 5:
-                        Stats["Mana"] += Inventory[manaSlot[0], manaSlot[1]].Stats["MaxMana"];
-
-                        sound = "Graphics/Sounds/closeinventory.wav";
-
-                        response += $"{Name} used a {Inventory[manaSlot[0], manaSlot[1]].Name}!\n";
-                        Inventory[manaSlot[0], manaSlot[1]].Quantity--;
-                        if (Inventory[manaSlot[0], manaSlot[1]].Quantity <= 0)
-                            Inventory[manaSlot[0], manaSlot[1]] = null;
-                        break;
-                    case 6:
-                        sound = "Graphics/Sounds/closeinventory.wav";
-                        // Arrows/Scrolls, aka using spells inside items
-                        if (Inventory[itemSlot[0], itemSlot[1]].Name.Contains("Scroll"))
-                        {
+                            response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
+                            if (actioncheck == 7)
+                            {
+                                response += $"{Name} leaps forward!";
+                                Stats["Mana"] -= 10;
+                                for (int i = 0; i < 4; i++)
+                                {
+                                    response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
+                                }
+                            }
+                            break;
+                        case 2:
+                            if (Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
+                            {
+                                Stats["Mana"] = GetStat("MaxMana") + GetSpellCost(Spells[chosenSpell]);
+                                Inventory[6, 0].Name = "Empty Moon Amulet";
+                                Inventory[6, 0].Quantity = Inventory[6, 0].ClassType;
+                                Inventory[6, 0].ClassType += 10;
+                                Inventory[6, 0].Description = $"A used Moon Amulet. It requires {Inventory[6, 0].Quantity} more steps to work again\n";
+                                Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet13.png";
+                                response += $"{Name}'s Moon Amulet glows brightly!\n";
+                            }
+                            Stats["Mana"] -= GetSpellCost(Spells[chosenSpell]);
+                            sound = "Graphics/Sounds/holychoir.wav";
                             arrowSlot[0] = 0;
                             arrowSlot[1] = 0;
-                            if (IsAggresiveSpell(Inventory[itemSlot[0], itemSlot[1]].Spell))
+                            if (IsAggresiveSpell(Spells[chosenSpell]))
                             {
                                 arrowSlot[0] = player.position[0] - position[0];
                                 arrowSlot[1] = player.position[1] - position[1];
                             }
-                            effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { arrowSlot[0], arrowSlot[1] }, GetStat("Magic"), Inventory[itemSlot[0], itemSlot[1]].Spell));
-                        }
-                        // Healing items
-                        else
-                        {
-                            if (Inventory[itemSlot[0], itemSlot[1]].Name == "Improvement Potion")
+                            effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { arrowSlot[0], arrowSlot[1] }, GetStat("Magic"), Spells[chosenSpell]));
+                            response += $"{Name} casts {Spells[chosenSpell]}!\n";
+                            break;
+                        case 3:
+                            healSlot[0] = player.position[0] - position[0];
+                            healSlot[1] = player.position[1] - position[1];
+                            sound = "Graphics/Sounds/bow.wav";
+
+                            effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { healSlot[0], healSlot[1] }, GetStat("Agility"), $"Shoot {Inventory[arrowSlot[0], arrowSlot[1]].Name}"));
+
+                            Inventory[arrowSlot[0], arrowSlot[1]].Quantity--;
+                            if (Inventory[arrowSlot[0], arrowSlot[1]].Quantity <= 0)
+                                Inventory[arrowSlot[0], arrowSlot[1]] = null;
+                            break;
+                        case 4:
+                            Stats["HP"] += Inventory[healSlot[0], healSlot[1]].Stats["MaxHP"];
+
+                            sound = "Graphics/Sounds/closeinventory.wav";
+
+                            response += $"{Name} used a {Inventory[healSlot[0], healSlot[1]].Name}!\n";
+                            Inventory[healSlot[0], healSlot[1]].Quantity--;
+                            if (Inventory[healSlot[0], healSlot[1]].Quantity <= 0)
+                                Inventory[healSlot[0], healSlot[1]] = null;
+                            break;
+                        case 5:
+                            Stats["Mana"] += Inventory[manaSlot[0], manaSlot[1]].Stats["MaxMana"];
+
+                            sound = "Graphics/Sounds/closeinventory.wav";
+
+                            response += $"{Name} used a {Inventory[manaSlot[0], manaSlot[1]].Name}!\n";
+                            Inventory[manaSlot[0], manaSlot[1]].Quantity--;
+                            if (Inventory[manaSlot[0], manaSlot[1]].Quantity <= 0)
+                                Inventory[manaSlot[0], manaSlot[1]] = null;
+                            break;
+                        case 6:
+                            sound = "Graphics/Sounds/closeinventory.wav";
+                            // Arrows/Scrolls, aka using spells inside items
+                            if (Inventory[itemSlot[0], itemSlot[1]].Name.Contains("Scroll"))
                             {
-                                Statuses[0] = 0;
-                                Statuses[1] = 0;
-                                Statuses[2] = 0;
-                                Statuses[3] = 0;
+                                arrowSlot[0] = 0;
+                                arrowSlot[1] = 0;
+                                if (IsAggresiveSpell(Inventory[itemSlot[0], itemSlot[1]].Spell))
+                                {
+                                    arrowSlot[0] = player.position[0] - position[0];
+                                    arrowSlot[1] = player.position[1] - position[1];
+                                }
+                                effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { arrowSlot[0], arrowSlot[1] }, GetStat("Magic"), Inventory[itemSlot[0], itemSlot[1]].Spell));
                             }
+                            // Healing items
                             else
                             {
-                                Stats["HP"] += Inventory[itemSlot[0], itemSlot[1]].Stats["MaxHP"];
-                                Stats["Mana"] += Inventory[itemSlot[0], itemSlot[1]].Stats["MaxMana"];
-
-                                if (Stats["HP"] > GetStat("MaxHP"))
-                                    Stats["HP"] = GetStat("MaxHP");
-                                if (Stats["Mana"] > GetStat("MaxMana"))
-                                    Stats["Mana"] = GetStat("MaxMana");
-
-                                if (Inventory[itemSlot[0], itemSlot[1]].Stats["Strength"] > 0)
+                                if (Inventory[itemSlot[0], itemSlot[1]].Name == "Improvement Potion")
                                 {
-                                    if (Buffs["Strength"] > 0)
-                                        BuffLevels["Strength"] = (int)((BuffLevels["Strength"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Strength"]) / 1.5);
-                                    else
-                                        BuffLevels["Strength"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Strength"];
-                                    if (BuffLevels["Strength"] >= 0)
-                                        Buffs["Strength"] = BuffLevels["Strength"] * 10;
-                                    else Buffs["Strength"] = -(BuffLevels["Strength"]) * 10;
+                                    Statuses[0] = 0;
+                                    Statuses[1] = 0;
+                                    Statuses[2] = 0;
+                                    Statuses[3] = 0;
                                 }
-
-                                if (Inventory[itemSlot[0], itemSlot[1]].Stats["Agility"] > 0)
+                                else
                                 {
-                                    if (Buffs["Agility"] > 0)
-                                        BuffLevels["Agility"] = (int)((BuffLevels["Agility"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Agility"]) / 1.5);
-                                    else
-                                        BuffLevels["Agility"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Agility"];
-                                    if (BuffLevels["Agility"] >= 0)
-                                        Buffs["Agility"] = BuffLevels["Agility"] * 10;
-                                    else Buffs["Agility"] = -(BuffLevels["Agility"]) * 10;
-                                }
+                                    Stats["HP"] += Inventory[itemSlot[0], itemSlot[1]].Stats["MaxHP"];
+                                    Stats["Mana"] += Inventory[itemSlot[0], itemSlot[1]].Stats["MaxMana"];
 
-                                if (Inventory[itemSlot[0], itemSlot[1]].Stats["Magic"] > 0)
-                                {
-                                    if (Buffs["Magic"] > 0)
-                                        BuffLevels["Magic"] = (int)((BuffLevels["Magic"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Magic"]) / 1.5);
-                                    else
-                                        BuffLevels["Magic"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Magic"];
-                                    if (BuffLevels["Magic"] >= 0)
-                                        Buffs["Magic"] = BuffLevels["Magic"] * 10;
-                                    else Buffs["Magic"] = -(BuffLevels["Magic"]) * 10;
-                                }
+                                    if (Stats["HP"] > GetStat("MaxHP"))
+                                        Stats["HP"] = GetStat("MaxHP");
+                                    if (Stats["Mana"] > GetStat("MaxMana"))
+                                        Stats["Mana"] = GetStat("MaxMana");
 
-                                if (Inventory[itemSlot[0], itemSlot[1]].Stats["Defense"] > 0)
-                                {
-                                    if (Buffs["Defense"] > 0)
-                                        BuffLevels["Defense"] = (int)((BuffLevels["Defense"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Defense"]) / 1.5);
-                                    else
-                                        BuffLevels["Defense"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Defense"];
-                                    if (BuffLevels["Defense"] >= 0)
-                                        Buffs["Defense"] = BuffLevels["Defense"] * 10;
-                                    else Buffs["Defense"] = -(BuffLevels["Defense"]) * 10;
-                                }
+                                    if (Inventory[itemSlot[0], itemSlot[1]].Stats["Strength"] > 0)
+                                    {
+                                        if (Buffs["Strength"] > 0)
+                                            BuffLevels["Strength"] = (int)((BuffLevels["Strength"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Strength"]) / 1.5);
+                                        else
+                                            BuffLevels["Strength"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Strength"];
+                                        if (BuffLevels["Strength"] >= 0)
+                                            Buffs["Strength"] = BuffLevels["Strength"] * 10;
+                                        else Buffs["Strength"] = -(BuffLevels["Strength"]) * 10;
+                                    }
 
-                                if (Inventory[itemSlot[0], itemSlot[1]].Stats["MagicDefense"] > 0)
-                                {
-                                    if (Buffs["MagicDefense"] > 0)
-                                        BuffLevels["MagicDefense"] = (int)((BuffLevels["MagicDefense"] + Inventory[itemSlot[0], itemSlot[1]].Stats["MagicDefense"]) / 1.5);
-                                    else
-                                        BuffLevels["MagicDefense"] = Inventory[itemSlot[0], itemSlot[1]].Stats["MagicDefense"];
-                                    if (BuffLevels["MagicDefense"] >= 0)
-                                        Buffs["MagicDefense"] = BuffLevels["MagicDefense"] * 10;
-                                    else Buffs["MagicDefense"] = -(BuffLevels["MagicDefense"]) * 10;
+                                    if (Inventory[itemSlot[0], itemSlot[1]].Stats["Agility"] > 0)
+                                    {
+                                        if (Buffs["Agility"] > 0)
+                                            BuffLevels["Agility"] = (int)((BuffLevels["Agility"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Agility"]) / 1.5);
+                                        else
+                                            BuffLevels["Agility"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Agility"];
+                                        if (BuffLevels["Agility"] >= 0)
+                                            Buffs["Agility"] = BuffLevels["Agility"] * 10;
+                                        else Buffs["Agility"] = -(BuffLevels["Agility"]) * 10;
+                                    }
+
+                                    if (Inventory[itemSlot[0], itemSlot[1]].Stats["Magic"] > 0)
+                                    {
+                                        if (Buffs["Magic"] > 0)
+                                            BuffLevels["Magic"] = (int)((BuffLevels["Magic"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Magic"]) / 1.5);
+                                        else
+                                            BuffLevels["Magic"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Magic"];
+                                        if (BuffLevels["Magic"] >= 0)
+                                            Buffs["Magic"] = BuffLevels["Magic"] * 10;
+                                        else Buffs["Magic"] = -(BuffLevels["Magic"]) * 10;
+                                    }
+
+                                    if (Inventory[itemSlot[0], itemSlot[1]].Stats["Defense"] > 0)
+                                    {
+                                        if (Buffs["Defense"] > 0)
+                                            BuffLevels["Defense"] = (int)((BuffLevels["Defense"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Defense"]) / 1.5);
+                                        else
+                                            BuffLevels["Defense"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Defense"];
+                                        if (BuffLevels["Defense"] >= 0)
+                                            Buffs["Defense"] = BuffLevels["Defense"] * 10;
+                                        else Buffs["Defense"] = -(BuffLevels["Defense"]) * 10;
+                                    }
+
+                                    if (Inventory[itemSlot[0], itemSlot[1]].Stats["MagicDefense"] > 0)
+                                    {
+                                        if (Buffs["MagicDefense"] > 0)
+                                            BuffLevels["MagicDefense"] = (int)((BuffLevels["MagicDefense"] + Inventory[itemSlot[0], itemSlot[1]].Stats["MagicDefense"]) / 1.5);
+                                        else
+                                            BuffLevels["MagicDefense"] = Inventory[itemSlot[0], itemSlot[1]].Stats["MagicDefense"];
+                                        if (BuffLevels["MagicDefense"] >= 0)
+                                            Buffs["MagicDefense"] = BuffLevels["MagicDefense"] * 10;
+                                        else Buffs["MagicDefense"] = -(BuffLevels["MagicDefense"]) * 10;
+                                    }
                                 }
                             }
-                        }
 
-                        response += $"{Name} used a {Inventory[itemSlot[0], itemSlot[1]].Name}!\n";
-                        Inventory[itemSlot[0], itemSlot[1]].Quantity--;
-                        if (Inventory[itemSlot[0], itemSlot[1]].Quantity <= 0)
-                            Inventory[itemSlot[0], itemSlot[1]] = null;
-                        break;
+                            response += $"{Name} used a {Inventory[itemSlot[0], itemSlot[1]].Name}!\n";
+                            Inventory[itemSlot[0], itemSlot[1]].Quantity--;
+                            if (Inventory[itemSlot[0], itemSlot[1]].Quantity <= 0)
+                                Inventory[itemSlot[0], itemSlot[1]] = null;
+                            break;
+                    }
                 }
-
             }
             else
             {
@@ -3764,187 +3962,189 @@ namespace ByteLike
                 }
 
                 // ACTUAL ACTION
-                switch (actions[rand.Next(actions.Count)])
+                if (Stats["HP"] > 0)
                 {
-                    case 0:
-                        response += $"{Name} is watching carefully...\n";
-                        break;
-                    case 1:
-                        int movementdirection = FindDirection(new int[] { player.position[0], player.position[1] }, ref level, ref enemies);
-                        int[] movement = new int[2];
-                        switch (movementdirection)
-                        {
-                            case 0:
-                                movement[0] = 1;
-                                movement[1] = 0;
-                                break;
-                            case 180:
-                                movement[0] = -1;
-                                movement[1] = 0;
-                                break;
-                            case 270:
-                                movement[0] = 0;
-                                movement[1] = 1;
-                                break;
-                            case 90:
-                                movement[0] = 0;
-                                movement[1] = -1;
-                                break;
-                        }
-                        response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
-                        break;
-                    case 2:
-                        if (Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
-                        {
-                            Stats["Mana"] = GetStat("MaxMana") + GetSpellCost(Spells[chosenSpell]);
-                            Inventory[6, 0].Name = "Empty Moon Amulet";
-                            Inventory[6, 0].Quantity = Inventory[6, 0].ClassType;
-                            Inventory[6, 0].ClassType += 10;
-                            Inventory[6, 0].Description = $"A used Moon Amulet. It requires {Inventory[6, 0].Quantity} more steps to work again\n";
-                            Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet13.png";
-                            response += $"{Name}'s Moon Amulet glows brightly!\n";
-                        }
-                        Stats["Mana"] -= GetSpellCost(Spells[chosenSpell]);
-                        sound = "Graphics/Sounds/holychoir.wav";
-                        arrowSlot[0] = 0;
-                        arrowSlot[1] = 0;
-                        if (IsAggresiveSpell(Spells[chosenSpell]))
-                        {
-                            arrowSlot[0] = player.position[0] - position[0];
-                            arrowSlot[1] = player.position[1] - position[1];
-                        }
-                        effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { arrowSlot[0], arrowSlot[1] }, GetStat("Magic"), Spells[chosenSpell]));
-                        response += $"{Name} casts {Spells[chosenSpell]}!\n";
-                        break;
-                    case 3:
-                        healSlot[0] = player.position[0] - position[0];
-                        healSlot[1] = player.position[1] - position[1];
-                        sound = "Graphics/Sounds/bow.wav";
-
-                        effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { healSlot[0], healSlot[1] }, GetStat("Agility"), $"Shoot {Inventory[arrowSlot[0], arrowSlot[1]].Name}"));
-
-                        Inventory[arrowSlot[0], arrowSlot[1]].Quantity--;
-                        if (Inventory[arrowSlot[0], arrowSlot[1]].Quantity <= 0)
-                            Inventory[arrowSlot[0], arrowSlot[1]] = null;
-                        break;
-                    case 4:
-                        Stats["HP"] += Inventory[healSlot[0], healSlot[1]].Stats["MaxHP"];
-
-                        sound = "Graphics/Sounds/closeinventory.wav";
-
-                        response += $"{Name} used a {Inventory[healSlot[0], healSlot[1]].Name}!\n";
-                        Inventory[healSlot[0], healSlot[1]].Quantity--;
-                        if (Inventory[healSlot[0], healSlot[1]].Quantity <= 0)
-                            Inventory[healSlot[0], healSlot[1]] = null;
-                        break;
-                    case 5:
-                        Stats["Mana"] += Inventory[manaSlot[0], manaSlot[1]].Stats["MaxMana"];
-
-                        sound = "Graphics/Sounds/closeinventory.wav";
-
-                        response += $"{Name} used a {Inventory[manaSlot[0], manaSlot[1]].Name}!\n";
-                        Inventory[manaSlot[0], manaSlot[1]].Quantity--;
-                        if (Inventory[manaSlot[0], manaSlot[1]].Quantity <= 0)
-                            Inventory[manaSlot[0], manaSlot[1]] = null;
-                        break;
-                    case 6:
-                        sound = "Graphics/Sounds/closeinventory.wav";
-                        // Arrows/Scrolls, aka using spells inside items
-                        if (Inventory[itemSlot[0], itemSlot[1]].Name.Contains("Scroll"))
-                        {
+                    switch (actions[rand.Next(actions.Count)])
+                    {
+                        case 0:
+                            response += $"{Name} is watching carefully...\n";
+                            break;
+                        case 1:
+                            int movementdirection = FindDirection(new int[] { player.position[0], player.position[1] }, ref level, ref enemies);
+                            int[] movement = new int[2];
+                            switch (movementdirection)
+                            {
+                                case 0:
+                                    movement[0] = 1;
+                                    movement[1] = 0;
+                                    break;
+                                case 180:
+                                    movement[0] = -1;
+                                    movement[1] = 0;
+                                    break;
+                                case 270:
+                                    movement[0] = 0;
+                                    movement[1] = 1;
+                                    break;
+                                case 90:
+                                    movement[0] = 0;
+                                    movement[1] = -1;
+                                    break;
+                            }
+                            response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
+                            break;
+                        case 2:
+                            if (Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
+                            {
+                                Stats["Mana"] = GetStat("MaxMana") + GetSpellCost(Spells[chosenSpell]);
+                                Inventory[6, 0].Name = "Empty Moon Amulet";
+                                Inventory[6, 0].Quantity = Inventory[6, 0].ClassType;
+                                Inventory[6, 0].ClassType += 10;
+                                Inventory[6, 0].Description = $"A used Moon Amulet. It requires {Inventory[6, 0].Quantity} more steps to work again\n";
+                                Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet13.png";
+                                response += $"{Name}'s Moon Amulet glows brightly!\n";
+                            }
+                            Stats["Mana"] -= GetSpellCost(Spells[chosenSpell]);
+                            sound = "Graphics/Sounds/holychoir.wav";
                             arrowSlot[0] = 0;
                             arrowSlot[1] = 0;
-                            if (IsAggresiveSpell(Inventory[itemSlot[0], itemSlot[1]].Spell))
+                            if (IsAggresiveSpell(Spells[chosenSpell]))
                             {
                                 arrowSlot[0] = player.position[0] - position[0];
                                 arrowSlot[1] = player.position[1] - position[1];
                             }
-                            effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { arrowSlot[0], arrowSlot[1] }, GetStat("Magic"), Inventory[itemSlot[0], itemSlot[1]].Spell));
-                        }
-                        // Healing items
-                        else
-                        {
-                            if (Inventory[itemSlot[0], itemSlot[1]].Name == "Improvement Potion")
+                            effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { arrowSlot[0], arrowSlot[1] }, GetStat("Magic"), Spells[chosenSpell]));
+                            response += $"{Name} casts {Spells[chosenSpell]}!\n";
+                            break;
+                        case 3:
+                            healSlot[0] = player.position[0] - position[0];
+                            healSlot[1] = player.position[1] - position[1];
+                            sound = "Graphics/Sounds/bow.wav";
+
+                            effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { healSlot[0], healSlot[1] }, GetStat("Agility"), $"Shoot {Inventory[arrowSlot[0], arrowSlot[1]].Name}"));
+
+                            Inventory[arrowSlot[0], arrowSlot[1]].Quantity--;
+                            if (Inventory[arrowSlot[0], arrowSlot[1]].Quantity <= 0)
+                                Inventory[arrowSlot[0], arrowSlot[1]] = null;
+                            break;
+                        case 4:
+                            Stats["HP"] += Inventory[healSlot[0], healSlot[1]].Stats["MaxHP"];
+
+                            sound = "Graphics/Sounds/closeinventory.wav";
+
+                            response += $"{Name} used a {Inventory[healSlot[0], healSlot[1]].Name}!\n";
+                            Inventory[healSlot[0], healSlot[1]].Quantity--;
+                            if (Inventory[healSlot[0], healSlot[1]].Quantity <= 0)
+                                Inventory[healSlot[0], healSlot[1]] = null;
+                            break;
+                        case 5:
+                            Stats["Mana"] += Inventory[manaSlot[0], manaSlot[1]].Stats["MaxMana"];
+
+                            sound = "Graphics/Sounds/closeinventory.wav";
+
+                            response += $"{Name} used a {Inventory[manaSlot[0], manaSlot[1]].Name}!\n";
+                            Inventory[manaSlot[0], manaSlot[1]].Quantity--;
+                            if (Inventory[manaSlot[0], manaSlot[1]].Quantity <= 0)
+                                Inventory[manaSlot[0], manaSlot[1]] = null;
+                            break;
+                        case 6:
+                            sound = "Graphics/Sounds/closeinventory.wav";
+                            // Arrows/Scrolls, aka using spells inside items
+                            if (Inventory[itemSlot[0], itemSlot[1]].Name.Contains("Scroll"))
                             {
-                                Statuses[0] = 0;
-                                Statuses[1] = 0;
-                                Statuses[2] = 0;
-                                Statuses[3] = 0;
+                                arrowSlot[0] = 0;
+                                arrowSlot[1] = 0;
+                                if (IsAggresiveSpell(Inventory[itemSlot[0], itemSlot[1]].Spell))
+                                {
+                                    arrowSlot[0] = player.position[0] - position[0];
+                                    arrowSlot[1] = player.position[1] - position[1];
+                                }
+                                effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { arrowSlot[0], arrowSlot[1] }, GetStat("Magic"), Inventory[itemSlot[0], itemSlot[1]].Spell));
                             }
+                            // Healing items
                             else
                             {
-                                Stats["HP"] += Inventory[itemSlot[0], itemSlot[1]].Stats["MaxHP"];
-                                Stats["Mana"] += Inventory[itemSlot[0], itemSlot[1]].Stats["MaxMana"];
-
-                                if (Stats["HP"] > GetStat("MaxHP"))
-                                    Stats["HP"] = GetStat("MaxHP");
-                                if (Stats["Mana"] > GetStat("MaxMana"))
-                                    Stats["Mana"] = GetStat("MaxMana");
-
-                                if (Inventory[itemSlot[0], itemSlot[1]].Stats["Strength"] > 0)
+                                if (Inventory[itemSlot[0], itemSlot[1]].Name == "Improvement Potion")
                                 {
-                                    if (Buffs["Strength"] > 0)
-                                        BuffLevels["Strength"] = (int)((BuffLevels["Strength"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Strength"]) / 1.5);
-                                    else
-                                        BuffLevels["Strength"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Strength"];
-                                    if (BuffLevels["Strength"] >= 0)
-                                        Buffs["Strength"] = BuffLevels["Strength"] * 10;
-                                    else Buffs["Strength"] = -(BuffLevels["Strength"]) * 10;
+                                    Statuses[0] = 0;
+                                    Statuses[1] = 0;
+                                    Statuses[2] = 0;
+                                    Statuses[3] = 0;
                                 }
-
-                                if (Inventory[itemSlot[0], itemSlot[1]].Stats["Agility"] > 0)
+                                else
                                 {
-                                    if (Buffs["Agility"] > 0)
-                                        BuffLevels["Agility"] = (int)((BuffLevels["Agility"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Agility"]) / 1.5);
-                                    else
-                                        BuffLevels["Agility"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Agility"];
-                                    if (BuffLevels["Agility"] >= 0)
-                                        Buffs["Agility"] = BuffLevels["Agility"] * 10;
-                                    else Buffs["Agility"] = -(BuffLevels["Agility"]) * 10;
-                                }
+                                    Stats["HP"] += Inventory[itemSlot[0], itemSlot[1]].Stats["MaxHP"];
+                                    Stats["Mana"] += Inventory[itemSlot[0], itemSlot[1]].Stats["MaxMana"];
 
-                                if (Inventory[itemSlot[0], itemSlot[1]].Stats["Magic"] > 0)
-                                {
-                                    if (Buffs["Magic"] > 0)
-                                        BuffLevels["Magic"] = (int)((BuffLevels["Magic"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Magic"]) / 1.5);
-                                    else
-                                        BuffLevels["Magic"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Magic"];
-                                    if (BuffLevels["Magic"] >= 0)
-                                        Buffs["Magic"] = BuffLevels["Magic"] * 10;
-                                    else Buffs["Magic"] = -(BuffLevels["Magic"]) * 10;
-                                }
+                                    if (Stats["HP"] > GetStat("MaxHP"))
+                                        Stats["HP"] = GetStat("MaxHP");
+                                    if (Stats["Mana"] > GetStat("MaxMana"))
+                                        Stats["Mana"] = GetStat("MaxMana");
 
-                                if (Inventory[itemSlot[0], itemSlot[1]].Stats["Defense"] > 0)
-                                {
-                                    if (Buffs["Defense"] > 0)
-                                        BuffLevels["Defense"] = (int)((BuffLevels["Defense"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Defense"]) / 1.5);
-                                    else
-                                        BuffLevels["Defense"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Defense"];
-                                    if (BuffLevels["Defense"] >= 0)
-                                        Buffs["Defense"] = BuffLevels["Defense"] * 10;
-                                    else Buffs["Defense"] = -(BuffLevels["Defense"]) * 10;
-                                }
+                                    if (Inventory[itemSlot[0], itemSlot[1]].Stats["Strength"] > 0)
+                                    {
+                                        if (Buffs["Strength"] > 0)
+                                            BuffLevels["Strength"] = (int)((BuffLevels["Strength"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Strength"]) / 1.5);
+                                        else
+                                            BuffLevels["Strength"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Strength"];
+                                        if (BuffLevels["Strength"] >= 0)
+                                            Buffs["Strength"] = BuffLevels["Strength"] * 10;
+                                        else Buffs["Strength"] = -(BuffLevels["Strength"]) * 10;
+                                    }
 
-                                if (Inventory[itemSlot[0], itemSlot[1]].Stats["MagicDefense"] > 0)
-                                {
-                                    if (Buffs["MagicDefense"] > 0)
-                                        BuffLevels["MagicDefense"] = (int)((BuffLevels["MagicDefense"] + Inventory[itemSlot[0], itemSlot[1]].Stats["MagicDefense"]) / 1.5);
-                                    else
-                                        BuffLevels["MagicDefense"] = Inventory[itemSlot[0], itemSlot[1]].Stats["MagicDefense"];
-                                    if (BuffLevels["MagicDefense"] >= 0)
-                                        Buffs["MagicDefense"] = BuffLevels["MagicDefense"] * 10;
-                                    else Buffs["MagicDefense"] = -(BuffLevels["MagicDefense"]) * 10;
+                                    if (Inventory[itemSlot[0], itemSlot[1]].Stats["Agility"] > 0)
+                                    {
+                                        if (Buffs["Agility"] > 0)
+                                            BuffLevels["Agility"] = (int)((BuffLevels["Agility"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Agility"]) / 1.5);
+                                        else
+                                            BuffLevels["Agility"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Agility"];
+                                        if (BuffLevels["Agility"] >= 0)
+                                            Buffs["Agility"] = BuffLevels["Agility"] * 10;
+                                        else Buffs["Agility"] = -(BuffLevels["Agility"]) * 10;
+                                    }
+
+                                    if (Inventory[itemSlot[0], itemSlot[1]].Stats["Magic"] > 0)
+                                    {
+                                        if (Buffs["Magic"] > 0)
+                                            BuffLevels["Magic"] = (int)((BuffLevels["Magic"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Magic"]) / 1.5);
+                                        else
+                                            BuffLevels["Magic"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Magic"];
+                                        if (BuffLevels["Magic"] >= 0)
+                                            Buffs["Magic"] = BuffLevels["Magic"] * 10;
+                                        else Buffs["Magic"] = -(BuffLevels["Magic"]) * 10;
+                                    }
+
+                                    if (Inventory[itemSlot[0], itemSlot[1]].Stats["Defense"] > 0)
+                                    {
+                                        if (Buffs["Defense"] > 0)
+                                            BuffLevels["Defense"] = (int)((BuffLevels["Defense"] + Inventory[itemSlot[0], itemSlot[1]].Stats["Defense"]) / 1.5);
+                                        else
+                                            BuffLevels["Defense"] = Inventory[itemSlot[0], itemSlot[1]].Stats["Defense"];
+                                        if (BuffLevels["Defense"] >= 0)
+                                            Buffs["Defense"] = BuffLevels["Defense"] * 10;
+                                        else Buffs["Defense"] = -(BuffLevels["Defense"]) * 10;
+                                    }
+
+                                    if (Inventory[itemSlot[0], itemSlot[1]].Stats["MagicDefense"] > 0)
+                                    {
+                                        if (Buffs["MagicDefense"] > 0)
+                                            BuffLevels["MagicDefense"] = (int)((BuffLevels["MagicDefense"] + Inventory[itemSlot[0], itemSlot[1]].Stats["MagicDefense"]) / 1.5);
+                                        else
+                                            BuffLevels["MagicDefense"] = Inventory[itemSlot[0], itemSlot[1]].Stats["MagicDefense"];
+                                        if (BuffLevels["MagicDefense"] >= 0)
+                                            Buffs["MagicDefense"] = BuffLevels["MagicDefense"] * 10;
+                                        else Buffs["MagicDefense"] = -(BuffLevels["MagicDefense"]) * 10;
+                                    }
                                 }
                             }
-                        }
 
-                        response += $"{Name} used a {Inventory[itemSlot[0], itemSlot[1]].Name}!\n";
-                        Inventory[itemSlot[0], itemSlot[1]].Quantity--;
-                        if (Inventory[itemSlot[0], itemSlot[1]].Quantity <= 0)
-                            Inventory[itemSlot[0], itemSlot[1]] = null;
-                        break;
+                            response += $"{Name} used a {Inventory[itemSlot[0], itemSlot[1]].Name}!\n";
+                            Inventory[itemSlot[0], itemSlot[1]].Quantity--;
+                            if (Inventory[itemSlot[0], itemSlot[1]].Quantity <= 0)
+                                Inventory[itemSlot[0], itemSlot[1]] = null;
+                            break;
+                    }
                 }
-
             }
             else
             {

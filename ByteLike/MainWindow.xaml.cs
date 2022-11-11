@@ -42,6 +42,18 @@ namespace ByteLike
         static string response = "";
         static string currentSound = "";
         static string tempSound = "";
+        static char[] characters = new char[]
+        { 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
+            'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',
+            'z', 'x', 'c', 'v', 'b', 'n', 'm',
+            'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',
+            'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L',
+            'Z', 'X', 'C', 'V', 'B', 'N', 'M' };
+        static Key[] keys = new Key[]
+            { Key.Q, Key.W, Key.E, Key.R, Key.T, Key.Y, Key.U, Key.I, Key.O, Key.P,
+                Key.A, Key.S, Key.D, Key.F, Key.G, Key.H, Key.J, Key.K, Key.L,
+                Key.Z, Key.X, Key.C, Key.V, Key.B, Key.N, Key.M
+            };
 
         static Random rand = new Random();
 
@@ -1228,20 +1240,32 @@ namespace ByteLike
                 //dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 48));
 
                 FormattedText dialogue4 = new FormattedText("New Game", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
-                dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 110));
-                if (pausePointer == 0)
-                    dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 104, 32, 32));
 
-                dialogue4 = new FormattedText("Load Game", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
-                dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 140));
-                if (pausePointer == 1)
-                    dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 134, 32, 32));
+                if (pausePointer < 3)
+                {
 
-                dialogue4 = new FormattedText("Exit", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
-                dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 170));
-                if (pausePointer == 2)
-                    dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 164, 32, 32));
+                    dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 110));
+                    if (pausePointer == 0)
+                        dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 104, 32, 32));
 
+                    dialogue4 = new FormattedText("Load Game", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                    dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 140));
+                    if (pausePointer == 1)
+                        dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 134, 32, 32));
+
+                    dialogue4 = new FormattedText("Exit", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                    dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 170));
+                    if (pausePointer == 2)
+                        dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 164, 32, 32));
+
+                }
+                else if (pausePointer == 3)
+                {
+                    dialogue4 = new FormattedText("Enter your character's name", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                    dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 140));
+                    dialogue4 = new FormattedText($"{response}_", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                    dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 170));
+                }
                 if (drawCamera)
                 {
                     dialogue4 = new FormattedText($"cam: {cameraSize[0]}/{cameraSize[1]}", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 8, Brushes.White);
@@ -1281,6 +1305,7 @@ namespace ByteLike
             }
             chests = new List<Chest>();
             enemies = new List<Creature>();
+            effects = new List<Effect>();
             Generator.Reset();
 
             // Generate level, set player's initial position
@@ -1348,14 +1373,14 @@ namespace ByteLike
             // Pause/Menu controls
             if (Paused || MainMenu)
             {
-                if (Keyboard.IsKeyDown(Key.W))
+                if (Keyboard.IsKeyDown(Key.W) && pausePointer < 3)
                 {
                     pausePointer--;
                     if (pausePointer < 0)
                         pausePointer = 2;
                     currentSound = "Graphics/Sounds/menuclick.wav";
                 }
-                if (Keyboard.IsKeyDown(Key.S))
+                if (Keyboard.IsKeyDown(Key.S) && pausePointer < 3)
                 {
                     pausePointer++;
                     if (pausePointer > 2)
@@ -1363,7 +1388,55 @@ namespace ByteLike
                     currentSound = "Graphics/Sounds/menuclick.wav";
                 }
 
-                if (Keyboard.IsKeyDown(Key.E) && !MainMenu)
+                if (pausePointer == 3 && MainMenu)
+                {
+                    for (int i = 0; i < keys.Length && response.Length < 20; i++)
+                    {
+                        if (Keyboard.IsKeyDown(keys[i]))
+                        {
+                            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                                response += characters[i + 26];
+                            else
+                                response += characters[i];
+                        }
+                    }
+
+                    if (Keyboard.IsKeyDown(Key.Space) && response.Length < 20)
+                        response += " ";
+                    else if (Keyboard.IsKeyDown(Key.Back) && response.Length > 0)
+                        response = response.Remove(response.Length - 1);
+
+                    if (Keyboard.IsKeyDown(Key.Return) && pausePointer == 3)
+                    {
+                        floor = 0;
+                        player = new Player(response);
+                        NewLevel();
+                        response = $"{player.Name} enters the dungeon\n";
+                        MainMenu = false;
+                        Paused = false;
+                        pausePointer = 0;
+                        cameraManagment = true;
+
+                        // Saving the game
+                        if (File.Exists("save.json"))
+                            File.Delete("save.json");
+                        using (StreamWriter sw = File.CreateText("save.json"))
+                        {
+                            sw.WriteLine(JsonConvert.SerializeObject(new GameData(chests, level, darkness, floor, player)));
+                            sw.Close();
+                        }
+
+                        music.Stop();
+                        music.Open(new Uri(@"Graphics/Sounds/firstpart.wav", UriKind.Relative));
+                        music.Play();
+                    }
+
+                    if (Keyboard.IsKeyDown(Key.Escape))
+                    {
+                        pausePointer = 0;
+                    }
+                }
+                else if (Keyboard.IsKeyDown(Key.E) && !MainMenu)
                 {
                     currentSound = "Graphics/Sounds/menuclick.wav";
                     switch (pausePointer)
@@ -1440,24 +1513,8 @@ namespace ByteLike
                     switch (pausePointer)
                     {
                         case 0:
-                            floor = 0;
-                            player = new Player("Player");
-                            NewLevel();
-                            response = $"{player.Name} enters the dungeon\n";
-                            MainMenu = false;
-
-                            // Saving the game
-                            if (File.Exists("save.json"))
-                                File.Delete("save.json");
-                            using (StreamWriter sw = File.CreateText("save.json"))
-                            {
-                                sw.WriteLine(JsonConvert.SerializeObject(new GameData(chests, level, darkness, floor, player)));
-                                sw.Close();
-                            }
-
-                            music.Stop();
-                            music.Open(new Uri(@"Graphics/Sounds/firstpart.wav", UriKind.Relative));
-                            music.Play();
+                            pausePointer = 3;
+                            response = "";
                             break;
                         case 1:
                             if (File.Exists("save.json"))
@@ -1519,6 +1576,8 @@ namespace ByteLike
                             break;
                     }
                 }
+
+
             }
 
             // Camera sizes
@@ -1616,7 +1675,7 @@ namespace ByteLike
                         {
 
                             // enemy spawn
-                            if (enemies.Count < 10 + floor / 2)
+                            if (enemies.Count < 10 + floor / 5)
                             {
                                 int[] newPos = new int[] { rand.Next(level.GetLength(0)), rand.Next(level.GetLength(1)) };
 
@@ -1630,7 +1689,9 @@ namespace ByteLike
                                     else if (enemy >= 10 && enemy <= 15)
                                         enemies.Add(new Snake(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
                                     else if (enemy > 15 && enemy < 17)
-                                        enemies.Add(new Mimic(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
+                                        enemies.Add(new Mimic(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }, null));
+                                    else if (enemy >= 17 && enemy < 23)
+                                        enemies.Add(new Slug(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
                                 }
                             }
 
@@ -1672,7 +1733,7 @@ namespace ByteLike
                                 {
                                     if (enemies[deletusXL[i]].DropEquipment)
                                     {
-                                        Chest temp = new Chest(new int[] { enemies[deletusXL[i]].position[0], enemies[deletusXL[i]].position[1] }, -(enemies[deletusXL[i]].Inventory.GetLength(1) + 1));
+                                        Chest temp = new Chest(new int[] { enemies[deletusXL[i]].position[0], enemies[deletusXL[i]].position[1] }, -(enemies[deletusXL[i]].Inventory.GetLength(1) + 1), null);
                                         for (int f = 0; f < enemies[deletusXL[i]].Inventory.GetLength(1); f++)
                                         {
                                             for (int k = 0; k < enemies[deletusXL[i]].Inventory.GetLength(0); k++)
@@ -1693,26 +1754,6 @@ namespace ByteLike
                             }
                         }
 
-                        if (effects.Count > 0)
-                        {
-                            List<int> deleteus = new List<int>();
-                            for (int i = 0; i < effects.Count; i++)
-                            {
-                                if (!effects[i].Logics(ref level, ref enemies, ref effects, ref player, out response, response, out tempSound))
-                                    deleteus.Add(i);
-
-                                if (currentSound == "" && tempSound != "")
-                                    currentSound = tempSound;
-                            }
-
-                            if (deleteus.Count > 0)
-                            {
-                                for (int i = deleteus.Count - 1; i >= 0; i--)
-                                {
-                                    effects.RemoveAt(deleteus[i]);
-                                }
-                            }
-                        }
                     }
                 }
                 else
@@ -2693,7 +2734,8 @@ namespace ByteLike
                 }
 
                 // Move, check for collison
-                Move();
+                if (!check)
+                    Move();
                 sound = "Graphics/Sounds/projectilesound.wav";
                 if (level[position[0], position[1]] == 0 || level[position[0], position[1]] == 5 || level[position[0], position[1]] == 4 || level[position[0], position[1]] == 2)
                 {
