@@ -1575,6 +1575,7 @@ namespace ByteLike
                 {
                     bool doEnemies = false;
 
+                    // effects
                     if (effects.Count > 0)
                     {
                         doEnemies = true;
@@ -1596,6 +1597,7 @@ namespace ByteLike
                         }
 
                     }
+                    // player
                     else
                     {
                         response = player.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness, out tempSound);
@@ -1605,22 +1607,33 @@ namespace ByteLike
                         {
                             doEnemies = true;
                         }
-
-                        if (enemies.Count < 10 + floor / 2)
-                        {
-                            int[] newPos = new int[] { rand.Next(level.GetLength(0)), rand.Next(level.GetLength(1)) };
-
-                            if (level[newPos[0], newPos[1]] == 1 && (darkness[newPos[0], newPos[1]] <= 0 || darkness[newPos[0], newPos[1]] == 2) && DistanceBetween(new int[] { newPos[0], newPos[1] }, new int[] { player.position[0], player.position[1] }) > player.GetStat("Torch") + 2)
-                            {
-                                enemies.Add(new Critter(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
-                            }
-                        }
                     }
 
+                    // enemies
                     if (effects.Count <= 0)
                     {
                         if (doEnemies)
                         {
+
+                            // enemy spawn
+                            if (enemies.Count < 10 + floor / 2)
+                            {
+                                int[] newPos = new int[] { rand.Next(level.GetLength(0)), rand.Next(level.GetLength(1)) };
+
+                                if (level[newPos[0], newPos[1]] == 1 && (darkness[newPos[0], newPos[1]] <= 0 || darkness[newPos[0], newPos[1]] == 2) && DistanceBetween(new int[] { newPos[0], newPos[1] }, new int[] { player.position[0], player.position[1] }) > player.GetStat("Torch") + 2)
+                                {
+                                    int enemy = rand.Next(0, floor + 5);
+                                    if (enemy < 5)
+                                        enemies.Add(new Critter(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
+                                    else if (enemy >= 5 && enemy < 10)
+                                        enemies.Add(new Undead(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
+                                    else if (enemy >= 10 && enemy <= 15)
+                                        enemies.Add(new Snake(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
+                                    else if (enemy > 15 && enemy < 17)
+                                        enemies.Add(new Mimic(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
+                                }
+                            }
+
                             List<int> deletusXL = new List<int>();
                             int pos = 0;
 

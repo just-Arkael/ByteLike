@@ -80,6 +80,8 @@ namespace ByteLike
                 if (rand.Next(5) == 0) { GearType = rand.Next(7) + 1; }
             }
             else { GearType = type; }
+            if (GearType > 8)
+                GearType = 10;
 
         RandomizeGearType:
             switch (GearType)
@@ -102,6 +104,10 @@ namespace ByteLike
                         if (strength > 3) { strength = 3; }
                         typeSwitch += 5000;
                     }
+
+                    if (GearType == 5 && strength == 0)
+                        strength = 1;
+
                     typeSwitch += strength * 10000;
 
 
@@ -1632,7 +1638,7 @@ namespace ByteLike
                 File = "Graphics/ByteLikeGraphics/Items/chest3.png";
             }
 
-            int counter = rand.Next(150);
+            int counter = rand.Next(100);
 
             if (floor > 0)
             {
@@ -1640,8 +1646,8 @@ namespace ByteLike
                 {
                     for (int j = 0; j < Inventory.GetLength(0); j++)
                     {
-                        counter += rand.Next(15);
-                        if (counter > 150-(quality*2))
+                        counter += rand.Next(10);
+                        if (counter > 105-(quality*2))
                         {
                             counter = 0;
                             Inventory[j, i] = new Item(floor, 0);
