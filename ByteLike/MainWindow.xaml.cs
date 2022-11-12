@@ -108,6 +108,12 @@ namespace ByteLike
                 case "Empty Moon Amulet":
                     File += "13.png";
                     break;
+                case "Empty Ghost Amulet":
+                    File += "14.png";
+                    break;
+                case "Ghost Amulet":
+                    File += "15.png";
+                    break;
                 default:
                     File = "";
                     break;
@@ -268,7 +274,6 @@ namespace ByteLike
 
             return Math.Sqrt(Math.Pow(disx, 2) + Math.Pow(disy, 2));
         }
-
 
         // DRAW MAP
 
@@ -1151,20 +1156,45 @@ namespace ByteLike
                     FormattedText dialogue4 = new FormattedText("PAUSED", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 32, Brushes.White);
                     dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 48));
                     
-                    dialogue4 = new FormattedText("CONTINUE", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                    dialogue4 = new FormattedText("Continue", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
                     dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 98));
                     if (pausePointer == 0)
                         dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 92, 32, 32));
 
-                    dialogue4 = new FormattedText("LOAD FROM LAST FLOOR", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                    dialogue4 = new FormattedText("Save Game", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
                     dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 128));
                     if (pausePointer == 1)
                         dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 122, 32, 32));
 
-                    dialogue4 = new FormattedText("QUIT", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                    dialogue4 = new FormattedText("Load Game", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
                     dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 158));
                     if (pausePointer == 2)
                         dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 152, 32, 32));
+
+                    dialogue4 = new FormattedText("Quit To Main Menu", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                    dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 188));
+                    if (pausePointer == 3)
+                        dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 182, 32, 32));
+
+                    bool aggressivecheck = false;
+
+                    foreach (Creature item in enemies)
+                    {
+                        if (item.Aggressive || darkness[item.position[0], item.position[1]] == 1)
+                            aggressivecheck = true;
+                    }
+
+                    if (aggressivecheck)
+                    {
+                        dialogue4 = new FormattedText("You need to kill all nearby enemies to save", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 10, Brushes.Red);
+                        dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 218));
+                    }
+
+                    if (effects.Count > 0)
+                    {
+                        dialogue4 = new FormattedText("You need to let all effects play out to save", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 10, Brushes.Red);
+                        dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 233));
+                    }
                 }
 
 
@@ -1234,14 +1264,15 @@ namespace ByteLike
                     }
                 }
 
-                dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/logo.png", UriKind.Relative)), new Rect(cameraSize[0]*8 - 82, 46, 164, 48));
+                if (pausePointer < 5)
+                    dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/logo.png", UriKind.Relative)), new Rect(cameraSize[0]*8 - 82, 46, 164, 48));
 
                 //FormattedText dialogue4 = new FormattedText("ByteLike", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 32, Brushes.White);
                 //dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 48));
 
                 FormattedText dialogue4 = new FormattedText("New Game", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
 
-                if (pausePointer < 3)
+                if (pausePointer < 4)
                 {
 
                     dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 110));
@@ -1253,18 +1284,32 @@ namespace ByteLike
                     if (pausePointer == 1)
                         dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 134, 32, 32));
 
-                    dialogue4 = new FormattedText("Exit", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+
+                    dialogue4 = new FormattedText("Credits/Controls", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
                     dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 170));
                     if (pausePointer == 2)
                         dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 164, 32, 32));
 
+                    dialogue4 = new FormattedText("Exit", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                    dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 200));
+                    if (pausePointer == 3)
+                        dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Hud/pointer.png", UriKind.Relative)), new Rect(cameraSize[0] * 8 + (dialogue4.Width / 2) - 26, 194, 32, 32));
+
                 }
-                else if (pausePointer == 3)
+                else if (pausePointer == 4)
                 {
-                    dialogue4 = new FormattedText("Enter your character's name", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                    dialogue4 = new FormattedText("Enter your character's name\n     Press [Enter] to start", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
                     dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 140));
                     dialogue4 = new FormattedText($"{response}_", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
-                    dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 170));
+                    dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 200));
+                }
+                else if (pausePointer == 5)
+                {
+                    dialogue4 = new FormattedText(
+                        "Game made by Arkael, Music by - vivivivivi on YouTube.\n\nControls:\n[W]/[A]/[S]/[D] - Walk / Move cursor; [E] - Choose; [Q] - Inventory; [escape] - Pause\nWalk into enemies to deal melee damage, press [E] while having a bow equiped to shoot an arrow!\nArrow keys - change camera size\nF12 - fullscreen"
+                        , System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 20, Brushes.White);
+                    dialogue4.MaxTextWidth = cameraSize[0] * 16;
+                    dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 7));
                 }
                 if (drawCamera)
                 {
@@ -1355,9 +1400,13 @@ namespace ByteLike
         {
             bool cameraManagment = Paused;
 
-            // Pause
+            if (!Paused && !MainMenu)
+                response = "";
+
+            // Pause/unpause
             if (Keyboard.IsKeyDown(Key.Escape) && !MainMenu)
             {
+                currentSound = "Graphics/Sounds/menuclick.wav";
                 switch (Paused)
                 {
                     case true:
@@ -1373,22 +1422,23 @@ namespace ByteLike
             // Pause/Menu controls
             if (Paused || MainMenu)
             {
-                if (Keyboard.IsKeyDown(Key.W) && pausePointer < 3)
+                if (Keyboard.IsKeyDown(Key.W) && pausePointer < 4)
                 {
                     pausePointer--;
                     if (pausePointer < 0)
-                        pausePointer = 2;
+                        pausePointer = 3;
                     currentSound = "Graphics/Sounds/menuclick.wav";
                 }
-                if (Keyboard.IsKeyDown(Key.S) && pausePointer < 3)
+                if (Keyboard.IsKeyDown(Key.S) && pausePointer < 4)
                 {
                     pausePointer++;
-                    if (pausePointer > 2)
+                    if (pausePointer > 3)
                         pausePointer = 0;
                     currentSound = "Graphics/Sounds/menuclick.wav";
                 }
 
-                if (pausePointer == 3 && MainMenu)
+                // Entering your name
+                if (pausePointer == 4 && MainMenu)
                 {
                     for (int i = 0; i < keys.Length && response.Length < 20; i++)
                     {
@@ -1406,7 +1456,7 @@ namespace ByteLike
                     else if (Keyboard.IsKeyDown(Key.Back) && response.Length > 0)
                         response = response.Remove(response.Length - 1);
 
-                    if (Keyboard.IsKeyDown(Key.Return) && pausePointer == 3)
+                    if (Keyboard.IsKeyDown(Key.Return) && pausePointer == 4)
                     {
                         floor = 0;
                         player = new Player(response);
@@ -1436,6 +1486,13 @@ namespace ByteLike
                         pausePointer = 0;
                     }
                 }
+                // Credits
+                else if (pausePointer == 5)
+                {
+                    if (Keyboard.IsKeyDown(Key.E) || Keyboard.IsKeyDown(Key.Escape))
+                        pausePointer = 0;
+                }
+                // Pause E presses
                 else if (Keyboard.IsKeyDown(Key.E) && !MainMenu)
                 {
                     currentSound = "Graphics/Sounds/menuclick.wav";
@@ -1445,6 +1502,30 @@ namespace ByteLike
                             Paused = false;
                             break;
                         case 1:
+                            bool aggressivecheck = false;
+                            foreach (Creature item in enemies)
+                            {
+                                if (item.Aggressive || darkness[item.position[0], item.position[1]] == 1)
+                                    aggressivecheck = true;
+                            }
+
+                            if (effects.Count > 0)
+                                aggressivecheck = true;
+
+
+                            if (!aggressivecheck)
+                            {
+                                // Saving the game
+                                if (File.Exists("save.json"))
+                                    File.Delete("save.json");
+                                using (StreamWriter sw = File.CreateText("save.json"))
+                                {
+                                    sw.WriteLine(JsonConvert.SerializeObject(new GameData(chests, level, darkness, floor, player)));
+                                    sw.Close();
+                                }
+                            }
+                            break;
+                        case 2:
                             if (File.Exists("save.json"))
                             {
                                 using (StreamReader sr = File.OpenText($"save.json"))
@@ -1466,6 +1547,9 @@ namespace ByteLike
                                     catch { }
                                     sr.Close();
                                 }
+                                Paused = false;
+                                cameraManagment = false;
+                                response = "You feel the darkness around you gloom...\n";
                                 player.DangerLevel++;
 
                                 if (floor <= 16)
@@ -1498,22 +1582,46 @@ namespace ByteLike
                                 }
                             }
                             break;
-                        case 2:
+                        case 3:
                             MainMenu = true;
                             Paused = false;
                             music.Stop();
                             music.Open(new Uri(@"Graphics/Sounds/menu.wav", UriKind.Relative));
                             music.Play();
+
+                            bool aggressivecheck2 = false;
+                            foreach (Creature item in enemies)
+                            {
+                                if (item.Aggressive || darkness[item.position[0], item.position[1]] == 1)
+                                    aggressivecheck = true;
+                            }
+
+                            if (effects.Count > 0)
+                                aggressivecheck2 = true;
+
+                            if (!aggressivecheck2)
+                            {
+                                // Saving the game
+                                if (File.Exists("save.json"))
+                                    File.Delete("save.json");
+                                using (StreamWriter sw = File.CreateText("save.json"))
+                                {
+                                    sw.WriteLine(JsonConvert.SerializeObject(new GameData(chests, level, darkness, floor, player)));
+                                    sw.Close();
+                                }
+                            }
+
                             break;
                     }
                 }
+                // Main Menu E presses
                 else if (Keyboard.IsKeyDown(Key.E))
                 {
                     currentSound = "Graphics/Sounds/menuclick.wav";
                     switch (pausePointer)
                     {
                         case 0:
-                            pausePointer = 3;
+                            pausePointer = 4;
                             response = "";
                             break;
                         case 1:
@@ -1572,6 +1680,9 @@ namespace ByteLike
                             }
                             break;
                         case 2:
+                            pausePointer = 5;
+                            break;
+                        case 3:
                             this.Close();
                             break;
                     }
@@ -1626,9 +1737,11 @@ namespace ByteLike
             // Main Game
             if (!MainMenu && (cameraManagment || Keyboard.IsKeyDown(Key.E) || Keyboard.IsKeyDown(Key.Q) || Keyboard.IsKeyDown(Key.W) || Keyboard.IsKeyDown(Key.S) || Keyboard.IsKeyDown(Key.A) || Keyboard.IsKeyDown(Key.D) || Keyboard.IsKeyDown(Key.R)))
             {
-                currentSound = "";
-                tempSound = "";
-
+                if (!Paused)
+                {
+                    currentSound = "";
+                    tempSound = "";
+                }
 
                 if (!cameraManagment)
                 {
@@ -1659,7 +1772,7 @@ namespace ByteLike
                     // player
                     else
                     {
-                        response = player.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness, out tempSound);
+                        response += player.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness, out tempSound);
                         currentSound = tempSound;
 
                         if (!player.OpenInventory && !Keyboard.IsKeyDown(Key.Q))
@@ -1698,6 +1811,7 @@ namespace ByteLike
                             List<int> deletusXL = new List<int>();
                             int pos = 0;
 
+                            // CREATURE LOGIC
                             foreach (Creature enemy in enemies)
                             {
                                 response += enemy.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness, out string tempSound);
@@ -1726,7 +1840,7 @@ namespace ByteLike
 
                             }
 
-
+                            // CREATURE DELETUS
                             if (deletusXL.Count > 0)
                             {
                                 for (int i = deletusXL.Count - 1; i >= 0; i--)
@@ -1806,6 +1920,7 @@ namespace ByteLike
                         music.Play();
                     }
 
+                    // Dopplegangers
                     if (Directory.Exists("Memories"))
                     {
                         if (File.Exists($"Memories/floor{floor}.json"))
@@ -1920,6 +2035,7 @@ namespace ByteLike
                 this.Content = imageBorder;
 
             }
+            // Main Menu draw stuff
             else if (MainMenu)
             {
                 if (File.Exists(currentSound))

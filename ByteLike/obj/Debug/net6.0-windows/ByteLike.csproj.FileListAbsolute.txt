@@ -513,3 +513,7 @@ C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windo
 C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\mainmenu8.png
 C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\mainmenu9.png
 C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Hud\logo.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Items\amulet14.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Items\amulet15.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Armor\armor7-14.png
+C:\Users\Arkael\source\repos\homeworks2\ByteLike\ByteLike\bin\Debug\net6.0-windows\Graphics\ByteLikeGraphics\Armor\armor7-15.png

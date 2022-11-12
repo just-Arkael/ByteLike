@@ -1226,7 +1226,7 @@ namespace ByteLike
                     break;
                 case 7:
                     File = "Graphics/ByteLikeGraphics/Items/amulet";
-                    typeSwitch = rand.Next(14);
+                    typeSwitch = rand.Next(16);
                     File += typeSwitch;
                     File += ".png";
                     switch (typeSwitch)
@@ -1319,6 +1319,17 @@ namespace ByteLike
                         case 13:
                             Name = "Empty Moon Amulet";
                             Description = "A used Moon Amulet. It requires 100 more steps to work again\n";
+                            ClassType = 100;
+                            Quantity = 100;
+                            break;
+                        case 14:
+                            Name = "Empty Ghost Amulet";
+                            Description = "A used Ghost Amulet. It will recharge after you level up\n";
+                            ClassType = 100;
+                            break;
+                        case 15:
+                            Name = "Ghost Amulet";
+                            Description = "It will allow you to walk through walls for 100 more steps for a price of your health. It will need to recharge afterwards to work again\n";
                             ClassType = 100;
                             Quantity = 100;
                             break;

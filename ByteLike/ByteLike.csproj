@@ -435,6 +435,12 @@
     <None Update="Graphics\ByteLikeGraphics\Armor\armor7-13.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Graphics\ByteLikeGraphics\Armor\armor7-14.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Armor\armor7-15.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Graphics\ByteLikeGraphics\Armor\armor7-2.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -577,6 +583,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Graphics\ByteLikeGraphics\Items\amulet13.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Items\amulet14.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Graphics\ByteLikeGraphics\Items\amulet15.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Graphics\ByteLikeGraphics\Items\amulet2.png">

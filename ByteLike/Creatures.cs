@@ -10,6 +10,7 @@ namespace ByteLike
 
     public abstract class Creature
     {
+        public bool Aggressive = false;
         public bool DrawEquipment = false;
         public bool DrawHealthbar = true;
         public bool DropEquipment = false;
@@ -27,7 +28,17 @@ namespace ByteLike
         public Dictionary<string, int> Buffs = new Dictionary<string, int>();
         public Dictionary<string, int> BuffLevels = new Dictionary<string, int>();
 
-        public bool IsGhost = false;
+        public bool IsGhost {
+            get {
+                if (Inventory[6, 0] != null)
+                {
+                    if (Inventory[6, 0].Name == "Ghost Amulet")
+                        return true;
+                    else
+                        return false;
+                }
+                else
+                    return false; } }
         public List<string> Spells = new List<string>();
         public Item[,] Inventory = new Item[11, 1];
         public string File = "Graphics/ByteLikeGraphics/placeholder.png";
@@ -500,7 +511,7 @@ namespace ByteLike
             BuffLevels.Add("Torch", 0);
         }
 
-        protected bool FloorCheck(int tile)
+        protected virtual bool FloorCheck(int tile)
         {
             if (IsGhost) { return false; }
 
@@ -1742,6 +1753,24 @@ namespace ByteLike
                                 Inventory[6, 0].Description = "It will fully restore your mana and let you cast a spell if you run out of mana once. It will need to recharge afterwards to work again\n";
                             }
                             break;
+                        case "Ghost Amulet":
+                            Inventory[6, 0].Quantity--;
+                            Inventory[6, 0].Description = $"It will allow you to walk through walls for {Inventory[6,0].Quantity} more steps for a price of your health. It will need to recharge afterwards to work again\n";
+                            if (Inventory[6, 0].Quantity <= 0)
+                            {
+                                Inventory[6, 0].Quantity = 0;
+                                Inventory[6, 0].Description = $"It looks unstable. It looks like its hanging onto its dear life just to keep you safe\n";
+                                if (level[position[0], position[1]] != 4 && level[position[0], position[1]] != 2 && level[position[0], position[1]] != 0 && level[position[0], position[1]] != 5)
+                                {
+                                    response += $"{Name}'s Ghost Amulet glows brightly!\n";
+                                    Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet14.png";
+                                    Inventory[6, 0].Quantity = 1;
+                                    Inventory[6, 0].ClassType += 10;
+                                    Inventory[6, 0].Name = "Empty Ghost Amulet";
+                                    Inventory[6, 0].Description = "A used Ghost Amulet. It will recharge after you level up\n";
+                                }
+                            }
+                            break;
                     }
                 }
             }
@@ -1834,8 +1863,6 @@ namespace ByteLike
                                 // Regular inventory, aka not equipment
                                 if (CurrentSlot[1] != 0 && SelectedSlot[1] != 0)
                                 {
-
-
                                     // Our inventory, aka not interacting with a chest
                                     if (CurrentSlot[1] < Inventory.GetLength(1) && SelectedSlot[1] < Inventory.GetLength(1))
                                     {
@@ -1983,7 +2010,10 @@ namespace ByteLike
                                             // if we're trying to switch equipment between eachother, prevent
                                             else if (CurrentSlot[0] < 9)
                                             {
-                                                response += $"{Name}: I can't put that there.\n";
+                                                if (CurrentSlot[0] != SelectedSlot[0])
+                                                    response += $"{Name}: I can't put that there.\n";
+                                                else
+                                                    SelectedSlot[0] = -100;
                                             }
                                             // Trying to use equipment
                                             else if (CurrentSlot[0] == 9 && Inventory[SelectedSlot[0], SelectedSlot[1]] != null)
@@ -2455,7 +2485,21 @@ namespace ByteLike
 
             // leveling up
             if (Stats["XP"] >= (int)(90 + Math.Pow(Stats["Level"], 2) * 10))
+            {
                 response += LevelUp();
+                if (Inventory[6, 0] != null)
+                {
+                    if (Inventory[6, 0].Name == "Empty Ghost Amulet")
+                    {
+                        Inventory[6, 0].Name = "Ghost Amulet";
+                        Inventory[6, 0].Quantity = Inventory[6, 0].ClassType;
+                        Inventory[6, 0].ClassType += 10;
+                        Inventory[6, 0].Description = $"It will allow you to walk through walls for {Inventory[6,0].Quantity} more steps for a price of your health. It will need to recharge afterwards to work again\n";
+                        Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet15.png";
+                        response += $"{Name}'s Ghost Amulet glows brightly!\n";
+                    }
+                }
+            }
 
 
             // Skipping turns
@@ -2545,7 +2589,6 @@ namespace ByteLike
 
     public class Critter : Creature
     {
-        bool Aggressive = false;
         public Critter(int floor, int[] pos)
             :base()
         {
@@ -2567,7 +2610,7 @@ namespace ByteLike
                 File += "3.png";
                 Stats["HPRegen"] += 1;
                 Stats["ManaRegen"] += 1;
-                statModifier = 1.25;
+                statModifier = 1.05;
                 Name = "Giant Rat";
                 Spells.Add("Ice Shard");
                 Spells.Add("Rage");
@@ -2579,6 +2622,7 @@ namespace ByteLike
             {
                 File += "2.png";
                 Stats["HPRegen"] += 1;
+                statModifier = 0.9;
                 Name = "Smart Rat";
                 Spells.Add("Focus");
                 Spells.Add("Corrode Armor");
@@ -2587,7 +2631,7 @@ namespace ByteLike
             else
             {
                 File += "1.png";
-                statModifier = 0.75;
+                statModifier = 0.65;
                 Name = "Rat";
                 Spells.Add("Sharpen");
             }
@@ -2706,7 +2750,6 @@ namespace ByteLike
 
     public class Undead : Creature
     {
-        bool Aggressive = false;
         public Undead(int floor, int[] pos)
             : base()
         {
@@ -2729,7 +2772,7 @@ namespace ByteLike
                 File += "3.png";
                 Stats["HPRegen"] += 1;
                 Stats["ManaRegen"] += 2;
-                statModifier = 1.3;
+                statModifier = 1.15;
                 Name = "Demon";
                 Spells.Add("Fireball");
                 Spells.Add("Transcend");
@@ -2743,7 +2786,7 @@ namespace ByteLike
                 File += "2.png";
                 Stats["HPRegen"] += 1;
                 Stats["ManaRegen"] += 1;
-                statModifier = 1.15;
+                statModifier = 1;
                 Name = "Skeleton";
                 Spells.Add("Ember");
                 Spells.Add("Prepare");
@@ -2754,7 +2797,7 @@ namespace ByteLike
             {
                 Stats["ManaRegen"] += 1;
                 File += "1.png";
-                statModifier = 1;
+                statModifier = 0.8;
                 Name = "Zombie";
                 Spells.Add("Focus");
                 Spells.Add("Energy Drain");
@@ -2878,7 +2921,6 @@ namespace ByteLike
 
     public class Snake : Creature
     {
-        bool Aggressive = false;
         public Snake(int floor, int[] pos)
             : base()
         {
@@ -3048,12 +3090,19 @@ namespace ByteLike
             else return "";
         }
 
+        protected override bool FloorCheck(int tile)
+        {
+            if (tile == 12 || tile == 13)
+                return false;
 
+            if (IsGhost) { return false; }
+
+            return true;
+        }
     }
 
     public class Slug : Creature
     {
-        bool Aggressive = false;
         public Slug(int floor, int[] pos)
             : base()
         {
@@ -3144,6 +3193,9 @@ namespace ByteLike
             int movementdirection = rand.Next(4) * 90;
             int chosenSpell = -1;
 
+            if (File == "Graphics/ByteLikeGraphics/Creatures/enemyslug3.png")
+                level[position[0], position[1]] = 14;
+
             if (Aggressive)
             {
                 if (rand.Next(3) != 0)
@@ -3230,7 +3282,25 @@ namespace ByteLike
             if (Stats["HP"] > GetStat("MaxHP")) { Stats["HP"] = GetStat("MaxHP"); Stats["MaxHPRegen"] = 0; }
             if (Stats["Mana"] > GetStat("MaxMana")) { Stats["Mana"] = GetStat("MaxMana"); Stats["MaxManaRegen"] = 0; }
 
+            if (Stats["HP"] <= 0)
+            {
+                int distance = 0;
+                if (File == "Graphics/ByteLikeGraphics/Creatures/enemyslug2.png")
+                    distance = 1;
+                else if (File == "Graphics/ByteLikeGraphics/Creatures/enemyslug3.png")
+                    distance = 2;
 
+                for (int i = -3; i <= 3; i++)
+                {
+                    for (int j = -3; j <= 3; j++)
+                    {
+                        if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { position[0] + j, position[1] + i }) <= distance && position[0]+j>=0 && position[0]+j<level.GetLength(0)&& position[1]+i >= 0 && position[1] < level.GetLength(1))
+                        {
+                            level[position[0] + j, position[1] + i] = 14;
+                        }
+                    }
+                }
+            }
 
             currentSound = sound;
             if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= player.GetStat("Torch") || Aggressive)
@@ -3238,13 +3308,21 @@ namespace ByteLike
             else return "";
         }
 
+        protected override bool FloorCheck(int tile)
+        {
+            if (tile == 14)
+                return false;
+
+            if (IsGhost) { return false; }
+
+            return true;
+        }
 
     }
 
 
     public class Mimic : Creature
     {
-        bool Aggressive = false;
         public Mimic(int floor, int[] pos, int? modifier)
             : base()
         {
@@ -3760,13 +3838,20 @@ namespace ByteLike
             else return "";
         }
 
+        protected override bool FloorCheck(int tile)
+        {
+            if (tile == 6 || tile == 11 || tile == 12)
+                return false;
+
+            if (IsGhost) { return false; }
+
+            return true;
+        }
 
     }
 
     public class DoppleGanger : Creature
     {
-        bool Aggressive = false;
-
         public DoppleGanger(Player player, int[] spawnpoint)
             :base()
         {
