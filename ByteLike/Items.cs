@@ -83,7 +83,6 @@ namespace ByteLike
             if (GearType > 8)
                 GearType = 10;
 
-        RandomizeGearType:
             switch (GearType)
             {
                 case 1:
@@ -653,6 +652,7 @@ namespace ByteLike
                             Stats["Magic"] += 1;
                             Stats["Defense"] += 2;
                             Stats["MagicDefense"] += 3;
+                            Description = "A hood imbued with many tiny crystals in a spiral pattern. Some mages believe crystals help channel arkhana\n";
                             break;
                         case 25320:
                             Name = "Crystal Cloak";
@@ -660,6 +660,7 @@ namespace ByteLike
                             Stats["Magic"] += 5;
                             Stats["Defense"] += -2;
                             Stats["MagicDefense"] += 8;
+                            Description = "A cloak imbued with many tiny crystals in a spiral pattern. Miners would often hide precious stones to later sell them to loner mages for high prices\n";
                             break;
                         case 25330:
                             Name = "Crystal Kilt";
@@ -668,6 +669,7 @@ namespace ByteLike
                             Stats["Magic"] += 3;
                             Stats["Defense"] += 2;
                             Stats["MagicDefense"] += 2;
+                            Description = "A kilt imbued with many tiny crystals in a spiral pattern. Extra layer of fabric prevents the crystals from cutting your legs\n";
                             break;
                         case 25340:
                             Name = "Crooked Staff";
@@ -675,6 +677,7 @@ namespace ByteLike
                             Stats["MaxMana"] += 15;
                             Stats["Strength"] += 6;
                             Stats["Magic"] += 8;
+                            Description = "A staff made from the crooked swamp tree. Its said that if you listen carefuly you can hear the screams of those who have been sacrificed to the tree\n";
                             break;
                         case 25345:
                             Name = "Flame Wand";
@@ -684,6 +687,8 @@ namespace ByteLike
                             Stats["Magic"] += 7;
                             Stats["Defense"] += 2;
                             Stats["MagicDefense"] += 2;
+                            Element = 1;
+                            Description = "A wand with an eternal fire at its tip. First Flame Wands were purchased from a devil, the legends say\n";
                             break;
                         case 25350:
                             Name = "Enchanted Tome";
@@ -692,6 +697,7 @@ namespace ByteLike
                             Stats["Magic"] += 3;
                             Stats["Defense"] += 2;
                             Stats["MagicDefense"] += 2;
+                            Description = "A tome with magic force running through it. Nightswipes are hard to weave with, so Enchanted Tomes are very rare to find\n";
                             break;
                         case 30110:
                             Name = "Hardened Helmet";
@@ -700,6 +706,7 @@ namespace ByteLike
                             Stats["Magic"] += -1;
                             Stats["Defense"] += 8;
                             Stats["MagicDefense"] += 3;
+                            Description = "A helmet made from hardened steel. A seer once said that the first kingdom to discover material better than bronze would conquer the world. Good thing two kingdoms discovered it at the same time\n";
                             break;
                         case 30120:
                             Name = "Hardened Armor";
@@ -708,17 +715,20 @@ namespace ByteLike
                             Stats["Strength"] += 3;
                             Stats["Defense"] += 10;
                             Stats["MagicDefense"] += 4;
+                            Description = "A full plate chestplate made from hardened steel. Steel armor is so rare that even kings can't afford to wear it\n";
                             break;
                         case 30130:
                             Name = "Hardened Leggings";
                             Stats["Strength"] += 3;
                             Stats["Defense"] += 6;
                             Stats["MagicDefense"] += 2;
+                            Description = "A set of leggings made from hardened steel. Working with steel is the highest honor a blacksmith could achieve\n";
                             break;
                         case 30140:
                             Name = "Hardened Sword";
                             Stats["Strength"] += 13;
                             Stats["Defense"] += 2;
+                            Description = "A blade made from pure hardened steel. Light, sharp and durable. A blade so perfect it can cut through magic\n";
                             break;
                         case 30145:
                             Name = "Obsidian Hammer";
@@ -726,6 +736,7 @@ namespace ByteLike
                             Stats["Strength"] += 16;
                             Stats["Magic"] += -5;
                             Stats["Defense"] += 4;
+                            Description = "A hammer made from cooled lava. Necromancers believe that obsidian opens a channel straight to hell. It also hits pretty hard\n";
                             break;
                         case 30150:
                             Name = "Tower Shield";
@@ -733,6 +744,7 @@ namespace ByteLike
                             Stats["Strength"] += 2;
                             Stats["Defense"] += 7;
                             Stats["MagicDefense"] += 2;
+                            Description = "A large shield that could cover an entire person. Paladins would rather lose their weapon than give up their shield, as protecting your kin is more important than killing your foe\n";
                             break;
                         case 35110:
                             Name = "Dragon Helmet";
@@ -741,6 +753,7 @@ namespace ByteLike
                             Stats["Defense"] += 5;
                             Stats["MagicDefense"] += 6;
                             Stats["HPRegen"] += -1;
+                            Description = "A helmet made from dragon scales. There's a legend about a warrior who tamed a dragon by fooling it with the smell of his Dragon Helmet\n";
                             break;
                         case 35120:
                             Name = "Dragon Armor";
@@ -750,6 +763,7 @@ namespace ByteLike
                             Stats["Defense"] += 7;
                             Stats["MagicDefense"] += 6;
                             Stats["HPRegen"] += -2;
+                            Description = "A ful plate armor made from dragon scales. The first blacksmith to make dragon armor did so out of anger caused by a dragon burning his village\n";
                             break;
                         case 35130:
                             Name = "Dragon Leggings";
@@ -758,6 +772,7 @@ namespace ByteLike
                             Stats["Strength"] += 3;
                             Stats["Defense"] += 4;
                             Stats["MagicDefense"] += 4;
+                            Description = "A let of leggings made from dragon scales. Dragons' fire is not magical so many get confused when they get burned by a Fireball while wearing dragon armor\n";
                             break;
                         case 35140:
                             Name = "Obsidian Sword";
@@ -765,6 +780,7 @@ namespace ByteLike
                             Stats["Defense"] += 3;
                             Stats["MagicDefense"] += 2;
                             Stats["ManaRegen"] += -2;
+                            Description = "A blade made from cooled down lava. Shaping such a blade would require a forge with fire from a dragon. The fact that this blade exists is fascinating and concerning\n";
                             break;
                         case 35145:
                             Name = "Milion Pounds Hammer";
@@ -773,6 +789,7 @@ namespace ByteLike
                             Stats["Strength"] += 20;
                             Stats["Magic"] += -5;
                             Stats["Defense"] += 6;
+                            Description = "A hammer made from hardened steel. Steel hammers get their nickname from the sheer force they put out. Such a weapon can shatter the toughest shields\n";
                             break;
                         case 35150:
                             Name = "Reflective Shield";
@@ -781,6 +798,7 @@ namespace ByteLike
                             Stats["MagicDefense"] += 4;
                             Stats["HPRegen"] += -1;
                             Stats["ManaRegen"] += -2;
+                            Description = "A shield with a magic mirror strapped to it. Mages say if you look in one of these you see the side of you you've never known before\n";
                             break;
                         case 30210:
                             Name = "Huntsman's Hat";
@@ -788,6 +806,7 @@ namespace ByteLike
                             Stats["Agility"] += 3;
                             Stats["Defense"] += 4;
                             Stats["MagicDefense"] += 5;
+                            Description = "A hat worn by the best huntsmen. Just putting it on makes the world seem slower\n";
                             break;
                         case 30220:
                             Name = "Huntsman's Vest";
@@ -795,6 +814,7 @@ namespace ByteLike
                             Stats["Agility"] += 3;
                             Stats["Defense"] += 6;
                             Stats["MagicDefense"] += 4;
+                            Description = "A vest worn by the best huntsmen. The material on the back is rough to prevent quivers from sliding around\n";
                             break;
                         case 30230:
                             Name = "Huntsman's Leggings";
@@ -802,12 +822,14 @@ namespace ByteLike
                             Stats["Agility"] += 3;
                             Stats["Defense"] += 4;
                             Stats["MagicDefense"] += 3;
+                            Description = "A set of leggings worn by the best huntsmen. They're tight and stretchy, allowing full freedom of movement while keeping weather effects at bay\n";
                             break;
                         case 30240:
                             Name = "Huntsman's Longbow";
                             Stats["MaxMana"] += 5;
                             Stats["Strength"] += 8;
                             Stats["Agility"] += 12;
+                            Description = "A bow made for some master huntsman. These are always made custom to fit the hand of whoever is to use it";
                             break;
                         case 30245:
                             Name = "Perfected Shortbow";
@@ -816,12 +838,14 @@ namespace ByteLike
                             Stats["Strength"] += 6;
                             Stats["Magic"] += 3;
                             Stats["Agility"] += 10;
+                            Description = "A bow chizeled down to perfection. There was just one person who ever made and owned perfect bows. They mysteriously wanished one day without leaving a trace\n";
                             break;
                         case 30250:
                             Name = "Crystal Quiver";
                             Stats["Strength"] += 2;
                             Stats["Magic"] += 3;
                             Stats["Agility"] += 6;
+                            Description = "A quiver imbued with many tiny crystals. The perfect item to accompany a hunter who practices magic. Arrows stored in this quiver feel lighter than usual\n";
                             break;
                         case 35210:
                             Name = "Camo Hat";
@@ -830,6 +854,7 @@ namespace ByteLike
                             Stats["Agility"] += 4;
                             Stats["Defense"] += 2;
                             Stats["MagicDefense"] += 2;
+                            Description = "A hat worn by the dark forest outcasts. Forest outcasts are known for their excelent vission and patience\n";
                             break;
                         case 35220:
                             Name = "Camo Vest";
@@ -838,6 +863,7 @@ namespace ByteLike
                             Stats["Defense"] += 4;
                             Stats["MagicDefense"] += 6;
                             Stats["ManaRegen"] += -1;
+                            Description = "A vest covered in mud and leaves. If you meet an outcast in the dark forest, know that many of them are probably watching you from the shadows at that moment\n";
                             break;
                         case 35230:
                             Name = "Camo Leggings";
@@ -845,12 +871,14 @@ namespace ByteLike
                             Stats["Agility"] += 3;
                             Stats["Defense"] += 3;
                             Stats["HPRegen"] += -1;
+                            Description = "A set of leggings made to bland in with a forest environment. Outcasts from the dark forest are swift and accurate. Their wears help with hiding and navigating in the forest\n";
                             break;
                         case 35240:
                             Name = "Golden Longbow";
                             Stats["Torch"] += 1;
                             Stats["Strength"] += 5;
                             Stats["Agility"] += 10;
+                            Description = "A bow made from solid gold. The material helps shoot arrows with extreme speeds. The impact is so severe, it could paralyse your foe\n";
                             Element = 4;
                             break;
                         case 35245:
@@ -861,6 +889,7 @@ namespace ByteLike
                             Stats["Agility"] += 7;
                             Stats["HPRegen"] += -1;
                             Stats["ManaRegen"] += -2;
+                            Description = "A bow made from pure crystal. The material is suprising, but it works out well. Huntsmen who practice magic find no need in a wand in they have one of these\n";
                             break;
                         case 35250:
                             Name = "Enchanted Quiver";
@@ -869,6 +898,7 @@ namespace ByteLike
                             Stats["Agility"] += 4;
                             Stats["HPRegen"] += -1;
                             Stats["ManaRegen"] += -1;
+                            Description = "A quiver with Nightswipe thread weaved into it. Arrows shot from Nightswipe quivers are told to steal life from whoever they hit\n";
                             break;
                         case 30310:
                             Name = "Wizard's Hood";
@@ -876,6 +906,7 @@ namespace ByteLike
                             Stats["Magic"] += 3;
                             Stats["Defense"] += 2;
                             Stats["MagicDefense"] += 7;
+                            Description = "A hood for a true mage. Your voice echoes when you put this on. The echo increases the strength of all your spells\n";
                             break;
                         case 30320:
                             Name = "Wizard's Cloak";
@@ -883,6 +914,7 @@ namespace ByteLike
                             Stats["Magic"] += 3;
                             Stats["Defense"] += 3;
                             Stats["MagicDefense"] += 9;
+                            Description = "A cloak worn by veteran mages. You can barely feel the material on your skin, it feels lighter than air\n";
                             break;
                         case 30330:
                             Name = "Wizard's Kilt";
@@ -890,6 +922,7 @@ namespace ByteLike
                             Stats["Magic"] += 3;
                             Stats["Defense"] += 1;
                             Stats["MagicDefense"] += 6;
+                            Description = "A kilt made for veteran mages. You can feel the ground tremble with every word you say while wearing this\n";
                             break;
                         case 30340:
                             Name = "Ruby Staff";
@@ -899,6 +932,7 @@ namespace ByteLike
                             Stats["Magic"] += 15;
                             Stats["Defense"] += 2;
                             Stats["ManaRegen"] += -1;
+                            Description = "A staff with a ruby on its tip. Rubbies are rare to find, but they're perfect for a staff. The handle is covered in Nightswipe cloth\n";
                             break;
                         case 30345:
                             Name = "Arkhana Wand";
@@ -909,6 +943,7 @@ namespace ByteLike
                             Stats["Defense"] += 3;
                             Stats["MagicDefense"] += 4;
                             Stats["HPRegen"] += -1;
+                            Description = "A wand with an arkhana crystal on it. Your fully open arkhana makes you feel cold while holding it\n";
                             break;
                         case 30350:
                             Name = "Wizard's Tome";
@@ -916,6 +951,7 @@ namespace ByteLike
                             Stats["Magic"] += 5;
                             Stats["MagicDefense"] += 1;
                             Stats["ManaRegen"] += -1;
+                            Description = "A tome made which's pages are made from Moonglow. The pages turn by themselves whenever you start pronouncing a spell\n";
                             break;
                         case 35310:
                             Name = "Dark Mage's Hood";
@@ -924,6 +960,7 @@ namespace ByteLike
                             Stats["Magic"] += 3;
                             Stats["Defense"] += 4;
                             Stats["MagicDefense"] += 4;
+                            Description = "A hood imbued with pure darkness. Those who dare wear these are exiled from the arkhana school. It's too dangerous for their own good\n";
                             break;
                         case 35320:
                             Name = "Dark Mage's Cloak";
@@ -932,6 +969,7 @@ namespace ByteLike
                             Stats["Defense"] += 4;
                             Stats["MagicDefense"] += 7;
                             Stats["ManaRegen"] += -2;
+                            Description = "A cloak imbued with pure darkness. You feel like your empathy slowly gets lost as you wear this\n";
                             break;
                         case 35330:
                             Name = "Dark Mage's Kilt";
@@ -941,6 +979,7 @@ namespace ByteLike
                             Stats["MagicDefense"] += 3;
                             Stats["HPRegen"] += -2;
                             Stats["ManaRegen"] += -1;
+                            Description = "A kilt imbued with pure darkness. Those who wear these are told to walk the grounds of hell instead of the real world\n";
                             break;
                         case 35340:
                             Name = "Shattered Staff";
@@ -950,6 +989,7 @@ namespace ByteLike
                             Stats["MagicDefense"] += -8;
                             Stats["ManaRegen"] += -2;
                             Stats["Strength"] += 10;
+                            Description = "A staff with its crystal blown up. Whoever used this staff did mischivious things with it, to a point the crystal itself couldn't handle the wrongdoings\n";
                             break;
                         case 35345:
                             Name = "Two-sided Wand";
@@ -961,6 +1001,7 @@ namespace ByteLike
                             Stats["MagicDefense"] += -4;
                             Stats["HPRegen"] += 1;
                             Stats["ManaRegen"] += -2;
+                            Description = "A wand with two a crystal on both sides of it. It's unwise to use a two-sided wand as it drains your life force to power your magic\n";
                             break;
                         case 35350:
                             Name = "Forbidden Tome";
@@ -968,6 +1009,7 @@ namespace ByteLike
                             Stats["MaxMana"] += 20;
                             Stats["Magic"] += 3;
                             Stats["ManaRegen"] += -2;
+                            Description = "A tome that arrived from hell itself. Whoever reads its pages cannot relearn the human ways of casting magic\n";
                             break;
                         case 40110:
                             Name = "Paladin's Helmet";
@@ -978,6 +1020,7 @@ namespace ByteLike
                             Stats["Defense"] += 10;
                             Stats["MagicDefense"] += 5;
                             Stats["HPRegen"] += -1;
+                            Description = "A helmet once worn by a brave paladin. Putting one on means you swear by your life to protect your kin. Dying in one means protecting the one who wears it afterwards\n";
                             break;
                         case 40120:
                             Name = "Paladin's Armor";
@@ -988,6 +1031,7 @@ namespace ByteLike
                             Stats["Defense"] += 15;
                             Stats["MagicDefense"] += 6;
                             Stats["HPRegen"] += -2;
+                            Description = "Armor once worn by a brave paladin. If you see a paladin without such a chestplate, it means they gave it up to someone who's dearer to them than life\n";
                             break;
                         case 40130:
                             Name = "Paladin's Leggings";
@@ -998,6 +1042,7 @@ namespace ByteLike
                             Stats["Defense"] += 8;
                             Stats["MagicDefense"] += 4;
                             Stats["HPRegen"] += -1;
+                            Description = "A set of leggings once worn by a brave paladin. Paladins often get free drinks at bars for their service. Paladins would often tell their stories for just a piece of bread and a drink\n";
                             break;
                         case 40140:
                             Name = "Sword Of Legends";
@@ -1005,6 +1050,7 @@ namespace ByteLike
                             Stats["Defense"] += 2;
                             Stats["MagicDefense"] += 2;
                             Stats["HPRegen"] += -1;
+                            Description = "A blade once used by an angel in the great war. It was considered a myth, but here it is in your hands. It's lighter than a feather and sharper than hardened steel\n";
                             break;
                         case 40145:
                             Name = "Mace Of Legends";
@@ -1015,6 +1061,7 @@ namespace ByteLike
                             Stats["Defense"] += 4;
                             Stats["HPRegen"] += 1;
                             Stats["ManaRegen"] += 2;
+                            Description = "A mace once used by a demon in the great war. It was considered a myth, but here it is in your hands. It's denser than the Earth's core and heavier than a large boulder\n";
                             break;
                         case 40150:
                             Name = "Unbreakable Shield";
@@ -1022,6 +1069,7 @@ namespace ByteLike
                             Stats["Defense"] += 10;
                             Stats["MagicDefense"] += 2;
                             Stats["HPRegen"] += -2;
+                            Description = "A shield made from unknown material. It was believed to be a myth, but here it is in your hands. It's believed to have been a gift from God to a paladin who joined the angels in the great war\n";
                             break;
                         case 40210:
                             Name = "Hawk Hat";
@@ -1030,6 +1078,7 @@ namespace ByteLike
                             Stats["Agility"] += 4;
                             Stats["Defense"] += 7;
                             Stats["MagicDefense"] += 6;
+                            Description = "A hat made by harpies from their own feathers. Just putting it on makes you feel lighter than air. Harpies provide their allies with invaluable items if a war comes near\n";
                             break;
                         case 40220:
                             Name = "Hawk Scarf";
@@ -1039,6 +1088,7 @@ namespace ByteLike
                             Stats["Agility"] += 4;
                             Stats["Defense"] += 9;
                             Stats["MagicDefense"] += 6;
+                            Description = "A scarf weaved by harpies from their own feathers. It feels warmer than all your clothes combined. Yet it doesn't seem to overheat you in warm environments\n";
                             break;
                         case 40230:
                             Name = "Hawk Belt";
@@ -1047,6 +1097,7 @@ namespace ByteLike
                             Stats["Defense"] += 7;
                             Stats["MagicDefense"] += 4;
                             Stats["ManaRegen"] += -1;
+                            Description = "A belt once worn by harpy archers. It has a clip on the back to secure a quiver. It's highly durable and helps keeping your clothes tamed in harsh weather conditions\n";
                             break;
                         case 40240:
                             Name = "Living Longbow";
@@ -1055,6 +1106,7 @@ namespace ByteLike
                             Stats["Magic"] += 2;
                             Stats["Agility"] += 15;
                             Stats["Defense"] += 2;
+                            Description = "A bow crafted from a living root. Living root trees are hard to tame, but they make amazing weapons and furniture. It's eager to fire an arrow\n";
                             break;
                         case 40245:
                             Name = "Full Metal Shortbow";
@@ -1065,6 +1117,7 @@ namespace ByteLike
                             Stats["Agility"] += 12;
                             Stats["Defense"] += 1;
                             Stats["HPRegen"] += -1;
+                            Description = "A bow made from steel. It's harder to bend but that allows extra impact for your arrows. Dragon hunters often look for those due to steel being a lot harder to melt than wood is to burn\n";
                             break;
                         case 40250:
                             Name = "Black Feather Quiver";
@@ -1074,6 +1127,7 @@ namespace ByteLike
                             Stats["Defense"] += 2;
                             Stats["MagicDefense"] += 2;
                             Stats["ManaRegen"] += -1;
+                            Description = "A quiver with black feathers on the edge of it. The feathers help keep the arrows from rustling inside the quiver. The black bird is a master of magic and quivers made with her feathers prove it\n";
                             break;
                         case 40310:
                             Name = "Forgotten Hood";
@@ -1083,6 +1137,7 @@ namespace ByteLike
                             Stats["Defense"] += 4;
                             Stats["MagicDefense"] += 12;
                             Stats["ManaRegen"] += -1;
+                            Description = "A hood of unknown origin. It feels safe. You can hear a motherly voice whisper to you\n";
                             break;
                         case 40320:
                             Name = "Forgotten Cape";
@@ -1092,6 +1147,7 @@ namespace ByteLike
                             Stats["Defense"] += 5;
                             Stats["MagicDefense"] += 15;
                             Stats["ManaRegen"] += -1;
+                            Description = "A cape of unknown origin. It feels warm. You can feel a gentle touch when you wear it\n";
                             break;
                         case 40330:
                             Name = "Mana Belt";
@@ -1101,6 +1157,7 @@ namespace ByteLike
                             Stats["Defense"] += 3;
                             Stats["MagicDefense"] += 7;
                             Stats["ManaRegen"] += -2;
+                            Description = "A belt made from Nightswipe cloth imbued with pure mana. It takes practice to wear a mana belt, but those who can tame the sheer magic force become masters of the craft\n";
                             break;
                         case 40340:
                             Name = "Rainbow Staff";
@@ -1110,6 +1167,7 @@ namespace ByteLike
                             Stats["Magic"] += 20;
                             Stats["Defense"] += 3;
                             Stats["ManaRegen"] += -2;
+                            Description = "A staff with a combination of many gems on its tip. All the different crystals give off their own positives, making this staff perfect for any kind of magic\n";
                             break;
                         case 40345:
                             Name = "Refraction Wand";
@@ -1120,6 +1178,7 @@ namespace ByteLike
                             Stats["Defense"] += 5;
                             Stats["MagicDefense"] += 3;
                             Stats["ManaRegen"] += -3;
+                            Description = "A wand with a mirror crystal on its tip. Any spell that comes out of this wand is perfectly balanced. The arkhana school needed years to find a way to make a perfectly balanced crystal\n";
                             break;
                         case 40350:
                             Name = "Balance Tome";
@@ -1129,6 +1188,7 @@ namespace ByteLike
                             Stats["MagicDefense"] += 3;
                             Stats["HPRegen"] += -2;
                             Stats["ManaRegen"] += -2;
+                            Description = "A tome with half its pages dedicated to dark magic and the other half to holy magic. A good mage must know how to balance between the good and evil. A balance tome is a good start to perfect your inner judge\n";
                             break;
                     }
 

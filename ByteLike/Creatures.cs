@@ -829,7 +829,6 @@ namespace ByteLike
                         movement[0] = 0;
                         movement[1] = 0;
                         goto WalkReset;
-                        break;
 
                     // Door
                     case 4:
@@ -1216,7 +1215,7 @@ namespace ByteLike
 
     public class Player : Creature
     {
-        public new bool IsGhost
+        public bool IsGhost
         {
             get
             {
@@ -1944,9 +1943,6 @@ namespace ByteLike
             // Actual Movement if not in inventory
             if (!OpenInventory)
             {
-                bool movecheck = true;
-
-
                 // Shooting with a bow
                 if (Keyboard.IsKeyDown(Key.E) && Inventory[3, 0] != null && level[position[0],position[1]] != 15)
                 {
