@@ -28,17 +28,6 @@ namespace ByteLike
         public Dictionary<string, int> Buffs = new Dictionary<string, int>();
         public Dictionary<string, int> BuffLevels = new Dictionary<string, int>();
 
-        public bool IsGhost {
-            get {
-                if (Inventory[6, 0] != null)
-                {
-                    if (Inventory[6, 0].Name == "Ghost Amulet")
-                        return true;
-                    else
-                        return false;
-                }
-                else
-                    return false; } }
         public List<string> Spells = new List<string>();
         public Item[,] Inventory = new Item[11, 1];
         public string File = "Graphics/ByteLikeGraphics/placeholder.png";
@@ -513,8 +502,6 @@ namespace ByteLike
 
         protected virtual bool FloorCheck(int tile)
         {
-            if (IsGhost) { return false; }
-
             return true;
         }
 
@@ -835,43 +822,18 @@ namespace ByteLike
                 // We don't if we're ghost or have certain conditions or something
                 switch (level[position[0] + movement[0], position[1] + movement[1]])
                 {
-                    // If walls, walk only if ghost, reset to check underfoot
+                    // If walls, reset to check underfoot
                     case 2:
                     case 0:
                     case 5:
-                        if (level[position[0] + movement[0], position[1] + movement[1]] == 5)
-                        {
-                            movement[0] = 0;
-                            movement[1] = 0;
-                            goto WalkReset;
-                        }
-                        else if (level[position[0], position[1]] != 2 && level[position[0], position[1]] != 0 && IsGhost == false)
-                        {
-                            movement[0] = 0;
-                            movement[1] = 0;
-                            goto WalkReset;
-                        }
-                        else if (IsGhost)
-                        {
-                            if (level[position[0], position[1]] == 0 && (position[0] + position[1]) % 2 == 0)
-                            {
-                                Stats["HP"]--;
-                            }
-                            position[0] += movement[0];
-                            position[1] += movement[1];
-                            currentSound = "Graphics/Sounds/footstep.wav";
-                        }
+                        movement[0] = 0;
+                        movement[1] = 0;
+                        goto WalkReset;
                         break;
 
                     // Door
                     case 4:
-                        if (IsGhost)
-                        {
-                            position[0] += movement[0];
-                            position[1] += movement[1];
-                            currentSound = "Graphics/Sounds/footstep.wav";
-                        }
-                        else { level[position[0] + movement[0], position[1] + movement[1]] = 1; currentSound = "Graphics/Sounds/dooropen.wav"; }
+                        level[position[0] + movement[0], position[1] + movement[1]] = 1; currentSound = "Graphics/Sounds/dooropen.wav";
                         break;
 
                     // Regular tile
@@ -1106,7 +1068,7 @@ namespace ByteLike
 
             if (position[0] + 1 < level.GetLength(0))
             {
-                if (!IsGhost || (level[position[0] + 1, position[1]] != 2 && level[position[0] + 1, position[1]] != 0 && level[position[0] + 1, position[1]] != 5))
+                if (level[position[0] + 1, position[1]] != 2 && level[position[0] + 1, position[1]] != 0 && level[position[0] + 1, position[1]] != 5)
                 {
                     bool enemycheck = false;
                     foreach (Creature item in enemies)
@@ -1120,7 +1082,7 @@ namespace ByteLike
             }
             if (position[0] - 1 >= 0)
             {
-                if (!IsGhost || (level[position[0] - 1, position[1]] != 2 && level[position[0] - 1, position[1]] != 0 && level[position[0] - 1, position[1]] != 5))
+                if (level[position[0] - 1, position[1]] != 2 && level[position[0] - 1, position[1]] != 0 && level[position[0] - 1, position[1]] != 5)
                 {
                     bool enemycheck = false;
                     foreach (Creature item in enemies)
@@ -1135,7 +1097,7 @@ namespace ByteLike
 
             if (position[1] + 1 < level.GetLength(1))
             {
-                if (!IsGhost || (level[position[0], position[1] + 1] != 2 && level[position[0], position[1] + 1] != 0 && level[position[0], position[1] + 1] != 5))
+                if (level[position[0], position[1] + 1] != 2 && level[position[0], position[1] + 1] != 0 && level[position[0], position[1] + 1] != 5)
                 {
                     bool enemycheck = false;
                     foreach (Creature item in enemies)
@@ -1149,7 +1111,7 @@ namespace ByteLike
             }
             if (position[1] - 1 >= 0)
             {
-                if (!IsGhost || (level[position[0], position[1] - 1] != 2 && level[position[0], position[1] - 1] != 0 && level[position[0], position[1] - 1] != 5))
+                if (level[position[0], position[1] - 1] != 2 && level[position[0], position[1] - 1] != 0 && level[position[0], position[1] - 1] != 5)
                 {
                     bool enemycheck = false;
                     foreach (Creature item in enemies)
@@ -1254,6 +1216,22 @@ namespace ByteLike
 
     public class Player : Creature
     {
+        public new bool IsGhost
+        {
+            get
+            {
+                if (Inventory[6, 0] != null)
+                {
+                    if (Inventory[6, 0].Name == "Ghost Amulet")
+                        return true;
+                    else
+                        return false;
+                }
+                else
+                    return false;
+            }
+        }
+
         public int DangerLevel = 0;
         public new Item[,] Inventory = new Item[11, 3];
 
@@ -1266,6 +1244,324 @@ namespace ByteLike
         bool UseMana = true;
 
         string RemSpell = "";
+
+        // Had to ovveride it due to ghost walking
+        protected new string WalkTo(int[] movement, ref int[,] level, string response, ref List<Creature> enemies, ref Player player, ref int[,] darkness, out string sound)
+        {
+        WalkReset:
+            bool InTheWay = false;
+            string currentSound = "";
+
+            if (movement[0] != 0 || movement[1] != 0)
+            {
+                foreach (Creature item in enemies)
+                {
+                    if (item.position[0] == position[0] + movement[0] && item.position[1] == position[1] + movement[1])
+                    {
+                        InTheWay = true;
+                        int element = 0;
+                        for (int f = 0; f < 9; f++)
+                        {
+                            if (Inventory[f, 0] != null)
+                            {
+                                if (Inventory[f, 0].Element != 0)
+                                    element = Inventory[f, 0].Element;
+                            }
+                        }
+                        int xp = item.TakeDamage(GetStat("Strength"), element);
+
+                        switch (rand.Next(6))
+                        {
+                            case 1:
+                                response += $"{Name} slashes {item.Name}!\n";
+                                break;
+                            case 2:
+                                response += $"{Name} pounces at {item.Name}!\n";
+                                break;
+                            case 3:
+                                response += $"{Name} attacks {item.Name}!\n";
+                                break;
+                            case 4:
+                                response += $"{Name} bashes {item.Name}!\n";
+                                break;
+                            case 5:
+                                response += $"{Name} hits {item.Name}!\n";
+                                break;
+                        }
+
+                        currentSound = "Graphics/Sounds/attack.wav";
+
+                        if (Stats.ContainsKey("XP") && xp > 0)
+                        {
+                            int extraxp = 0;
+                            for (int f = 0; f < 9; f++)
+                            {
+                                if (Inventory[f, 0] != null)
+                                {
+                                    if (Inventory[f, 0].Name.Contains("XP"))
+                                        extraxp += (int)(xp * 0.25);
+                                }
+                            }
+                            xp += extraxp;
+                            Stats["XP"] += xp;
+                            response += $"{Name} has gained {xp} XP!\n";
+                        }
+                    }
+                }
+
+            }
+            if (!InTheWay && position[0] + movement[0] >= 0 && position[0] + movement[0] < level.GetLength(0) && position[1] + movement[1] >= 0 && position[1] + movement[1] < level.GetLength(1))
+            {
+                // FloorCheck does a check whether we actually step on the floor
+                // We don't if we're ghost or have certain conditions or something
+                switch (level[position[0] + movement[0], position[1] + movement[1]])
+                {
+                    // If walls, walk only if ghost, reset to check underfoot
+                    case 2:
+                    case 0:
+                    case 5:
+                        if (level[position[0] + movement[0], position[1] + movement[1]] == 5)
+                        {
+                            movement[0] = 0;
+                            movement[1] = 0;
+                            goto WalkReset;
+                        }
+                        else if (level[position[0], position[1]] != 2 && level[position[0], position[1]] != 0 && IsGhost == false)
+                        {
+                            movement[0] = 0;
+                            movement[1] = 0;
+                            goto WalkReset;
+                        }
+                        else if (IsGhost)
+                        {
+                            if ((position[0] + position[1]) % 2 == 0)
+                            {
+                                Stats["HP"]--;
+                            }
+                            position[0] += movement[0];
+                            position[1] += movement[1];
+                            currentSound = "Graphics/Sounds/footstep.wav";
+                        }
+                        break;
+
+                    // Door
+                    case 4:
+                        if (IsGhost)
+                        {
+                            position[0] += movement[0];
+                            position[1] += movement[1];
+                            currentSound = "Graphics/Sounds/footstep.wav";
+                        }
+                        else { level[position[0] + movement[0], position[1] + movement[1]] = 1; currentSound = "Graphics/Sounds/dooropen.wav"; }
+                        break;
+
+                    // Regular tile
+                    case 1:
+                    case 3:
+                        position[0] += movement[0];
+                        position[1] += movement[1];
+                        currentSound = "Graphics/Sounds/footstep.wav";
+                        break;
+
+                    // Water tile, Freeze for a turn time from time
+                    case 6:
+                        if (Statuses[2] == 0)
+                        {
+                            position[0] += movement[0];
+                            position[1] += movement[1];
+                            if (FloorCheck(level[position[0], position[1]]))
+                            {
+                                Statuses[2] = 2 + Weight();
+                                response += $"{Name} is splashing in a pool of water\n";
+                            }
+                        }
+                        currentSound = "Graphics/Sounds/waterfootstep.wav";
+                        break;
+
+                    // Lava
+                    case 7:
+                        if (Potentials[0] == 0)
+                            response += $"{Name} steps into lava!\n";
+                        position[0] += movement[0];
+                        position[1] += movement[1];
+                        if (FloorCheck(level[position[0], position[1]]))
+                        {
+                            Potentials[0] += 2;
+                        }
+                        currentSound = "Graphics/Sounds/firefootstep.wav";
+                        break;
+
+                    // Grass
+                    case 8:
+                        position[0] += movement[0];
+                        position[1] += movement[1];
+                        if (FloorCheck(level[position[0], position[1]]))
+                        {
+                            if (darkness[position[0], position[1]] == 1 && darkness[position[0], position[1]] != 2)
+                            {
+                                level[position[0], position[1]] = 1;
+                                if (position[0] + 1 < level.GetLength(0))
+                                {
+                                    if (level[position[0] + 1, position[1]] == 8) { level[position[0] + 1, position[1]] = 1; }
+                                }
+                                if (position[0] - 1 >= 0)
+                                {
+                                    if (level[position[0] - 1, position[1]] == 8) { level[position[0] - 1, position[1]] = 1; }
+                                }
+
+                                if (position[1] + 1 < level.GetLength(1))
+                                {
+                                    if (level[position[0], position[1] + 1] == 8) { level[position[0], position[1] + 1] = 1; }
+                                }
+                                if (position[1] - 1 >= 0)
+                                {
+                                    if (level[position[0], position[1] - 1] == 8) { level[position[0], position[1] - 1] = 1; }
+                                }
+                            }
+                        }
+                        currentSound = "Graphics/Sounds/grassfootstep.wav";
+                        break;
+
+                    // Spike traps
+                    case 9:
+                    case 11:
+                        response += $"{Name} steps onto a spike trap!\n";
+                        position[0] += movement[0];
+                        position[1] += movement[1];
+                        if (FloorCheck(level[position[0], position[1]]))
+                        {
+                            Stats["HP"] -= (int)(Stats["MaxHP"] * 0.2);
+
+                            if (darkness[position[0], position[1]] == 1 && darkness[position[0], position[1]] != 2)
+                            {
+                                level[position[0], position[1]] = 11;
+
+                                if (position[0] + 1 < level.GetLength(0))
+                                {
+                                    if (level[position[0] + 1, position[1]] == 8) { level[position[0] + 1, position[1]] = 1; }
+                                    else if (level[position[0] + 1, position[1]] == 9) { level[position[0] + 1, position[1]] = 11; }
+                                    else if (level[position[0] + 1, position[1]] == 10) { level[position[0] + 1, position[1]] = 12; }
+                                }
+                                if (position[0] - 1 >= 0)
+                                {
+                                    if (level[position[0] - 1, position[1]] == 8) { level[position[0] - 1, position[1]] = 1; }
+                                    else if (level[position[0] - 1, position[1]] == 9) { level[position[0] - 1, position[1]] = 11; }
+                                    else if (level[position[0] - 1, position[1]] == 10) { level[position[0] - 1, position[1]] = 12; }
+                                }
+
+                                if (position[1] + 1 < level.GetLength(1))
+                                {
+                                    if (level[position[0], position[1] + 1] == 8) { level[position[0], position[1] + 1] = 1; }
+                                    else if (level[position[0], position[1] + 1] == 9) { level[position[0], position[1] + 1] = 11; }
+                                    else if (level[position[0], position[1] + 1] == 10) { level[position[0], position[1] + 1] = 12; }
+                                }
+                                if (position[1] - 1 >= 0)
+                                {
+                                    if (level[position[0], position[1] - 1] == 8) { level[position[0], position[1] - 1] = 1; }
+                                    else if (level[position[0], position[1] - 1] == 9) { level[position[0], position[1] - 1] = 11; }
+                                    else if (level[position[0], position[1] - 1] == 10) { level[position[0], position[1] - 1] = 12; }
+                                }
+                            }
+                        }
+                        currentSound = "Graphics/Sounds/footstep.wav";
+                        break;
+
+                    // Poison traps
+                    case 10:
+                    case 12:
+                        response += $"{Name} steps onto a poison trap!\n";
+                        position[0] += movement[0];
+                        position[1] += movement[1];
+                        if (FloorCheck(level[position[0], position[1]]))
+                        {
+                            Statuses[1] = 10;
+                            if (darkness[position[0], position[1]] == 1 && darkness[position[0], position[1]] != 2)
+                            {
+                                level[position[0], position[1]] = 12;
+
+                                if (position[0] + 1 < level.GetLength(0))
+                                {
+                                    if (level[position[0] + 1, position[1]] == 8) { level[position[0] + 1, position[1]] = 1; }
+                                    else if (level[position[0] + 1, position[1]] == 9) { level[position[0] + 1, position[1]] = 11; }
+                                    else if (level[position[0] + 1, position[1]] == 10) { level[position[0] + 1, position[1]] = 12; }
+                                }
+                                if (position[0] - 1 >= 0)
+                                {
+                                    if (level[position[0] - 1, position[1]] == 8) { level[position[0] - 1, position[1]] = 1; }
+                                    else if (level[position[0] - 1, position[1]] == 9) { level[position[0] - 1, position[1]] = 11; }
+                                    else if (level[position[0] - 1, position[1]] == 10) { level[position[0] - 1, position[1]] = 12; }
+                                }
+
+                                if (position[1] + 1 < level.GetLength(1))
+                                {
+                                    if (level[position[0], position[1] + 1] == 8) { level[position[0], position[1] + 1] = 1; }
+                                    else if (level[position[0], position[1] + 1] == 9) { level[position[0], position[1] + 1] = 11; }
+                                    else if (level[position[0], position[1] + 1] == 10) { level[position[0], position[1] + 1] = 12; }
+                                }
+                                if (position[1] - 1 >= 0)
+                                {
+                                    if (level[position[0], position[1] - 1] == 8) { level[position[0], position[1] - 1] = 1; }
+                                    else if (level[position[0], position[1] - 1] == 9) { level[position[0], position[1] - 1] = 11; }
+                                    else if (level[position[0], position[1] - 1] == 10) { level[position[0], position[1] - 1] = 12; }
+                                }
+                            }
+                        }
+                        currentSound = "Graphics/Sounds/firefootstep.wav";
+                        break;
+                    // Poisonous vines
+                    case 13:
+                        if (Potentials[1] == 0)
+                            response += $"{Name} steps into poisonous vines!\n";
+                        position[0] += movement[0];
+                        position[1] += movement[1];
+                        if (FloorCheck(level[position[0], position[1]]))
+                        {
+                            Potentials[1] += 2;
+                        }
+                        currentSound = "Graphics/Sounds/grassfootstep.wav";
+                        break;
+                    // Electro terrain
+                    case 14:
+                        position[0] += movement[0];
+                        position[1] += movement[1];
+                        if (Statuses[3] == 0)
+                        {
+                            if (FloorCheck(level[position[0], position[1]]))
+                            {
+                                Statuses[3] = 2 + Weight();
+                                response += $"{Name} is paralyzed by electric terrain!\n";
+                            }
+                        }
+                        currentSound = "Graphics/Sounds/footstep.wav";
+                        break;
+                    // Level exit
+                    case 15:
+                        position[0] += movement[0];
+                        position[1] += movement[1];
+                        if (this.GetType() == typeof(Player))
+                        {
+                            response += $"{Name} has found the exit to the next floor!\n";
+                            response += $"Press [E] to move to the next floor\n";
+                        }
+                        currentSound = "Graphics/Sounds/footstep.wav";
+                        break;
+                    // Secret exit
+                    case 16:
+                        position[0] += movement[0];
+                        position[1] += movement[1];
+                        level[position[0], position[1]] = 15;
+                        if (this.GetType() == typeof(Player))
+                        {
+                            response += $"{Name} has found a secret exit to the next floor!\n";
+                            response += $"Press [E] to move to the next floor\n";
+                        }
+                        currentSound = "Graphics/Sounds/footstep.wav";
+                        break;
+                }
+            }
+            sound = currentSound;
+            return response;
+        }
 
 
         protected string LevelUp()
@@ -3095,7 +3391,6 @@ namespace ByteLike
             if (tile == 12 || tile == 13)
                 return false;
 
-            if (IsGhost) { return false; }
 
             return true;
         }
@@ -3313,7 +3608,6 @@ namespace ByteLike
             if (tile == 14)
                 return false;
 
-            if (IsGhost) { return false; }
 
             return true;
         }
@@ -3843,7 +4137,6 @@ namespace ByteLike
             if (tile == 6 || tile == 11 || tile == 12)
                 return false;
 
-            if (IsGhost) { return false; }
 
             return true;
         }
