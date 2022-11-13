@@ -521,7 +521,7 @@ namespace ByteLike
                                     }
 
                                     // If not a ghost, draw regular sprite
-                                    if (!player.IsGhost)
+                                    if (!player.IsGhost(player.Inventory))
                                     {
                                         dc.DrawImage(new BitmapImage(new Uri(player.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
                                     }
@@ -1768,6 +1768,9 @@ namespace ByteLike
                             }
                         }
 
+                        if (effects.Count <= 0)
+                            doEnemies = false;
+
                     }
                     // player
                     else
@@ -2186,7 +2189,7 @@ namespace ByteLike
                 case "Ember":
                 case "Ice Shard":
                 case "Zap":
-                case "Posion Sting":
+                case "Poison Sting":
                 case "Fireball":
                 case "Ice Storm":
                 case "Electro Bolt":
