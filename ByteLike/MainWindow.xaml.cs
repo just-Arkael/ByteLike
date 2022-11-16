@@ -504,7 +504,7 @@ namespace ByteLike
                                 {
                                     if (item.position[0] == camera[0] + j && item.position[1] == camera[1] + i && level[item.position[0], item.position[1]] != 2 && level[item.position[0], item.position[1]] != 0 && level[item.position[0], item.position[1]] != 5 && level[item.position[0], item.position[1]] != 4)
                                     {
-                                        dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        dc.DrawImage(new BitmapImage(new Uri(item.File, UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
                                     }
                                 }
 
@@ -516,40 +516,40 @@ namespace ByteLike
                                     {
                                         if (player.Inventory[4, 0].Name.Contains("Quiver"))
                                         {
-                                            dc.DrawImage(new BitmapImage(new Uri(player.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                            dc.DrawImage(new BitmapImage(new Uri(player.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
                                         }
                                     }
 
                                     // If not a ghost, draw regular sprite
                                     if (!player.IsGhost(player.Inventory))
                                     {
-                                        dc.DrawImage(new BitmapImage(new Uri(player.File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        dc.DrawImage(new BitmapImage(new Uri(player.File, UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
                                     }
                                     // Otherwise, draw the ghosty appearance
                                     else
                                     {
-                                        dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Creatures/player4.png", UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        dc.DrawImage(new BitmapImage(new Uri("Graphics/ByteLikeGraphics/Creatures/player4.png", UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
                                     }
 
 
                                     // Draw legs
                                     if (player.Inventory[2, 0] != null)
-                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[2, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[2, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
                                     // Draw chestplate
                                     if (player.Inventory[1, 0] != null)
-                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[1, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[1, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
                                     // Draw hat
                                     if (player.Inventory[0, 0] != null)
-                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[0, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[0, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
                                     // Draw Amulet
                                     if (player.Inventory[6, 0] != null)
                                     {
                                         if (GetAmulet(player.Inventory[6, 0].Name) != "")
-                                            dc.DrawImage(new BitmapImage(new Uri(GetAmulet(player.Inventory[6, 0].Name), UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                            dc.DrawImage(new BitmapImage(new Uri(GetAmulet(player.Inventory[6, 0].Name), UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
                                     }
                                     // Draw weapon
                                     if (player.Inventory[3, 0] != null)
-                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[3, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                        dc.DrawImage(new BitmapImage(new Uri(player.Inventory[3, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
 
 
                                     // Draw offhand if not a quiver (drew quiver earlier)
@@ -557,7 +557,7 @@ namespace ByteLike
                                     {
                                         if (!player.Inventory[4, 0].Name.Contains("Quiver"))
                                         {
-                                            dc.DrawImage(new BitmapImage(new Uri(player.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                            dc.DrawImage(new BitmapImage(new Uri(player.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
                                         }
                                     }
 
@@ -573,7 +573,7 @@ namespace ByteLike
                                         {
                                             if (item.Inventory[4, 0].Name.Contains("Quiver"))
                                             {
-                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
                                             }
                                         }
 
@@ -583,38 +583,36 @@ namespace ByteLike
                                         {
                                             // Draw legs
                                             if (item.Inventory[2, 0] != null)
-                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[2, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[2, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
                                             // Draw chestplate
                                             if (item.Inventory[1, 0] != null)
-                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[1, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[1, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
                                             // Draw hat
                                             if (item.Inventory[0, 0] != null)
-                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[0, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[0, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
                                             // Draw Amulet
                                             if (item.Inventory[6, 0] != null)
                                             {
                                                 if (GetAmulet(item.Inventory[6, 0].Name) != "")
-                                                    dc.DrawImage(new BitmapImage(new Uri(GetAmulet(item.Inventory[6, 0].Name), UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                                    dc.DrawImage(new BitmapImage(new Uri(GetAmulet(item.Inventory[6, 0].Name), UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
                                             }
                                             // Draw weapon
                                             if (item.Inventory[3, 0] != null)
-                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[3, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                                dc.DrawImage(new BitmapImage(new Uri(item.Inventory[3, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
 
                                             // Draw offhand if not a quiver (drew quiver earlier)
                                             if (item.Inventory[4, 0] != null)
                                             {
                                                 if (!item.Inventory[4, 0].Name.Contains("Quiver"))
                                                 {
-                                                    dc.DrawImage(new BitmapImage(new Uri(item.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 17, 17));
+                                                    dc.DrawImage(new BitmapImage(new Uri(item.Inventory[4, 0].File, UriKind.Relative)), new Rect(j * 16, i * 16, 16, 16));
                                                 }
                                             }
                                         }
 
+                                        // Healthbar
                                         if (i > 0 && (!player.OpenInventory || player.OpenSpell) && !item.File.Contains("Items"))
                                         {
-                                            //FormattedText dialogueen = new FormattedText($"{item.Stats["HP"]}/{item.GetStat("MaxHP")}", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 4, Brushes.Red);
-                                            //dc.DrawText(dialogueen, new Point(j*16 + (16 - dialogueen.Width)/2, i*16 - 2));
-
                                             for (int f = 0; f < 14; f++)
                                             {
                                                 string hpbar = "Graphics/ByteLikeGraphics/Hud/healthbar";
@@ -1395,7 +1393,6 @@ namespace ByteLike
         }
 
         // MAIN LOGIC
-
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
             bool cameraManagment = Paused;
@@ -1737,6 +1734,7 @@ namespace ByteLike
             // Main Game
             if (!MainMenu && (cameraManagment || Keyboard.IsKeyDown(Key.E) || Keyboard.IsKeyDown(Key.Q) || Keyboard.IsKeyDown(Key.W) || Keyboard.IsKeyDown(Key.S) || Keyboard.IsKeyDown(Key.A) || Keyboard.IsKeyDown(Key.D) || Keyboard.IsKeyDown(Key.R)))
             {
+                // reset sounds
                 if (!Paused)
                 {
                     currentSound = "";
@@ -1767,10 +1765,6 @@ namespace ByteLike
                                 effects.RemoveAt(deleteus[i]);
                             }
                         }
-
-                        if (effects.Count <= 0)
-                            doEnemies = false;
-
                     }
                     // player
                     else
@@ -1785,43 +1779,47 @@ namespace ByteLike
                     }
 
                     // enemies
-                    if (effects.Count <= 0)
+                    if (effects.Count <= 0 && doEnemies)
                     {
-                        if (doEnemies)
+                        // enemy spawn
+                        if (enemies.Count < 10 + floor / 5)
                         {
+                            int[] newPos = new int[] { rand.Next(level.GetLength(0)), rand.Next(level.GetLength(1)) };
 
-                            // enemy spawn
-                            if (enemies.Count < 10 + floor / 5)
+                            if (level[newPos[0], newPos[1]] == 1 && (darkness[newPos[0], newPos[1]] <= 0 || darkness[newPos[0], newPos[1]] == 2) && DistanceBetween(new int[] { newPos[0], newPos[1] }, new int[] { player.position[0], player.position[1] }) > player.GetStat("Torch") + 2)
                             {
-                                int[] newPos = new int[] { rand.Next(level.GetLength(0)), rand.Next(level.GetLength(1)) };
-
-                                if (level[newPos[0], newPos[1]] == 1 && (darkness[newPos[0], newPos[1]] <= 0 || darkness[newPos[0], newPos[1]] == 2) && DistanceBetween(new int[] { newPos[0], newPos[1] }, new int[] { player.position[0], player.position[1] }) > player.GetStat("Torch") + 2)
-                                {
-                                    int enemy = rand.Next(0, floor + 5);
-                                    if (enemy < 5)
-                                        enemies.Add(new Critter(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
-                                    else if (enemy >= 5 && enemy < 10)
-                                        enemies.Add(new Undead(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
-                                    else if (enemy >= 10 && enemy <= 15)
-                                        enemies.Add(new Snake(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
-                                    else if (enemy > 15 && enemy < 17)
-                                        enemies.Add(new Mimic(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }, null));
-                                    else if (enemy >= 17 && enemy < 23)
-                                        enemies.Add(new Slug(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
-                                }
+                                int enemy = rand.Next(0, floor + 5);
+                                if (enemy < 7)
+                                    enemies.Add(new Critter(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
+                                else if (enemy >= 7 && enemy < 14)
+                                    enemies.Add(new Undead(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
+                                else if (enemy >= 14 && enemy <= 21)
+                                    enemies.Add(new Snake(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
+                                else if (enemy > 21 && enemy < 25)
+                                    enemies.Add(new Mimic(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }, null));
+                                else if (enemy >= 25 && enemy <= 32)
+                                    enemies.Add(new Slug(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
+                                else
+                                    enemies.Add(new Dragon(floor + player.DangerLevel, new int[] { newPos[0], newPos[1] }));
                             }
+                        }
 
-                            List<int> deletusXL = new List<int>();
-                            int pos = 0;
+                        List<int> deletusXL = new List<int>();
+                        int pos = 0;
 
-                            // CREATURE LOGIC
-                            foreach (Creature enemy in enemies)
+                        // CREATURE LOGIC
+                        foreach (Creature enemy in enemies)
+                        {
+                            if (!enemy.Turn)
                             {
+                                enemy.Turn = true;
                                 response += enemy.Logics(ref level, ref chests, ref effects, ref enemies, ref player, ref darkness, out string tempSound);
 
                                 if (tempSound != "" && currentSound == "" || tempSound == "Graphics/Sounds/explosion.wav")
                                     tempSound = currentSound;
 
+                                // Death checks
+                                // Survival amulet
                                 if (enemy.Stats["HP"] <= 0 && enemy.Inventory[6, 0] != null)
                                 {
                                     if (enemy.Inventory[6, 0].Name == "Survival Amulet")
@@ -1836,41 +1834,65 @@ namespace ByteLike
                                     }
                                 }
 
+                                // Heartiness ring(s)
+                                if (enemy.Stats["HP"] <= 0 && enemy.Inventory[7, 0] != null)
+                                {
+                                    if (enemy.Inventory[7, 0].Name == "Dagger Ring" && enemy.Stats["MaxHP"] > -(enemy.Stats["HP"] - 1))
+                                    {
+                                        enemy.Stats["MaxHP"] += (enemy.Stats["HP"] - 1);
+                                        enemy.Stats["HP"] = 1;
+                                    }
+                                }
+                                if (enemy.Stats["HP"] <= 0 && enemy.Inventory[8, 0] != null)
+                                {
+                                    if (enemy.Inventory[8, 0].Name == "Dagger Ring" && enemy.Stats["MaxHP"] > -(enemy.Stats["HP"] - 1))
+                                    {
+                                        enemy.Stats["MaxHP"] += (enemy.Stats["HP"] - 1);
+                                        enemy.Stats["HP"] = 1;
+                                    }
+                                }
+
+                                // Finally, death
                                 if (enemy.Stats["HP"] <= 0)
                                     deletusXL.Add(pos);
-
                                 pos++;
-
-                            }
-
-                            // CREATURE DELETUS
-                            if (deletusXL.Count > 0)
-                            {
-                                for (int i = deletusXL.Count - 1; i >= 0; i--)
-                                {
-                                    if (enemies[deletusXL[i]].DropEquipment)
-                                    {
-                                        Chest temp = new Chest(new int[] { enemies[deletusXL[i]].position[0], enemies[deletusXL[i]].position[1] }, -(enemies[deletusXL[i]].Inventory.GetLength(1) + 1), null);
-                                        for (int f = 0; f < enemies[deletusXL[i]].Inventory.GetLength(1); f++)
-                                        {
-                                            for (int k = 0; k < enemies[deletusXL[i]].Inventory.GetLength(0); k++)
-                                            {
-                                                temp.Inventory[k, f] = enemies[deletusXL[i]].Inventory[k, f];
-                                            }
-                                        }
-                                        chests.Add(temp);
-                                    }
-
-                                    if (enemies[deletusXL[i]].GetType() == typeof(DoppleGanger))
-                                    {
-                                        response += "The darkness around you glooms...\n";
-                                        player.DangerLevel += 3;
-                                    }
-                                    enemies.RemoveAt(deletusXL[i]);
-                                }
                             }
                         }
 
+                        // CREATURE DELETUS
+                        if (deletusXL.Count > 0)
+                        {
+                            for (int i = deletusXL.Count - 1; i >= 0; i--)
+                            {
+                                if (enemies[deletusXL[i]].DropEquipment)
+                                {
+                                    Chest temp = new Chest(new int[] { enemies[deletusXL[i]].position[0], enemies[deletusXL[i]].position[1] }, -(enemies[deletusXL[i]].Inventory.GetLength(1) + 1), null);
+                                    for (int f = 0; f < enemies[deletusXL[i]].Inventory.GetLength(1); f++)
+                                    {
+                                        for (int k = 0; k < enemies[deletusXL[i]].Inventory.GetLength(0); k++)
+                                        {
+                                            temp.Inventory[k, f] = enemies[deletusXL[i]].Inventory[k, f];
+                                        }
+                                    }
+                                    chests.Add(temp);
+                                }
+
+                                if (enemies[deletusXL[i]].GetType() == typeof(DoppleGanger) || enemies[deletusXL[i]].GetType() == typeof(Mimic))
+                                {
+                                    response += "The darkness around you glooms...\n";
+                                    player.DangerLevel += 3;
+                                }
+                                enemies.RemoveAt(deletusXL[i]);
+                            }
+                        }
+                    }
+
+                    if (effects.Count <= 0)
+                    {
+                        foreach (Creature enemy in enemies)
+                        {
+                            enemy.Turn = false;
+                        }
                     }
                 }
                 else
@@ -1884,10 +1906,12 @@ namespace ByteLike
                 // New Floor
                 if (level[player.position[0], player.position[1]] == 15 && Keyboard.IsKeyDown(Key.E) && !player.OpenInventory && !Keyboard.IsKeyDown(Key.W) && !Keyboard.IsKeyDown(Key.S) && !Keyboard.IsKeyDown(Key.A) && !Keyboard.IsKeyDown(Key.D) && effects.Count <= 0)
                 {
+                    GC.Collect();
                     currentSound = "Graphics/Sounds/newfloor.wav";
                     NewLevel();
                     response = $"{player.Name} finds their way to floor #{floor}!\n";
 
+                    // Restoration amulet
                     if (player.Inventory[6, 0] != null)
                     {
                         if (player.Inventory[6, 0].Name == "Restoration Amulet")
@@ -1904,6 +1928,7 @@ namespace ByteLike
                         }
                     }
 
+                    // Music
                     if (floor <= 16)
                     {
                         music.Stop();
@@ -1973,6 +1998,13 @@ namespace ByteLike
                 }
 
                 // Revivals
+                // Random chance
+                if (player.Stats["HP"] <= 0 && rand.Next(50) == 0)
+                {
+                    response += $"{player.Name} barely survives!\n";
+                    player.Stats["HP"] = 1;
+                }
+                // Survival amulet
                 if (player.Stats["HP"] <= 0 && player.Inventory[6, 0] != null)
                 {
                     if (player.Inventory[6, 0].Name == "Survival Amulet")
@@ -1987,9 +2019,29 @@ namespace ByteLike
                     }
                 }
 
+                // Heartiness ring(s)
+                if (player.Stats["HP"] <= 0 && player.Inventory[7, 0] != null)
+                {
+                    if (player.Inventory[7, 0].Name == "Dagger Ring" && player.Stats["MaxHP"] > -(player.Stats["HP"] - 1))
+                    {
+                        player.Stats["MaxHP"] += (player.Stats["HP"] - 1);
+                        player.Stats["HP"] = 1;
+                    }
+                }
+                if (player.Stats["HP"] <= 0 && player.Inventory[8, 0] != null)
+                {
+                    if (player.Inventory[8, 0].Name == "Dagger Ring" && player.Stats["MaxHP"] > -(player.Stats["HP"] - 1))
+                    {
+                        player.Stats["MaxHP"] += (player.Stats["HP"] - 1);
+                        player.Stats["HP"] = 1;
+                    }
+                }
+
+
                 // Death
                 if (player.Stats["HP"] <= 0)
                 {
+                    GC.Collect();
                     music.Stop();
                     music.Open(new Uri(@"Graphics/Sounds/firstpart.wav", UriKind.Relative));
                     music.Play();
@@ -2198,6 +2250,8 @@ namespace ByteLike
                 case "Blizzard":
                 case "Thunder":
                 case "Plague Bomb":
+                case "Dragon Breath":
+                case "Incinerate":
                     isBullet = true;
 
                     // Setting up elemental spells
@@ -2255,6 +2309,17 @@ namespace ByteLike
                             isExplosion = true;
                             isWide = true;
                             radius = 2;
+                            break;
+                        case "Dragon Breath":
+                            element = 1;
+                            isWide = true;
+                            radius = 2;
+                            break;
+                        case "Incinerate":
+                            element = 1;
+                            isWide = true;
+                            radius = 3;
+                            spawntile = 7;
                             break;
                     }
                     // end set up
@@ -2353,7 +2418,7 @@ namespace ByteLike
                     element = 5;
                     strength *= 5;
                     break;
-                case "Corrode armor":
+                case "Corrode Armor":
                     stat = "MagicDefense|Defense";
                     File = "Graphics/ByteLikeGraphics/Effects/debuff.png";
                     isDamaging = false;

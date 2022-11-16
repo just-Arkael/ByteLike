@@ -34,6 +34,8 @@ namespace ByteLike
                 case "Meteor":
                 case "Lavafy":
                 case "Erruption":
+                case "Incinerate":
+                case "Dragon Breath":
                     return 1;
                 case "Posion Sting":
                 case "Shoot Poison Arrow":
@@ -77,7 +79,7 @@ namespace ByteLike
             if (type == 0)
             {
                 GearType = 10;
-                if (rand.Next(5) == 0) { GearType = rand.Next(7) + 1; }
+                if (rand.Next(5) == 0) { GearType = rand.Next(8) + 1; }
             }
             else { GearType = type; }
             if (GearType > 8)
@@ -104,8 +106,9 @@ namespace ByteLike
                         typeSwitch += 5000;
                     }
 
-                    if (GearType == 5 && strength == 0)
+                    if (GearType == 5 && strength == 0 || type > 4 && strength == 0)
                         strength = 1;
+
 
                     typeSwitch += strength * 10000;
 
@@ -122,6 +125,9 @@ namespace ByteLike
                     {
                         if (floor >= 0)
                             GearType = rand.Next(4) + 1;
+
+                        if (type != 0)
+                            GearType = type;
                         sideB = false;
                     }
 
@@ -1409,6 +1415,104 @@ namespace ByteLike
                         Stats["Defense"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
                     if (rand.Next(8) == 0)
                         Stats["MagicDefense"] += (int)(rand.Next(-4, 8) + rand.Next(-(floor / 12), floor / 12));
+                    break;
+                case 8:
+                    File = "Graphics/ByteLikeGraphics/Items/ring";
+                    typeSwitch = rand.Next(13);
+                    File += typeSwitch;
+                    File += ".png";
+
+                    switch (typeSwitch)
+                    {
+                        case 0:
+                            Name = "Ruby Ring";
+                            Description = "A golden ring with a ruby jem on it. Rubies are a symbol of might. Kings who wear a ruby ring are believed to rule with an iron fist\n";
+                            Stats["Strength"] += (int)(rand.Next(7) + 2 + floor / 12);
+                            break;
+                        case 1:
+                            Name = "Emerald Ring";
+                            Description = "A golden ring with an emerald jem on it. Emeralds are a symbol of stability. Harpies often gift emerald jewelry to guardians of their guests\n";
+                           Stats["Agility"] += (int)(rand.Next(7) + 2 + floor / 12);
+                            break;
+                        case 2:
+                            Name = "Amethyst Ring";
+                            Description = "A golden ring with an amethyst jem on it. Amethysts are a symbol of inteligence. Dragons often spare those who wears amethyst jewelry out of respect\n";
+                            Stats["Magic"] += (int)(rand.Next(7) + 2 + floor / 12);
+                            break;
+                        case 3:
+                            Name = "Dagger Ring";
+                            Description = "A golden ring with a bloody dagger charm on it. Rogues who wear dagger rings are rummored to not feel any pain.\nLose your natural MaxHP instead of HP when on verge of death\n";
+                            break;
+                        case 4:
+                            Name = "Deer Horn Ring";
+                            Description = "A golden ring with a deer horn charm on it. Deer horn charms started appearing after an archer shot down a dragon using just one arrow.\nChance to not use up arrows when firing with a bow\n";
+                            break;
+                        case 5:
+                            Name = "Moonglow Petal Ring";
+                            Description = "A golden ring with a saphire shaped like a moonglow petal on it. Mages often drink moonglow tea in the morning for extra magic strength.\nChance to not use up mana when casting a spell\n";
+                            break;
+                        case 6:
+                            Name = "Sustinence Ring";
+                            Description = "A golden ring with a green ember charm on it. Dyed ember is often used in practical jewelry for all sorts of effects.\nChance to not use up a healing item after using it\n";
+                            break;
+                        case 7:
+                            Name = "Heartiness Ring";
+                            Description = "A golden ring with a heart charm on it. Hearts are a universal symbol of love and peace. People often propose with heartiness rings\n";
+                            Stats["MaxHP"] -= 5;
+                            Stats["HPRegen"] -= 2;
+                            if (floor > 20 && rand.Next(2) == 0)
+                            {
+                                Stats["MaxHP"] -= 3;
+                                Stats["HPRegen"] -= 1;
+                            }
+                            break;
+                        case 8:
+                            Name = "Manaflow Ring";
+                            Description = "A golden ring with a mana drop charm on it. Fatique problems are treated with mana potions due to mana's regenerative qualities\n";
+                            Stats["MaxMana"] -= 5;
+                            Stats["ManaRegen"] -= 2;
+                            if (floor > 20 && rand.Next(2) == 0)
+                            {
+                                Stats["MaxMana"] -= 3;
+                                Stats["ManaRegen"] -= 1;
+                            }
+                            break;
+                        case 9:
+                            Name = "Obsidian Flame Ring";
+                            Description = "A ring made from cooled down hell lava. It pulsates and feels hot on touch\nFire resistence\n";
+                            Element = 1;
+                            break;
+                        case 10:
+                            Name = "Snake Bite Ring";
+                            Description = "A ring made from dried snake skin, painted like a snake. It tightens around your finger when you put it on\nPoison resistence\n";
+                            Element = 2;
+                            break;
+                        case 11:
+                            Name = "Ice Cave Ring";
+                            Description = "A ring made from eternal ice. The spikes can't be broken off and make it harder to put the ring on. It never melts\nIce resistence\n";
+                            Element = 3;
+                            break;
+                        case 12:
+                            Name = "Thunder God Ring";
+                            Description = "A ring made from platinum struck by holy lightning. It feels energizing when you put it on\nElectricity resistence\n";
+                            Element = 4;
+                            break;
+                    }
+
+                    if (rand.Next(10) == 0)
+                        Stats["MaxHP"] += (int)(rand.Next(-3, 6) + rand.Next(-(floor / 16), floor / 16));
+                    if (rand.Next(10) == 0)
+                        Stats["MaxMana"] += (int)(rand.Next(-3, 6) + rand.Next(-(floor / 16), floor / 16));
+                    if (rand.Next(10) == 0)
+                        Stats["Strength"] += (int)(rand.Next(-3, 6) + rand.Next(-(floor / 16), floor / 16));
+                    if (rand.Next(10) == 0)
+                        Stats["Magic"] += (int)(rand.Next(-3, 6) + rand.Next(-(floor / 16), floor / 16));
+                    if (rand.Next(10) == 0)
+                        Stats["Agility"] += (int)(rand.Next(-3, 6) + rand.Next(-(floor / 16), floor / 16));
+                    if (rand.Next(10) == 0)
+                        Stats["Defense"] += (int)(rand.Next(-3, 6) + rand.Next(-(floor / 16), floor / 16));
+                    if (rand.Next(10) == 0)
+                        Stats["MagicDefense"] += (int)(rand.Next(-3, 6) + rand.Next(-(floor / 16), floor / 16));
                     break;
                 case 10:
                     int itemtype = rand.Next(28);

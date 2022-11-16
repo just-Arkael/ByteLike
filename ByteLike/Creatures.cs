@@ -11,7 +11,7 @@ namespace ByteLike
     public abstract class Creature
     {
         protected bool[] Imunities = new bool[] { false, false, false, false };
-
+        public bool Turn = false;
         public bool Aggressive = false;
         public bool DrawEquipment = false;
         public bool DrawHealthbar = true;
@@ -47,21 +47,31 @@ namespace ByteLike
 
             damage -= (int)(defense / Math.Sqrt(Math.Sqrt(defense)));
 
+
+            if (type > 0 && type < 5)
+            {
+                Potentials[type - 1] += 6;
+                damage -= (int)(damage * (GetImunity(type) / 10.0));
+            }
+            else if (type > 0 && type < 9)
+            {
+                Potentials[type - 5] += 4;
+                damage -= (int)(damage * (GetImunity(type - 4) / 10.0));
+            }
+            else if (type > 0)
+            {
+                Potentials[type - 9] += 2;
+                damage -= (int)(damage * (GetImunity(type - 8) / 10.0));
+            }
+
             if (damage <= 0)
                 damage = 1;
                 
 
             Stats["HP"] -= damage;
 
-            if (type > 0 && type < 5)
-                Potentials[type - 1] += 6;
-            else if (type > 0 && type < 9)
-                Potentials[type - 5] += 4;
-            else if (type > 0)
-                Potentials[type - 9] += 2;
-
             if (Stats["HP"] <= 0)
-                result = Stats["Level"] * rand.Next(4, 10) + rand.Next(15);
+                result = Stats["Level"] * rand.Next(4, 12) + rand.Next(15);
 
             return result;
         }
@@ -125,7 +135,7 @@ namespace ByteLike
                             response = "Zap";
                             break;
                         case 6:
-                            response = "Posion Sting";
+                            response = "Poison Sting";
                             break;
                         case 7:
                             response = "Recover";
@@ -324,7 +334,7 @@ namespace ByteLike
                 case "Zap":
                     response = "Shoots a lightning bold in a specified direction, paralysis potential. 3 Mana\n";
                     break;
-                case "Posion Sting":
+                case "Poison Sting":
                     response = "Shoots a poison blob in a specified direction, poison potential. 3 Mana\n";
                     break;
                 case "Recover":
@@ -471,6 +481,12 @@ namespace ByteLike
                 case "Gamble":
                     response = "Casts a random spell. 20 Mana\n";
                     break;
+                case "Dragon Breath":
+                    response = "Shoots a powerful wave of fire. 25 Mana\n";
+                    break;
+                case "Incinerate":
+                    response = "Shoots an extremly powerful wave of fire. 25 Mana\n";
+                    break;
             }
 
             return response;
@@ -522,82 +538,26 @@ namespace ByteLike
         {
             switch (tile)
             {
+                // Water
                 case 6:
-                    if (Imunities[2])
+                    if (GetImunity(3) > 0)
                         return false;
-                    else if (Inventory[7, 0] != null)
-                    {
-                        if (Inventory[7, 0].Name == "WATER IMUNITY RING")
-                            return false;
-                        else if (Inventory[8, 0] != null)
-                        {
-                            if (Inventory[8, 0].Name == "WATER IMUNITY RING")
-                                return false;
-                        }
-                    }
-                    else if (Inventory[8, 0] != null)
-                    {
-                        if (Inventory[8, 0].Name == "WATER IMUNITY RING")
-                            return false;
-                    }
                     break;
+                // Lava
                 case 7:
-                    if (Imunities[0])
+                    if (GetImunity(1) > 0)
                         return false;
-                    else if (Inventory[7, 0] != null)
-                    {
-                        if (Inventory[7, 0].Name == "FIRE IMUNITY RING")
-                            return false;
-                        else if (Inventory[8, 0] != null)
-                        {
-                            if (Inventory[8, 0].Name == "FIRE IMUNITY RING")
-                                return false;
-                        }
-                    }
-                    else if (Inventory[8, 0] != null)
-                    {
-                        if (Inventory[8, 0].Name == "FIRE IMUNITY RING")
-                            return false;
-                    }
                     break;
+                // Poison
                 case 13:
                 case 12:
-                    if (Imunities[1])
+                    if (GetImunity(2) > 0)
                         return false;
-                    else if (Inventory[7, 0] != null)
-                    {
-                        if (Inventory[7, 0].Name == "POISON IMUNITY RING")
-                            return false;
-                        else if (Inventory[8, 0] != null)
-                        {
-                            if (Inventory[8, 0].Name == "POISON IMUNITY RING")
-                                return false;
-                        }
-                    }
-                    else if (Inventory[8, 0] != null)
-                    {
-                        if (Inventory[8, 0].Name == "POISON IMUNITY RING")
-                            return false;
-                    }
                     break;
+                // Electricity
                 case 14:
-                    if (Imunities[3])
+                    if (GetImunity(4) > 0)
                         return false;
-                    else if (Inventory[7, 0] != null)
-                    {
-                        if (Inventory[7, 0].Name == "ELECTRO IMUNITY RING")
-                            return false;
-                        else if (Inventory[8, 0] != null)
-                        {
-                            if (Inventory[8, 0].Name == "ELECTRO IMUNITY RING")
-                                return false;
-                        }
-                    }
-                    else if (Inventory[8, 0] != null)
-                    {
-                        if (Inventory[8, 0].Name == "ELECTRO IMUNITY RING")
-                            return false;
-                    }
                     break;
             }
             return true;
@@ -618,7 +578,45 @@ namespace ByteLike
             return result;
         }
 
+        protected int GetImunity(int element)
+        {
+            int result = 0;
 
+            string ringName = "";
+
+            switch (element)
+            {
+                case 1:
+                    ringName = "Obsidian Flame Ring";
+                    break;
+                case 2:
+                    ringName = "Snake Bite Ring";
+                    break;
+                case 3:
+                    ringName = "Ice Cave Ring";
+                    break;
+                case 4:
+                    ringName = "Thunder God Ring";
+                    break;
+            }
+
+            if (Imunities[element - 1])
+                result += 5;
+
+            if (Inventory[7, 0] != null)
+            {
+                if (Inventory[7, 0].Name == ringName)
+                    result += 3;
+            }
+
+            if (Inventory[8, 0] != null)
+            {
+                if (Inventory[8, 0].Name == ringName)
+                    result += 3;
+            }
+
+            return result;
+        }
         protected string Conditions(string response, Item[,] Inventory)
         {
             this.Inventory = Inventory;
@@ -812,6 +810,8 @@ namespace ByteLike
                 case "Wither":
                 case "Chain Up":
                 case "Hypnotize":
+                case "Dragon Breath":
+                case "Incinerate":
                     result = 25;
                     break;
             }
@@ -825,6 +825,12 @@ namespace ByteLike
             bool InTheWay = false;
             string currentSound = "";
 
+            // Can't attack if dead
+            if (Stats["HP"] <= 0)
+            {
+                movement[0] = 0;
+                movement[1] = 0;
+            }
 
             if (movement[0] != 0 || movement[1] != 0)
             {
@@ -922,7 +928,6 @@ namespace ByteLike
 
                     }
                 }
-
             }
             if (!InTheWay && position[0] + movement[0] >= 0 && position[0] + movement[0] < level.GetLength(0) && position[1] + movement[1] >= 0 && position[1] + movement[1] < level.GetLength(1))
             {
@@ -934,13 +939,13 @@ namespace ByteLike
                     case 2:
                     case 0:
                     case 5:
-                        if (level[position[0] + movement[0], position[1] + movement[1]] == 5)
+                        if (level[position[0] + movement[0], position[1] + movement[1]] == 5 && (movement[0] != 0 || movement[1] != 0))
                         {
                             movement[0] = 0;
                             movement[1] = 0;
                             goto WalkReset;
                         }
-                        else if (level[position[0], position[1]] != 2 && level[position[0], position[1]] != 0 && IsGhost(Inventory) == false)
+                        else if (level[position[0], position[1]] != 2 && level[position[0], position[1]] != 0 && IsGhost(Inventory) == false && (movement[0] != 0 || movement[1] != 0))
                         {
                             movement[0] = 0;
                             movement[1] = 0;
@@ -1305,7 +1310,7 @@ namespace ByteLike
                 case "Ember":
                 case "Ice Shard":
                 case "Zap":
-                case "Posion Sting":
+                case "Poison Sting":
                 case "Fireball":
                 case "Ice Storm":
                 case "Electro Bolt":
@@ -1338,6 +1343,9 @@ namespace ByteLike
                 case "Wither":
                 case "Chain Up":
                 case "Hypnotize":
+                // Dragon
+                case "Dragon Breath":
+                case "Incinerate":
                     return true;
                 // End statuses
                 default:
@@ -1362,8 +1370,6 @@ namespace ByteLike
 
         string RemSpell = "";
 
-        // Had to ovveride it due to ghost walking
-        
 
         protected string LevelUp()
         {
@@ -1571,7 +1577,22 @@ namespace ByteLike
             Stats["HP"] = GetStat("MaxHP");
             Stats["Mana"] = GetStat("MaxMana");
 
-            if (Stats["SpellSlots"] > 19) { Stats["SpellSlots"] = 19; }
+            if (Stats["SpellSlots"] > 16) { Stats["SpellSlots"] = 16; }
+
+            // randomly learning spells
+            if (rand.Next(15) == 0 && Spells.Count < Stats["SpellSlots"])
+            {
+                string spell = GetRandomSpell(Stats["Level"]);
+                for (int i = 0; i < 10 && Spells.Contains(spell); i++) 
+                {
+                    spell = GetRandomSpell(Stats["level"]);
+                }
+                if (!Spells.Contains(spell))
+                {
+                    Spells.Add(spell);
+                    response += $"{Name} has learnt how to use {spell}!\n";
+                }
+            }
 
             bool first = true;
 
@@ -1659,6 +1680,11 @@ namespace ByteLike
             return result;
         }
 
+        public Player()
+        :base()
+        {
+
+        }
         public Player(string name)
             : base()
         {
@@ -2285,6 +2311,15 @@ namespace ByteLike
                                                             Statuses[1] = 0;
                                                             Statuses[2] = 0;
                                                             Statuses[3] = 0;
+                                                            // debuffs
+                                                            foreach (KeyValuePair<string, int> pair in Buffs)
+                                                            {
+                                                                if (pair.Value > 0)
+                                                                {
+                                                                    if (BuffLevels[pair.Key] <= 0)
+                                                                        Buffs[pair.Key] = 0;
+                                                                }
+                                                            }
                                                         }
                                                         else
                                                         {
@@ -2351,6 +2386,24 @@ namespace ByteLike
                                                                 else Buffs["MagicDefense"] = -(BuffLevels["MagicDefense"]) * 10;
                                                             }
                                                         }
+
+                                                        // Sustinence Ring effect
+                                                        if (Inventory[7, 0] != null)
+                                                        {
+                                                            if (Inventory[7, 0].Name == "Sustinence Ring" && rand.Next(5) == 0)
+                                                                Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity++;
+                                                            else if (Inventory[8, 0] != null)
+                                                            {
+                                                                if (Inventory[8, 0].Name == "Sustinence Ring" && rand.Next(5) == 0)
+                                                                    Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity++;
+                                                            }
+                                                        }
+                                                        else if (Inventory[8, 0] != null)
+                                                        {
+                                                            if (Inventory[8, 0].Name == "Sustinence Ring" && rand.Next(5) == 0)
+                                                                Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity++;
+                                                        }
+
                                                         Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity--;
                                                         if (Inventory[SelectedSlot[0], SelectedSlot[1]].Quantity <= 0)
                                                             Inventory[SelectedSlot[0], SelectedSlot[1]] = null;
@@ -2484,6 +2537,25 @@ namespace ByteLike
                                 CurrentSlot[1] = rand.Next(-1, 2);
                             }
                         }
+                        // Moonglow Petal Ring effect
+                        if (UseMana)
+                        {
+                            if (Inventory[7, 0] != null)
+                            {
+                                if (Inventory[7, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                                    Stats["Mana"] += GetSpellCost(RemSpell);
+                                else if (Inventory[8, 0] != null)
+                                {
+                                    if (Inventory[8, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                                        Stats["Mana"] += GetSpellCost(RemSpell);
+                                }
+                            }
+                            else if (Inventory[8, 0] != null)
+                            {
+                                if (Inventory[8, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                                    Stats["Mana"] += GetSpellCost(RemSpell);
+                            }
+                        }
 
                         if (UseMana && Stats["Mana"] < GetSpellCost(RemSpell) && Inventory[6,0] != null)
                         {
@@ -2503,6 +2575,27 @@ namespace ByteLike
                         {
                             if (ArrowSlot[0] != 0 || ArrowSlot[1] != 0)
                             {
+                                // Deer Horn Ring effect
+                                if (Inventory[ArrowSlot[0], ArrowSlot[1]].Name.Contains("Arrow"))
+                                {
+                                    if (Inventory[7, 0] != null)
+                                    {
+                                        if (Inventory[7, 0].Name == "Deer Horn Ring" && rand.Next(5) == 0)
+                                            Inventory[ArrowSlot[0], ArrowSlot[1]].Quantity++;
+                                        else if (Inventory[8, 0] != null)
+                                        {
+                                            if (Inventory[8, 0].Name == "Deer Horn Ring" && rand.Next(5) == 0)
+                                                Inventory[ArrowSlot[0], ArrowSlot[1]].Quantity++;
+                                        }
+                                    }
+                                    else if (Inventory[8, 0] != null)
+                                    {
+                                        if (Inventory[8, 0].Name == "Deer Horn Ring" && rand.Next(5) == 0)
+                                            Inventory[ArrowSlot[0], ArrowSlot[1]].Quantity++;
+                                    }
+
+                                }
+
                                 Inventory[ArrowSlot[0], ArrowSlot[1]].Quantity--;
                                 if (Inventory[ArrowSlot[0], ArrowSlot[1]].Quantity <= 0)
                                     Inventory[ArrowSlot[0], ArrowSlot[1]] = null;
@@ -2622,7 +2715,7 @@ namespace ByteLike
                 {
                     if (Inventory[CurrentSlot[0], CurrentSlot[1]] != null)
                     {
-                        if (Inventory[CurrentSlot[0], CurrentSlot[1]].GearType == i + 1 || (i == 8 && Inventory[CurrentSlot[0], CurrentSlot[1]].GearType == i))
+                        if (Inventory[CurrentSlot[0], CurrentSlot[1]].GearType == i + 1)
                         {
                             current += Inventory[CurrentSlot[0], CurrentSlot[1]].Stats[index];
                         }
@@ -2677,7 +2770,6 @@ namespace ByteLike
         }
 
     }
-
 
     public class Critter : Creature
     {
@@ -2750,6 +2842,7 @@ namespace ByteLike
 
             if (Aggressive)
             {
+
                 movementdirection = FindDirection(new int[] { player.position[0], player.position[1] }, ref level, ref enemies);
 
                 if (rand.Next(10) == 0 && Stats["HP"] >= GetStat("MaxHP") / 10 && Stats["HP"] > 0)
@@ -2763,6 +2856,10 @@ namespace ByteLike
                         movementdirection = 5;
                     }
                 }
+
+                if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) >= GetStat("Torch") * 2)
+                    Aggressive = false;
+
             }
 
             if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= GetStat("Torch") && !Aggressive)
@@ -2853,6 +2950,7 @@ namespace ByteLike
             floor += rand.Next(-5, 5);
 
 
+            Stats["Torch"] = 3;
             Stats["Level"] = floor;
             if (Stats["Level"] <= 0)
                 Stats["Level"] = 1;
@@ -2870,6 +2968,7 @@ namespace ByteLike
                 Spells.Add("Recover");
                 Spells.Add("Hypnotize");
                 Spells.Add("Demonify");
+                Stats["Torch"] = 4;
             }
             else if ((floor / 12) >= 2)
             {
@@ -2931,6 +3030,38 @@ namespace ByteLike
                 {
                     chosenSpell = rand.Next(Spells.Count);
 
+                    // Moonglow Petal Ring effect
+                    if (Inventory[7, 0] != null)
+                    {
+                        if (Inventory[7, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                            Stats["Mana"] += GetSpellCost(Spells[chosenSpell]);
+                        else if (Inventory[8, 0] != null)
+                        {
+                            if (Inventory[8, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                                Stats["Mana"] += GetSpellCost(Spells[chosenSpell]);
+                        }
+                    }
+                    else if (Inventory[8, 0] != null)
+                    {
+                        if (Inventory[8, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                            Stats["Mana"] += GetSpellCost(Spells[chosenSpell]);
+                    }
+
+                    // Moon amulet
+                    if (Inventory[6, 0] != null && Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
+                    {
+                        if (Inventory[6,0].Name == "Moon Amulet")
+                        {
+                            Stats["Mana"] = GetStat("MaxMana") + GetSpellCost(Spells[chosenSpell]);
+                            Inventory[6, 0].Name = "Empty Moon Amulet";
+                            Inventory[6, 0].Quantity = Inventory[6, 0].ClassType;
+                            Inventory[6, 0].ClassType += 10;
+                            Inventory[6, 0].Description = $"A used Moon Amulet. It requires {Inventory[6, 0].Quantity} more steps to work again\n";
+                            Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet13.png";
+                            response += $"{Name}'s Moon Amulet glows brightly!\n";
+                        }
+                    }
+
                     if (Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
                         chosenSpell = -1;
                     else
@@ -2938,6 +3069,9 @@ namespace ByteLike
                         movementdirection = 5;
                     }
                 }
+
+                if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) >= GetStat("Torch") * 2)
+                    Aggressive = false;
             }
 
             if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= GetStat("Torch") && !Aggressive)
@@ -3040,6 +3174,7 @@ namespace ByteLike
                 Spells.Add("Weaken");
                 Spells.Add("Slow Down");
                 Spells.Add("Terrify");
+                Stats["Torch"] = 4;
 
                 for (int i = 0; i < 7; i++)
                 {
@@ -3052,7 +3187,7 @@ namespace ByteLike
                 if (rand.Next(10) == 0)
                     DropEquipment = true;
             }
-            else if ((floor / 12) >= 2)
+            else if ((floor / 12) >= 2.2)
             {
                 File += "2.png";
                 Stats["ManaRegen"] += 2;
@@ -3064,6 +3199,7 @@ namespace ByteLike
                 Spells.Add("Energy Drain");
                 Spells.Add("Confuse");
                 Spells.Add("Scare");
+                Stats["Torch"] = 3;
             }
             else
             {
@@ -3104,6 +3240,39 @@ namespace ByteLike
                 {
                     chosenSpell = rand.Next(Spells.Count);
 
+                    // Moonglow Petal Ring effect
+                    if (Inventory[7, 0] != null)
+                    {
+                        if (Inventory[7, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                            Stats["Mana"] += GetSpellCost(Spells[chosenSpell]);
+                        else if (Inventory[8, 0] != null)
+                        {
+                            if (Inventory[8, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                                Stats["Mana"] += GetSpellCost(Spells[chosenSpell]);
+                        }
+                    }
+                    else if (Inventory[8, 0] != null)
+                    {
+                        if (Inventory[8, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                            Stats["Mana"] += GetSpellCost(Spells[chosenSpell]);
+                    }
+
+                    // Moon amulet
+                    if (Inventory[6, 0] != null && Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
+                    {
+                        if (Inventory[6, 0].Name == "Moon Amulet")
+                        {
+                            Stats["Mana"] = GetStat("MaxMana") + GetSpellCost(Spells[chosenSpell]);
+                            Inventory[6, 0].Name = "Empty Moon Amulet";
+                            Inventory[6, 0].Quantity = Inventory[6, 0].ClassType;
+                            Inventory[6, 0].ClassType += 10;
+                            Inventory[6, 0].Description = $"A used Moon Amulet. It requires {Inventory[6, 0].Quantity} more steps to work again\n";
+                            Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet13.png";
+                            response += $"{Name}'s Moon Amulet glows brightly!\n";
+                        }
+                    }
+
+
                     if (Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
                         chosenSpell = -1;
                     else
@@ -3111,6 +3280,9 @@ namespace ByteLike
                         movementdirection = 5;
                     }
                 }
+
+                if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) >= GetStat("Torch") * 2)
+                    Aggressive = false;
             }
 
             if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= GetStat("Torch") && !Aggressive)
@@ -3196,7 +3368,7 @@ namespace ByteLike
             if (Stats["Level"] <= 0)
                 Stats["Level"] = 1;
 
-            if ((floor / 12) >= 3.75)
+            if ((floor / 12) >= 3.65)
             {
                 File += "3.png";
                 Stats["HPRegen"] += 2;
@@ -3211,19 +3383,9 @@ namespace ByteLike
                 Spells.Add("Chain Up");
                 Spells.Add("Weaken");
                 Spells.Add("Scare");
-
-                for (int i = 0; i < 7; i++)
-                {
-                    if (rand.Next(10) < 3)
-                    {
-                        Inventory[i, 0] = new Item(floor, i + 1);
-                    }
-                }
-
-                if (rand.Next(10) == 0)
-                    DropEquipment = true;
+                Stats["Torch"] = 3;
             }
-            else if ((floor / 12) >= 2)
+            else if ((floor / 12) > 2.75)
             {
                 File += "2.png";
                 Stats["ManaRegen"] += 3;
@@ -3237,6 +3399,7 @@ namespace ByteLike
                 Spells.Add("Charge");
                 Spells.Add("Slow Down");
                 Spells.Add("Energy Drain");
+                Stats["Torch"] = 2;
             }
             else
             {
@@ -3294,12 +3457,14 @@ namespace ByteLike
                     else if (rand.Next(3) == 0)
                         chosenSpell = rand.Next(5, Spells.Count);
 
-
                     if (Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
                         chosenSpell = -1;
                     else
                         movementdirection = 5;
                 }
+
+                if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) >= GetStat("Torch") * 2)
+                    Aggressive = false;
             }
 
             if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= GetStat("Torch") && !Aggressive)
@@ -3386,6 +3551,257 @@ namespace ByteLike
 
     }
 
+    public class Dragon : Creature
+    {
+        public Dragon(int floor, int[] pos)
+            : base()
+        {
+            Imunities[0] = true;
+            position[0] = pos[0];
+            position[1] = pos[1];
+            File = "Graphics/ByteLikeGraphics/Creatures/enemydragon";
+
+            double statModifier = 1;
+
+            floor += rand.Next(-5, 5);
+
+
+            Stats["Level"] = floor;
+            if (Stats["Level"] <= 0)
+                Stats["Level"] = 1;
+
+            if ((floor / 12) >= 3.75)
+            {
+                File += "3.png";
+                Stats["HPRegen"] += 2;
+                Stats["ManaRegen"] += 2;
+                statModifier = 3;
+                Name = "Sragon";
+                Spells.Add("Wither");
+                Spells.Add("Hypnotize");
+                Spells.Add("Demonify");
+                Spells.Add("Transcend");
+                Spells.Add("Meteor");
+                Spells.Add("Destroy Armor");
+                Spells.Add("Erruption");
+                Spells.Add("Incinerate");
+                Spells.Add("Regenerate");
+                Stats["Torch"] = 5;
+            }
+            else if ((floor / 12) >= 3.2)
+            {
+                File += "2.png";
+                Stats["ManaRegen"] += 1;
+                Stats["HPRegen"] += 2;
+                statModifier = 2;
+                Name = "Dragonkin";
+                Spells.Add("Weaken");
+                Spells.Add("Terrify");
+                Spells.Add("Rage");
+                Spells.Add("Concentrate");
+                Spells.Add("Fireball");
+                Spells.Add("Melt Armor");
+                Spells.Add("Lavafy");
+                Spells.Add("Dragon Breath");
+                Stats["Torch"] = 4;
+            }
+            else
+            {
+                Stats["HPRegen"] += 1;
+                File += "1.png";
+                statModifier = 1.7;
+                Name = "Dragonling";
+                Spells.Add("Energy Drain");
+                Spells.Add("Scare");
+                Spells.Add("Sharpen");
+                Spells.Add("Prepare");
+                Spells.Add("Ember");
+                Spells.Add("Corrode Armor");
+                Stats["Torch"] = 3;
+            }
+
+            for (int i = 0; i < 7; i++)
+            {
+                if (rand.Next(12) < statModifier)
+                {
+                    Inventory[i, 0] = new Item(floor, i + 1);
+                }
+            }
+
+            if (rand.Next(10) == 0)
+                DropEquipment = true;
+
+            Stats["MaxHP"] = (int)((floor + 10) * statModifier);
+            Stats["HP"] = Stats["MaxHP"];
+            Stats["MaxMana"] = (int)(((floor / 1.15) + 15) * statModifier);
+            Stats["Mana"] = Stats["MaxMana"];
+            Stats["Strength"] = (int)(((floor / 2) + 4) * statModifier);
+            Stats["Agility"] = (int)(((floor / 20) + 1) * statModifier);
+            Stats["Magic"] = (int)(((floor / 2) + 5) * statModifier);
+            Stats["Defense"] = (int)(((floor / 1.75) + 7) * statModifier);
+            Stats["MagicDefense"] = (int)(((floor / 1.25) + 6) * statModifier);
+
+
+        }
+
+        public override string Logics(ref int[,] level, ref List<Chest> chests, ref List<Effect> effects, ref List<Creature> enemies, ref Player player, ref int[,] darkness, out string currentSound)
+        {
+            string response = "";
+            string sound = "";
+
+            int movementdirection = rand.Next(4) * 90;
+            int chosenSpell = -1;
+
+            if (File == "Graphics/ByteLikeGraphics/Creatures/enemyslug3.png")
+                level[position[0], position[1]] = 14;
+
+            if (Aggressive)
+            {
+                if (rand.Next(3) != 0)
+                    movementdirection = FindDirection(new int[] { player.position[0], player.position[1] }, ref level, ref enemies);
+
+                if (rand.Next(3) == 0 && Stats["HP"] > 0)
+                {
+                    chosenSpell = rand.Next(Spells.Count);
+
+                    if (rand.Next(5) == 0)
+                        chosenSpell = 4;
+                    else if (rand.Next(7) == 0 && (player.Buffs["Defense"] <= 0 || (player.BuffLevels["Defense"] > 0 && player.Buffs["Defense"] > 0)))
+                        chosenSpell = 5;
+                    else if (rand.Next(5) == 0 && level[player.position[0], player.position[1]] != 7 && Spells.Count > 6)
+                        chosenSpell = 6;
+                    else if (rand.Next(4) == 0 && Buffs["HPRegen"] == 0 && Spells.Count > 8)
+                        chosenSpell = 8;
+                    else if (rand.Next(5) == 0 && Spells.Count > 7)
+                        chosenSpell = 7;
+                    else if (rand.Next(5) == 0)
+                        chosenSpell = rand.Next(4);
+
+                    // Moonglow Petal Ring effect
+                    if (Inventory[7, 0] != null)
+                    {
+                        if (Inventory[7, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                            Stats["Mana"] += GetSpellCost(Spells[chosenSpell]);
+                        else if (Inventory[8, 0] != null)
+                        {
+                            if (Inventory[8, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                                Stats["Mana"] += GetSpellCost(Spells[chosenSpell]);
+                        }
+                    }
+                    else if (Inventory[8, 0] != null)
+                    {
+                        if (Inventory[8, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                            Stats["Mana"] += GetSpellCost(Spells[chosenSpell]);
+                    }
+
+                    // Moon amulet
+                    if (Inventory[6, 0] != null && Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
+                    {
+                        if (Inventory[6, 0].Name == "Moon Amulet")
+                        {
+                            Stats["Mana"] = GetStat("MaxMana") + GetSpellCost(Spells[chosenSpell]);
+                            Inventory[6, 0].Name = "Empty Moon Amulet";
+                            Inventory[6, 0].Quantity = Inventory[6, 0].ClassType;
+                            Inventory[6, 0].ClassType += 10;
+                            Inventory[6, 0].Description = $"A used Moon Amulet. It requires {Inventory[6, 0].Quantity} more steps to work again\n";
+                            Inventory[6, 0].File = "Graphics/ByteLikeGraphics/Items/amulet13.png";
+                            response += $"{Name}'s Moon Amulet glows brightly!\n";
+                        }
+                    }
+
+                    if (Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
+                        chosenSpell = -1;
+                    else
+                        movementdirection = 5;
+                }
+
+                if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) >= GetStat("Torch") * 2)
+                    Aggressive = false;
+            }
+
+            if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= GetStat("Torch") && !Aggressive)
+            {
+                Aggressive = true;
+                response = $"{Name} notices {player.Name}!\n";
+            }
+
+            int[] movement = new int[2] { 0, 0 };
+            switch (movementdirection)
+            {
+                case 0:
+                    movement[0] = 1;
+                    movement[1] = 0;
+                    break;
+                case 180:
+                    movement[0] = -1;
+                    movement[1] = 0;
+                    break;
+                case 270:
+                    movement[0] = 0;
+                    movement[1] = 1;
+                    break;
+                case 90:
+                    movement[0] = 0;
+                    movement[1] = -1;
+                    break;
+            }
+
+            if (Statuses[2] != 0 || Statuses[3] % 2 != 0 || Stats["HP"] <= 0)
+            {
+                movement[0] = 0;
+                movement[1] = 0;
+            }
+            response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
+
+
+            if (chosenSpell >= 0)
+            {
+                Stats["Mana"] -= GetSpellCost(Spells[chosenSpell]);
+                sound = "Graphics/Sounds/holychoir.wav";
+                movement[0] = 0;
+                movement[1] = 0;
+                if (IsAggresiveSpell(Spells[chosenSpell]))
+                {
+                    movement[0] = player.position[0] - position[0];
+                    movement[1] = player.position[1] - position[1];
+                }
+                effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { movement[0], movement[1] }, GetStat("Magic"), Spells[chosenSpell]));
+                response += $"{Name} casts {Spells[chosenSpell]}!\n";
+            }
+
+
+            // Default logics ending
+            response = Conditions(response, Inventory);
+
+
+            if (Stats["HP"] <= 0)
+            {
+                int distance = 0;
+                if (File == "Graphics/ByteLikeGraphics/Creatures/enemyslug2.png")
+                    distance = 1;
+                else if (File == "Graphics/ByteLikeGraphics/Creatures/enemyslug3.png")
+                    distance = 2;
+
+                for (int i = -3; i <= 3; i++)
+                {
+                    for (int j = -3; j <= 3; j++)
+                    {
+                        if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { position[0] + j, position[1] + i }) <= distance && position[0] + j >= 0 && position[0] + j < level.GetLength(0) && position[1] + i >= 0 && position[1] < level.GetLength(1))
+                        {
+                            level[position[0] + j, position[1] + i] = 14;
+                        }
+                    }
+                }
+            }
+
+            currentSound = sound;
+            if (DistanceBetween(new int[] { position[0], position[1] }, new int[] { player.position[0], player.position[1] }) <= player.GetStat("Torch") || Aggressive)
+                return response;
+            else return "";
+        }
+
+
+    }
 
     public class Mimic : Creature
     {
@@ -3405,7 +3821,7 @@ namespace ByteLike
             if (Stats["Level"] <= 0)
                 Stats["Level"] = 1;
 
-            int chance = rand.Next(20+floor);
+            int chance = rand.Next(10,20+floor);
 
             if (floor >= 100)
             {
@@ -3434,6 +3850,7 @@ namespace ByteLike
                 Spells.Add("Transcend");
                 Inventory = new Item[11, 7];
                 chance = 50;
+                Stats["Torch"] = 3;
 
             }
             else if (chance > 50)
@@ -3530,7 +3947,7 @@ namespace ByteLike
                 int[] itemSlot = new int[] { 0, 0 };
 
 
-                // 0 - Nothing, 1 - Walk, 2 - Spell, 3 - Bow shot, 4 - Use Healing Item, 5 - Use Mana Item, 6 - Use random item, 7 - Leap
+                // 0 - Nothing, 1 - Walk, 2 - Spell, 3 - Bow shot, 4 - Use Healing Item, 5 - Use Mana Item, 6 - Use random item, 7 - Leap, 8 - use spell and moonglow ring
 
                 actions.Add(0);
 
@@ -3558,6 +3975,32 @@ namespace ByteLike
                                 actions.Add(2);
                         }
                     }
+                    // Moonglow ring
+                    else if (Inventory[7, 0] != null)
+                    {
+                        if (Inventory[7, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                        {
+                            for (byte i = 0; i < 12; i++)
+                                actions.Add(8);
+                        }
+                        else if (Inventory[8, 0] != null)
+                        {
+                            if (Inventory[8, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                            {
+                                for (byte i = 0; i < 12; i++)
+                                    actions.Add(8);
+                            }
+                        }
+                    }
+                    else if (Inventory[8, 0] != null)
+                    {
+                        if (Inventory[8, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                        {
+                            for (byte i = 0; i < 12; i++)
+                                actions.Add(8);
+                        }
+                    }
+
                 }
 
                 // deciding to - Shooting an arrow
@@ -3698,7 +4141,12 @@ namespace ByteLike
                             }
                             break;
                         case 2:
-                            if (Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
+                        case 8:
+                            if (actioncheck == 8)
+                            {
+                                Stats["Mana"] += GetSpellCost(Spells[chosenSpell]);
+                            }
+                            else if (Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
                             {
                                 Stats["Mana"] = GetStat("MaxMana") + GetSpellCost(Spells[chosenSpell]);
                                 Inventory[6, 0].Name = "Empty Moon Amulet";
@@ -3726,6 +4174,24 @@ namespace ByteLike
                             sound = "Graphics/Sounds/bow.wav";
 
                             effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { healSlot[0], healSlot[1] }, GetStat("Agility"), $"Shoot {Inventory[arrowSlot[0], arrowSlot[1]].Name}"));
+
+                            // Deer Horn Ring effect
+                            if (Inventory[7, 0] != null)
+                            {
+                                if (Inventory[7, 0].Name == "Deer Horn Ring" && rand.Next(5) == 0)
+                                    Inventory[arrowSlot[0], arrowSlot[1]].Quantity++;
+                                else if (Inventory[8, 0] != null)
+                                {
+                                    if (Inventory[8, 0].Name == "Deer Horn Ring" && rand.Next(5) == 0)
+                                        Inventory[arrowSlot[0], arrowSlot[1]].Quantity++;
+                                }
+                            }
+                            else if (Inventory[8, 0] != null)
+                            {
+                                if (Inventory[8, 0].Name == "Deer Horn Ring" && rand.Next(5) == 0)
+                                    Inventory[arrowSlot[0], arrowSlot[1]].Quantity++;
+                            }
+
 
                             Inventory[arrowSlot[0], arrowSlot[1]].Quantity--;
                             if (Inventory[arrowSlot[0], arrowSlot[1]].Quantity <= 0)
@@ -3768,12 +4234,40 @@ namespace ByteLike
                             // Healing items
                             else
                             {
+                                // Sustinence Ring effect
+                                if (Inventory[7, 0] != null)
+                                {
+                                    if (Inventory[7, 0].Name == "Sustinence Ring" && rand.Next(5) == 0)
+                                        Inventory[itemSlot[0], itemSlot[1]].Quantity++;
+                                    else if (Inventory[8, 0] != null)
+                                    {
+                                        if (Inventory[8, 0].Name == "Sustinence Ring" && rand.Next(5) == 0)
+                                            Inventory[itemSlot[0], itemSlot[1]].Quantity++;
+                                    }
+                                }
+                                else if (Inventory[8, 0] != null)
+                                {
+                                    if (Inventory[8, 0].Name == "Sustinence Ring" && rand.Next(5) == 0)
+                                        Inventory[itemSlot[0], itemSlot[1]].Quantity++;
+                                }
+
+
                                 if (Inventory[itemSlot[0], itemSlot[1]].Name == "Improvement Potion")
                                 {
                                     Statuses[0] = 0;
                                     Statuses[1] = 0;
                                     Statuses[2] = 0;
                                     Statuses[3] = 0;
+
+                                    // debuffs
+                                    foreach (KeyValuePair<string, int> pair in Buffs)
+                                    {
+                                        if (pair.Value > 0)
+                                        {
+                                            if (BuffLevels[pair.Key] <= 0)
+                                                Buffs[pair.Key] = 0;
+                                        }
+                                    }
                                 }
                                 else
                                 {
@@ -3857,6 +4351,19 @@ namespace ByteLike
                 {
                     Aggressive = true;
                     response = $"{Name} notices {player.Name}!\n";
+                    // Change to aggressive mimic sprite
+                    switch (File)
+                    {
+                        case "Graphics/ByteLikeGraphics/Items/chest0.png":
+                            File = "Graphics/ByteLikeGraphics/Creatures/enemymimic1.png";
+                            break;
+                        case "Graphics/ByteLikeGraphics/Items/chest1.png":
+                            File = "Graphics/ByteLikeGraphics/Creatures/enemymimic2.png";
+                            break;
+                        case "Graphics/ByteLikeGraphics/Items/chest3.png":
+                            File = "Graphics/ByteLikeGraphics/Creatures/enemymimic3.png";
+                            break;
+                    }
                 }
 
                 int movementdirection = rand.Next(4) * 90;
@@ -3984,7 +4491,7 @@ namespace ByteLike
                 int[] itemSlot = new int[] { 0, 0 };
 
 
-                // 0 - Nothing, 1 - Walk, 2 - Spell, 3 - Bow shot, 4 - Use Healing Item, 5 - Use Mana Item, 6 - Use random item
+                // 0 - Nothing, 1 - Walk, 2 - Spell, 3 - Bow shot, 4 - Use Healing Item, 5 - Use Mana Item, 6 - Use random item, 8 - moonglow casting spell
 
                 actions.Add(0);
 
@@ -4010,6 +4517,31 @@ namespace ByteLike
                         {
                             for (byte i = 0; i < 12; i++)
                                 actions.Add(2);
+                        }
+                    }
+                    // moonglow ring
+                    else if (Inventory[7, 0] != null)
+                    {
+                        if (Inventory[7, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                        {
+                            for (byte i = 0; i < 12; i++)
+                                actions.Add(8);
+                        }
+                        else if (Inventory[8, 0] != null)
+                        {
+                            if (Inventory[8, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                            {
+                                for (byte i = 0; i < 12; i++)
+                                    actions.Add(8);
+                            }
+                        }
+                    }
+                    else if (Inventory[8, 0] != null)
+                    {
+                        if (Inventory[8, 0].Name == "Moonglow Petal Ring" && rand.Next(5) == 0)
+                        {
+                            for (byte i = 0; i < 12; i++)
+                                actions.Add(8);
                         }
                     }
                 }
@@ -4104,7 +4636,8 @@ namespace ByteLike
                 // ACTUAL ACTION
                 if (Stats["HP"] > 0)
                 {
-                    switch (actions[rand.Next(actions.Count)])
+                    int actioncheck = actions[rand.Next(actions.Count)];
+                    switch (actioncheck)
                     {
                         case 0:
                             response += $"{Name} is watching carefully...\n";
@@ -4134,7 +4667,12 @@ namespace ByteLike
                             response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
                             break;
                         case 2:
-                            if (Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
+                        case 8:
+                            if (actioncheck == 8)
+                            {
+                                Stats["Mana"] += GetSpellCost(Spells[chosenSpell]);
+                            }
+                            else if (Stats["Mana"] < GetSpellCost(Spells[chosenSpell]))
                             {
                                 Stats["Mana"] = GetStat("MaxMana") + GetSpellCost(Spells[chosenSpell]);
                                 Inventory[6, 0].Name = "Empty Moon Amulet";
@@ -4162,6 +4700,23 @@ namespace ByteLike
                             sound = "Graphics/Sounds/bow.wav";
 
                             effects.Add(new Effect(new int[] { position[0], position[1] }, new int[] { healSlot[0], healSlot[1] }, GetStat("Agility"), $"Shoot {Inventory[arrowSlot[0], arrowSlot[1]].Name}"));
+
+                            // Deer Horn Ring effect
+                            if (Inventory[7, 0] != null)
+                            {
+                                if (Inventory[7, 0].Name == "Deer Horn Ring" && rand.Next(5) == 0)
+                                    Inventory[arrowSlot[0], arrowSlot[1]].Quantity++;
+                                else if (Inventory[8, 0] != null)
+                                {
+                                    if (Inventory[8, 0].Name == "Deer Horn Ring" && rand.Next(5) == 0)
+                                        Inventory[arrowSlot[0], arrowSlot[1]].Quantity++;
+                                }
+                            }
+                            else if (Inventory[8, 0] != null)
+                            {
+                                if (Inventory[8, 0].Name == "Deer Horn Ring" && rand.Next(5) == 0)
+                                    Inventory[arrowSlot[0], arrowSlot[1]].Quantity++;
+                            }
 
                             Inventory[arrowSlot[0], arrowSlot[1]].Quantity--;
                             if (Inventory[arrowSlot[0], arrowSlot[1]].Quantity <= 0)
@@ -4204,12 +4759,40 @@ namespace ByteLike
                             // Healing items
                             else
                             {
+                                // Sustinence Ring effect
+                                if (Inventory[7, 0] != null)
+                                {
+                                    if (Inventory[7, 0].Name == "Sustinence Ring" && rand.Next(5) == 0)
+                                        Inventory[itemSlot[0], itemSlot[1]].Quantity++;
+                                    else if (Inventory[8, 0] != null)
+                                    {
+                                        if (Inventory[8, 0].Name == "Sustinence Ring" && rand.Next(5) == 0)
+                                            Inventory[itemSlot[0], itemSlot[1]].Quantity++;
+                                    }
+                                }
+                                else if (Inventory[8, 0] != null)
+                                {
+                                    if (Inventory[8, 0].Name == "Sustinence Ring" && rand.Next(5) == 0)
+                                        Inventory[itemSlot[0], itemSlot[1]].Quantity++;
+                                }
+
+
                                 if (Inventory[itemSlot[0], itemSlot[1]].Name == "Improvement Potion")
                                 {
                                     Statuses[0] = 0;
                                     Statuses[1] = 0;
                                     Statuses[2] = 0;
                                     Statuses[3] = 0;
+
+                                    // debuffs
+                                    foreach (KeyValuePair<string, int> pair in Buffs)
+                                    {
+                                        if (pair.Value > 0)
+                                        {
+                                            if (BuffLevels[pair.Key] <= 0)
+                                                Buffs[pair.Key] = 0;
+                                        }
+                                    }
                                 }
                                 else
                                 {
@@ -4339,7 +4922,6 @@ namespace ByteLike
         }
 
     }
-
 
     public class Bomb : Creature
     {
