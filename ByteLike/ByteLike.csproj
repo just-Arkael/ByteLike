@@ -1332,6 +1332,9 @@
     <None Update="Graphics\ByteLikeGraphics\Tiles\nextfloor.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Graphics\ByteLikeGraphics\Tiles\nextfloor1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Graphics\ByteLikeGraphics\Tiles\partialdarkness.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

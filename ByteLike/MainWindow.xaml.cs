@@ -477,6 +477,8 @@ namespace ByteLike
                                 // Exit
                                 case 15:
                                     floorImage = "Graphics/ByteLikeGraphics/Tiles/nextfloor.png";
+                                    if ((floor + 1) % 10 == 0)
+                                        floorImage = "Graphics/ByteLikeGraphics/Tiles/nextfloor1.png";
                                     break;
 
                             }
@@ -1193,6 +1195,12 @@ namespace ByteLike
                         dialogue4 = new FormattedText("You need to let all effects play out to save", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 10, Brushes.Red);
                         dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 233));
                     }
+
+                    if (floor % 10 == 0)
+                    {
+                        dialogue4 = new FormattedText("You can't save durring a boss fight", System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, new Typeface("Arial"), 10, Brushes.Red);
+                        dc.DrawText(dialogue4, new Point(cameraSize[0] * 8 - (dialogue4.Width / 2), 248));
+                    }
                 }
 
 
@@ -1335,8 +1343,8 @@ namespace ByteLike
 
         static void NewLevel()
         {
-            level = new int[40 + floor*2, 40 + floor*2];
-            darkness = new int[40 + floor*2, 40 + floor*2];
+            level = new int[40 + floor, 40 + floor];
+            darkness = new int[40 + floor, 40 + floor];
 
             for (int i = 0; i < level.GetLength(1); i++)
             {
@@ -1507,6 +1515,8 @@ namespace ByteLike
                             }
 
                             if (effects.Count > 0)
+                                aggressivecheck = true;
+                            if (floor % 10 == 0)
                                 aggressivecheck = true;
 
 
@@ -1782,7 +1792,7 @@ namespace ByteLike
                     if (effects.Count <= 0 && doEnemies)
                     {
                         // enemy spawn
-                        if (enemies.Count < 10 + floor / 5)
+                        if (enemies.Count < 10 + floor / 5 && floor % 10 != 0)
                         {
                             int[] newPos = new int[] { rand.Next(level.GetLength(0)), rand.Next(level.GetLength(1)) };
 
@@ -1987,13 +1997,36 @@ namespace ByteLike
                     if (cameraSize[1] >= level.GetLength(1))
                         cameraSize[1] = level.GetLength(1) - 1;
 
-                    // Saving the game
-                    if (File.Exists("save.json"))
-                        File.Delete("save.json");
-                    using (StreamWriter sw = File.CreateText("save.json"))
+                    if (floor % 10 != 0)
                     {
-                        sw.WriteLine(JsonConvert.SerializeObject(new GameData(chests, level, darkness, floor, player)));
-                        sw.Close();
+                        // Saving the game
+                        if (File.Exists("save.json"))
+                            File.Delete("save.json");
+                        using (StreamWriter sw = File.CreateText("save.json"))
+                        {
+                            sw.WriteLine(JsonConvert.SerializeObject(new GameData(chests, level, darkness, floor, player)));
+                            sw.Close();
+                        }
+                    }
+                    // Boss fights
+                    else
+                    {
+                        int enemy = rand.Next(0, floor + 15);
+                        if (enemy < 7)
+                            enemies.Add(new Critter(floor + 20 + player.DangerLevel, new int[] { level.GetLength(0) / 2, level.GetLength(1) / 2 }));
+                        else if (enemy >= 7 && enemy < 14)
+                            enemies.Add(new Undead(floor + 20 + player.DangerLevel, new int[] { level.GetLength(0) / 2, level.GetLength(1) / 2 }));
+                        else if (enemy >= 14 && enemy <= 21)
+                            enemies.Add(new Snake(floor + 20 + player.DangerLevel, new int[] { level.GetLength(0) / 2, level.GetLength(1) / 2 }));
+                        else if (enemy > 21 && enemy < 25)
+                            enemies.Add(new Mimic(floor + 20 + player.DangerLevel, new int[] { level.GetLength(0) / 2, level.GetLength(1) / 2 - 15 }, 100));
+                        else if (enemy >= 25 && enemy <= 32)
+                            enemies.Add(new Slug(floor + 20 + player.DangerLevel, new int[] { level.GetLength(0) / 2, level.GetLength(1) / 2 }));
+                        else
+                            enemies.Add(new Dragon(floor + 20 + player.DangerLevel, new int[] { level.GetLength(0) / 2, level.GetLength(1) / 2 }));
+
+                        if (enemy <= 21 || enemy >= 25)
+                            chests.Add(new Chest(new int[] { level.GetLength(0) / 2, level.GetLength(1) / 2 - 15 }, floor + 10, 100));
                     }
                 }
 
@@ -2057,7 +2090,8 @@ namespace ByteLike
                     }
                     currentSound = "Graphics/Sounds/scream.wav";
                     floor = 0;
-                    player = new Player("Player");
+                    response = player.Name;
+                    player = new Player(response);
                     NewLevel();
                     response = $"{player.Name} enters the dungeon.\nScreams of an unfortunate adventurer echo somewhere in the depths...\n";
 

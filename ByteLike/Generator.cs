@@ -182,6 +182,29 @@ namespace ByteLike
                     }
                 }
                 counter++;
+
+                if (floor % 10 == 0)
+                {
+                    if (remrooms.Count == 0)
+                    {
+                        position[0] = level.GetLength(0) / 2;
+                        position[1] = level.GetLength(1) / 2 - 15;
+                        room = new int[] { 5, 5 };
+                    }
+                    else if (remrooms.Count == 1)
+                    {
+                        position[0] = level.GetLength(0) / 2;
+                        position[1] = level.GetLength(1) / 2;
+                        room = new int[] { 20, 20 };
+                    }
+                    else
+                    {
+                        position[0] = level.GetLength(0) / 2;
+                        position[1] = level.GetLength(1) / 2 + 15;
+                        room = new int[] { 5, 5 };
+                    }
+                    check = false;
+                }
             }
             //
 
@@ -197,6 +220,9 @@ namespace ByteLike
             floor = currentfloor;
             level = game;
             int[] startingpoint = new int[] { level.GetLength(0) / 2, level.GetLength(1) / 2 };
+
+            if (floor % 10 == 0)
+                size = 3;
 
             // Create a bunch of rooms
             for (int i = 0; i < size; i++)

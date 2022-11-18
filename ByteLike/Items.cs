@@ -37,7 +37,7 @@ namespace ByteLike
                 case "Incinerate":
                 case "Dragon Breath":
                     return 1;
-                case "Posion Sting":
+                case "Poison Sting":
                 case "Shoot Poison Arrow":
                 case "Sludge Bomb":
                 case "Ivy Growth":

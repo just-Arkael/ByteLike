@@ -1182,7 +1182,6 @@ namespace ByteLike
             return response;
         }
 
-
         protected static double DistanceBetween(int[] x, int[] y)
         {
             int disx = 0;
@@ -1331,7 +1330,7 @@ namespace ByteLike
                 // End tile spawners
 
                 // Statuses
-                case "Corrode armor":
+                case "Corrode Armor":
                 case "Energy Drain":
                 case "Confuse":
                 case "Scare":
@@ -3828,6 +3827,11 @@ namespace ByteLike
                 chance = 100;
             }
 
+            if (modifier != null)
+            {
+                chance = (int)modifier;
+            }
+
             if (chance > 99)
             {
                 File += "3.png";
@@ -4365,35 +4369,6 @@ namespace ByteLike
                             break;
                     }
                 }
-
-                int movementdirection = rand.Next(4) * 90;
-                int[] movement = new int[2];
-                switch (movementdirection)
-                {
-                    case 0:
-                        movement[0] = 1;
-                        movement[1] = 0;
-                        break;
-                    case 180:
-                        movement[0] = -1;
-                        movement[1] = 0;
-                        break;
-                    case 270:
-                        movement[0] = 0;
-                        movement[1] = 1;
-                        break;
-                    case 90:
-                        movement[0] = 0;
-                        movement[1] = -1;
-                        break;
-                }
-
-                if (Statuses[2] != 0 || Statuses[3] % 2 != 0 || Stats["HP"] <= 0)
-                {
-                    movement[0] = 0;
-                    movement[1] = 0;
-                }
-                response = WalkTo(new int[] { movement[0], movement[1] }, ref level, response, ref enemies, ref player, ref darkness, out sound);
 
             }
 
